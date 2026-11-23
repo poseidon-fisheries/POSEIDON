@@ -50,7 +50,7 @@ public final class Factories {
    * @see ObjectFactory
    */
   public static <T> ObjectFactory<T> object(final T value) {
-    return new ObjectFactory<>(value);
+    return ObjectFactory.<T>builder().value(value).build();
   }
 
   /**
@@ -86,21 +86,7 @@ public final class Factories {
    */
   @SafeVarargs
   public static <T> ObjectFactory<List<T>> listOf(final T... values) {
-    return new ObjectFactory<>(List.of(values));
-  }
-
-  /**
-   * @param values the literal values to wrap, deduplicated and order-preserved
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always
-   *         resolves to a {@link Set} of {@code values}
-   * @see ObjectFactory
-   */
-  @SafeVarargs
-  public static <T> ObjectFactory<Set<T>> setOf(final T... values) {
-    // using LinkedHashSet to preserve insertion order and be consistent with
-    // SnakeYAML
-    final LinkedHashSet<T> set = new LinkedHashSet<>(Arrays.asList(values));
-    return new ObjectFactory<>(Collections.unmodifiableSet(set));
+    return ObjectFactory.<List<T>>builder().value(List.of(values)).build();
   }
 
   /**

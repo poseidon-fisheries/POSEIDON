@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.core.ProductStoreTest.isCollected;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -34,7 +35,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
-import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 /**
  * Global products are built once and shared by every simulation of a
@@ -67,7 +67,7 @@ class GlobalProductSharingTest {
     final Scenario scenario = scenarioWith(new NewObjectGlobalFactory());
     final Scenario derivedScenario = scenario.withComponent(
       "other",
-      new ObjectFactory<>("another component")
+      object("another component")
     );
     final Simulation first = scenario.startNewSimulation();
     final Simulation second = derivedScenario.startNewSimulation();

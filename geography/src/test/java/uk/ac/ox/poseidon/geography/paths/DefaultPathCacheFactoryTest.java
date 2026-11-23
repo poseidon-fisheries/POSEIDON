@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.geography.paths;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
+import static uk.ac.ox.poseidon.core.testing.GlobalFactory.globally;
 import static uk.ac.ox.poseidon.geography.paths.Factories.pathCache;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -55,9 +55,9 @@ class DefaultPathCacheFactoryTest {
   @Test
   void sharesCacheWhenRoutingInputsAreGlobal() {
     final DefaultPathCacheFactory<SimulationScope> factory = pathCache(
-      object(bathymetricGrid()),
-      object(mock(PortGrid.class)),
-      object(mock(DistanceCalculator.class))
+      globally(bathymetricGrid()),
+      globally(mock(PortGrid.class)),
+      globally(mock(DistanceCalculator.class))
     );
 
     final PathCache<Cell> first = factory.get(new SimulationScope(simulation));
@@ -72,8 +72,8 @@ class DefaultPathCacheFactoryTest {
   void separatesCacheWhenRoutingInputsAreSimulationScoped() {
     final DefaultPathCacheFactory<SimulationScope> factory = pathCache(
       new SimulationBathymetricGridFactory(),
-      object(mock(PortGrid.class)),
-      object(mock(DistanceCalculator.class))
+      globally(mock(PortGrid.class)),
+      globally(mock(DistanceCalculator.class))
     );
 
     final PathCache<Cell> first = factory.get(new SimulationScope(simulation));

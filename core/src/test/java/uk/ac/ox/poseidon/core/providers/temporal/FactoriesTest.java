@@ -76,7 +76,7 @@ class FactoriesTest {
     Scope,
     Object,
     LocalDateTime
-  > REFERENCE_FACTORY = constant(REFERENCE);
+  > REFERENCE_FACTORY = constant(_ -> REFERENCE);
 
   private final Simulation simulation = Scenario.builder()
     .startingDateTime(new DateTimeFactory(2000, 1, 1, 0, 0, 0))
@@ -139,7 +139,11 @@ class FactoriesTest {
     final LocalDateTime lateEvening = LocalDateTime.of(2025, 6, 1, 23, 0);
 
     assertThat(
-      nextOccurrenceAfter(constant(lateEvening), time(6, 0, 0), time(22, 0, 0))
+      nextOccurrenceAfter(
+        constant(_ -> lateEvening),
+        time(6, 0, 0),
+        time(22, 0, 0)
+      )
         .get(scope)
         .apply(null)
     ).isEqualTo(LocalDateTime.of(2025, 6, 2, 6, 0));
@@ -155,7 +159,7 @@ class FactoriesTest {
   @Test
   void dateTimeAfterAddsAValueFactory() {
     assertThat(
-      dateTimeAfter(REFERENCE_FACTORY, constant(Duration.ofHours(2)))
+      dateTimeAfter(REFERENCE_FACTORY, constant(_ -> Duration.ofHours(2)))
         .get(scope)
         .apply(null)
     ).isEqualTo(REFERENCE.plusHours(2));
@@ -180,7 +184,7 @@ class FactoriesTest {
   @Test
   void dateTimeBeforeSubtractsAValueFactory() {
     assertThat(
-      dateTimeBefore(REFERENCE_FACTORY, constant(Duration.ofHours(2)))
+      dateTimeBefore(REFERENCE_FACTORY, constant(_ -> Duration.ofHours(2)))
         .get(scope)
         .apply(null)
     ).isEqualTo(REFERENCE.minusHours(2));

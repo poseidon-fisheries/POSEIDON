@@ -30,6 +30,8 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -160,7 +162,12 @@ class BuilderConstructor extends Constructor {
           .filter(Factory.class::isAssignableFrom)
           .forEach(BuilderConstructor.this::register);
       }
-      return new Property(name, readable.getType()) {
+      // SnakeYAML cannot instantiate an immutable sorted map, so it builds a
+      // TreeMap, which the builder copies
+      final Class<?> type = SortedMap.class.isAssignableFrom(readable.getType())
+        ? TreeMap.class
+        : readable.getType();
+      return new Property(name, type) {
         @Override
         public Class<?>[] getActualTypeArguments() {
           return readable.getActualTypeArguments();

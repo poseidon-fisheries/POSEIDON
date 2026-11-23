@@ -39,20 +39,15 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.functions.IntervalLabelFactory;
+import uk.ac.ox.poseidon.core.utils.Literals;
 
 /**
  * A scenario has one kind of part: a factory or a literal. So every builder
  * property of a factory is a factory, a literal (a primitive or boxed scalar, a
- * {@code String}, an enum, or a value type accepted as a leaf), a list or a
- * map, and the elements of a list and the values of a map obey the same rule.
+ * {@code String} or an enum), a list or a map, and the elements of a list and
+ * the values of a map obey the same rule.
  */
 class FactoryPropertiesTest {
-
-  /** Value types, other than scalars and enums, that are leaves. */
-  private static final List<Class<?>> LEAVES = List.of(
-    IntervalLabelFactory.Interval.class
-  );
 
   @Test
   void everyBuilderPropertyOfAFactoryIsAFactoryOrALiteral() throws IOException {
@@ -117,7 +112,7 @@ class FactoryPropertiesTest {
 
   private static boolean isFactoryOrLiteral(final Type type) {
     return switch (type) {
-      case final Class<?> clazz -> isLeaf(clazz) ||
+      case final Class<?> clazz -> Literals.isScalarType(clazz) ||
         Factory.class.isAssignableFrom(clazz);
       case final ParameterizedType parameterized -> isCollection(
         parameterized.getRawType()
@@ -132,7 +127,9 @@ class FactoryPropertiesTest {
       case final WildcardType wildcard -> Arrays.stream(
         wildcard.getUpperBounds()
       ).allMatch(FactoryPropertiesTest::isFactoryOrLiteral);
-      // A type parameter bounded only by Object holds a literal of any type
+      // A type parameter bounded only by Object holds a literal of any type,
+      // which erasure hides: the factory checks it with Literals.isLiteral
+      // when it is built
       case final TypeVariable<?> variable -> Arrays.equals(
         variable.getBounds(),
         new Type[] { Object.class }
@@ -149,18 +146,6 @@ class FactoryPropertiesTest {
     return (
       raw instanceof Class<?> clazz &&
       (List.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz))
-    );
-  }
-
-  private static boolean isLeaf(final Class<?> clazz) {
-    return (
-      clazz.isPrimitive() ||
-      clazz.isEnum() ||
-      clazz == String.class ||
-      clazz == Boolean.class ||
-      clazz == Character.class ||
-      Number.class.isAssignableFrom(clazz) ||
-      LEAVES.stream().anyMatch(leaf -> leaf.isAssignableFrom(clazz))
     );
   }
 

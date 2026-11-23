@@ -26,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.quantities.Factories.massOf;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -48,7 +47,7 @@ class IndexedBiomassCatchabilityGearFactoryTest {
       List.of(new Species("COD", "adult", "Cod"));
     final var factory = Factories.indexedBiomassCatchabilityGear(
       duration,
-      object(Duration.ofHours(2)),
+      _ -> Duration.ofHours(2),
       species,
       (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->
         0.5,
@@ -65,7 +64,7 @@ class IndexedBiomassCatchabilityGearFactoryTest {
     final Factory<Scope, Collection<? extends Species>> species = scope ->
       List.of(new Species("COD", "adult", "Cod"));
     final var factory = Factories.indexedBiomassCatchabilityGear(
-      object(Duration.ofHours(3)),
+      _ -> Duration.ofHours(3),
       species,
       (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->
         0.5,
@@ -86,7 +85,7 @@ class IndexedBiomassCatchabilityGearFactoryTest {
       List.of(new Species("COD", "adult", "Cod"));
     final var factory = Factories.indexedBiomassCatchabilityGear(
       duration,
-      object(Duration.ofHours(1)),
+      _ -> Duration.ofHours(1),
       species,
       (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->
         0.5,
@@ -104,7 +103,7 @@ class IndexedBiomassCatchabilityGearFactoryTest {
       List.of(new Species("COD", "adult", "Cod"));
     final var factory = Factories.indexedBiomassCatchabilityGear(
       duration,
-      object(Duration.ofHours(1)),
+      _ -> Duration.ofHours(1),
       species,
       (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->
         1.5,

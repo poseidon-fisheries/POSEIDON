@@ -76,7 +76,7 @@ public final class Factories {
    */
   public static <S extends Scope> BathymetricGridFromElevationValuesFactory<S> bathymetricGridFromElevationValues(
     final Factory<? super S, ? extends ModelGrid> modelGrid,
-    final List<Number> elevationValues
+    final List<Double> elevationValues
   ) {
     return new BathymetricGridFromElevationValuesFactory<>(
       modelGrid,

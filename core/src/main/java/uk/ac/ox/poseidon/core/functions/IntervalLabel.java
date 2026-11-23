@@ -22,19 +22,21 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.nullsFirst;
+import static com.google.common.base.Preconditions.checkArgument;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.function.BiFunction;
 import lombok.NonNull;
-import lombok.Value;
 
 /**
  * A mapping that gives the label of the interval a number falls in: the number
- * is read from the thing mapped, under the context, and placed among
- * non-overlapping intervals. Bounds are lower-inclusive and upper-exclusive;
- * null bounds are unbounded. Built via
+ * is read from the thing mapped, under the context, and placed among intervals
+ * given by their lower bounds. An interval runs from its lower bound, inclusive,
+ * up to the next lower bound, exclusive, and the last interval has no upper
+ * bound. A number below the first lower bound has no label. Built via
  * {@link Factories Factories.intervalLabel(...)} in this package, with labels
  * that are strings.
  *
@@ -45,117 +47,49 @@ import lombok.Value;
 public class IntervalLabel<C, T, R> implements BiFunction<C, T, R> {
 
   private final BiFunction<? super C, ? super T, ? extends Double> number;
-  private final List<Interval<R>> intervals;
+  // Arrays, not a map: this runs for every cell valued, and boxing showed in
+  // profiles.
+  private final double[] lowerBounds;
+  private final List<R> labels;
 
   /**
-   * @param number    the mapping that reads the number to place
-   * @param intervals the non-overlapping intervals to place it among; each
-   *                  must have at least one bound, and a lower bound strictly
-   *                  less than its upper bound
+   * @param number the mapping that reads the number to place
+   * @param labelsByLowerBound each interval's label, by its lower bound, in
+   *               ascending order of bound
    */
   public IntervalLabel(
     @NonNull final BiFunction<? super C, ? super T, ? extends Double> number,
-    final List<Interval<R>> intervals
+    @NonNull final SortedMap<Double, R> labelsByLowerBound
   ) {
+    checkArgument(
+      !labelsByLowerBound.isEmpty(),
+      "Interval labels need at least one interval"
+    );
+    labelsByLowerBound
+      .keySet()
+      .forEach(bound ->
+        checkArgument(!bound.isNaN(), "An interval's lower bound is NaN")
+      );
     this.number = number;
-    this.intervals = List.copyOf(intervals);
-    validateIntervals(this.intervals);
+    lowerBounds = labelsByLowerBound
+      .keySet()
+      .stream()
+      .mapToDouble(Double::doubleValue)
+      .toArray();
+    labels = new ArrayList<>(labelsByLowerBound.values());
   }
 
   /**
    * @return the label of the interval containing the number, or {@code null} if
-   *         no interval contains it
+   *         the number is below the first lower bound or is {@code NaN}
    * @throws NullPointerException if the number is {@code null}
    */
   @Override
-  @SuppressWarnings("checkstyle:ReturnCount")
   public R apply(final C context, final T t) {
     final double value = number.apply(context, t);
-    // A loop, not a stream: this runs for every cell valued, and the stream's
-    // overhead showed in profiles.
-    for (final Interval<R> interval : intervals) {
-      if (interval.contains(value)) return interval.getMappedValue();
-    }
-    return null;
-  }
-
-  private static void validateIntervals(
-    final List<? extends Interval<?>> intervals
-  ) {
-    intervals.forEach(IntervalLabel::validateBounds);
-    final List<? extends Interval<?>> sortedIntervals = intervals
-      .stream()
-      .sorted(
-        comparing(
-          Interval::getLowerBoundInclusive,
-          nullsFirst(Double::compareTo)
-        )
-      )
-      .toList();
-    for (int i = 1; i < sortedIntervals.size(); i++) {
-      final Interval<?> previous = sortedIntervals.get(i - 1);
-      final Interval<?> current = sortedIntervals.get(i);
-      if (overlaps(previous, current)) {
-        throw new IllegalArgumentException("Intervals overlap.");
-      }
-    }
-  }
-
-  private static void validateBounds(final Interval<?> interval) {
-    if (
-      interval.lowerBoundInclusive == null &&
-      interval.upperBoundExclusive == null
-    ) {
-      throw new IllegalArgumentException(
-        "Interval must have at least one bound."
-      );
-    }
-    if (
-      interval.lowerBoundInclusive != null &&
-      interval.upperBoundExclusive != null &&
-      interval.lowerBoundInclusive >= interval.upperBoundExclusive
-    ) {
-      throw new IllegalArgumentException(
-        "Interval lower bound must be strictly less than upper bound."
-      );
-    }
-  }
-
-  private static boolean overlaps(
-    final Interval<?> previous,
-    final Interval<?> current
-  ) {
-    return (
-      previous.upperBoundExclusive == null ||
-      current.lowerBoundInclusive == null ||
-      current.lowerBoundInclusive < previous.upperBoundExclusive
-    );
-  }
-
-  /**
-   * An interval and its label.
-   *
-   * @param <R> the type of the label
-   */
-  @Value
-  public static class Interval<R> {
-
-    // Null means the interval is unbounded on that side.
-    Double lowerBoundInclusive;
-    Double upperBoundExclusive;
-    R mappedValue;
-
-    /** @return whether {@code value} falls within this interval's bounds */
-    public boolean contains(final double value) {
-      return lowerBoundContains(value) && upperBoundContains(value);
-    }
-
-    private boolean lowerBoundContains(final double value) {
-      return lowerBoundInclusive == null || lowerBoundInclusive <= value;
-    }
-
-    private boolean upperBoundContains(final double value) {
-      return upperBoundExclusive == null || value < upperBoundExclusive;
-    }
+    // Adding 0.0 turns -0.0 into 0.0, which the search would place below it
+    final int found = Arrays.binarySearch(lowerBounds, value + 0.0);
+    final int index = found >= 0 ? found : -found - 2;
+    return Double.isNaN(value) || index < 0 ? null : labels.get(index);
   }
 }

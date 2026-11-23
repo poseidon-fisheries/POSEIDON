@@ -32,7 +32,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledByDateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegister;
@@ -177,7 +176,7 @@ class VesselRegisterFactoryTest {
     final List<String> attributeColumns,
     final String rows
   ) {
-    final var fleet = fleet(object(vesselField), object(portGrid));
+    final var fleet = fleet(_ -> vesselField, _ -> portGrid);
     final var vesselSpecification = vesselSpecification(
       fleet,
       behaviour(scope -> new RecordingTask())

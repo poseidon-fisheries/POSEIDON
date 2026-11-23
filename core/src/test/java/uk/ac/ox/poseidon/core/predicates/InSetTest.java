@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core.predicates;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.predicates.Factories.in;
+import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
 
 import java.util.Collection;
 import java.util.List;
@@ -71,5 +72,13 @@ class InSetTest {
       List.of("a", "b", "c");
 
     assertThat(in(values).get(GLOBAL_SCOPE).apply(null, "b")).isTrue();
+  }
+
+  @Test
+  void factoryBuildsThePredicateOverAListOfMembers() {
+    final var membership = in(listOf("a", "b", "c")).get(GLOBAL_SCOPE);
+
+    assertThat(membership.apply(null, "b")).isTrue();
+    assertThat(membership.apply(null, "z")).isFalse();
   }
 }

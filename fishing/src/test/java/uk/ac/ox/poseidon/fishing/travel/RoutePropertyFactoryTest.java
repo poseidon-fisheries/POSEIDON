@@ -57,7 +57,7 @@ class RoutePropertyFactoryTest {
   @Test
   void readsTheDurationOfARouteValue() {
     assertThat(
-      routeProperty(constant(route), "duration")
+      routeProperty(constant(_ -> route), "duration")
         .get(Scope.GLOBAL_SCOPE)
         .apply(null)
     ).isEqualTo(Duration.ofMinutes(90));

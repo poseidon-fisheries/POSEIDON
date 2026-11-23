@@ -27,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.tasks.landings.Factories.landCatches;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
@@ -49,14 +48,14 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  */
 class VesselComponentWiringTest {
 
-  private final VesselComponent<Hold> listedHold = vesselComponent(
-    object(mock(Hold.class))
+  private final VesselComponent<Hold> listedHold = vesselComponent(_ ->
+    mock(Hold.class)
   );
 
   @Test
   void aComponentTheSpecificationLeavesOutFailsBeforeTheSimulationStarts() {
-    final VesselComponent<Hold> unlistedHold = vesselComponent(
-      object(mock(Hold.class))
+    final VesselComponent<Hold> unlistedHold = vesselComponent(_ ->
+      mock(Hold.class)
     );
     final Scenario scenario = scenarioLanding(unlistedHold);
 
@@ -79,12 +78,10 @@ class VesselComponentWiringTest {
       .component(
         "vesselSpecification",
         vesselSpecification(
-          fleet(object(mock(VesselField.class)), object(mock(PortGrid.class))),
+          fleet(_ -> mock(VesselField.class), _ -> mock(PortGrid.class)),
           behaviour(
-            landCatches(
-              hold,
-              constant(Duration.ZERO),
-              object(mock(MarketGrid.class))
+            landCatches(hold, constant(_ -> Duration.ZERO), _ ->
+              mock(MarketGrid.class)
             )
           ),
           entry("hold", listedHold)

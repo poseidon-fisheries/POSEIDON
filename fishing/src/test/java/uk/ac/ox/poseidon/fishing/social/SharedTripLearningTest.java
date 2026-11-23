@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.fishing.social;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.fishingTripEndRecorder;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.keepLastReceived;
 import static uk.ac.ox.poseidon.fishing.social.Factories.fishingTripEndSharer;
@@ -69,8 +68,8 @@ class SharedTripLearningTest {
   private final SimulationScope simulationScope = new SimulationScope(
     simulation
   );
-  private final SocialNetworkFactory network = socialNetwork(
-    object(fleetOf(a, b))
+  private final SocialNetworkFactory network = socialNetwork(_ ->
+    fleetOf(a, b)
   );
   private final EventSharerFactory<FishingTripEndEvent> tripSharer =
     fishingTripEndSharer(network);

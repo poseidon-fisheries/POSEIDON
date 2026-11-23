@@ -26,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
@@ -54,9 +53,9 @@ class SpeciesBiomassFieldsPortrayalFactoryTest {
     when(biomassGrid.getModelGrid()).thenReturn(modelGrid);
     when(biomassGrid.getField()).thenReturn(new DoubleGrid2D(3, 1));
     final var factory = new SpeciesBiomassFieldsPortrayalFactory(
-      listOf(object(biomassGrid)),
-      listOf(
-        object(new CarryingCapacityGrid(new MutableDoubleGrid(modelGrid, 1.0)))
+      listOf(_ -> biomassGrid),
+      listOf(_ ->
+        new CarryingCapacityGrid(new MutableDoubleGrid(modelGrid, 1.0))
       ),
       true
     );

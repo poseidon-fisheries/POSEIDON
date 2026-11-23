@@ -59,12 +59,12 @@ public class BathymetricGridFromElevationValuesFactory<S extends Scope> extends 
   private final Factory<? super S, ? extends ModelGrid> modelGrid;
 
   @Singular
-  private final ImmutableList<Number> elevationValues;
+  private final ImmutableList<Double> elevationValues;
 
   @Override
   protected BathymetricGrid newInstance(final S scope) {
     final ModelGrid modelGrid = checkNotNull(this.modelGrid).get(scope);
-    final List<Number> elevationValues = checkNotNull(this.elevationValues);
+    final List<Double> elevationValues = checkNotNull(this.elevationValues);
     final int height = modelGrid.getGridHeight();
     final int width = modelGrid.getGridWidth();
     final int expectedCells = height * width;
@@ -77,7 +77,7 @@ public class BathymetricGridFromElevationValuesFactory<S extends Scope> extends 
     final double[][] elevationGrid = new double[width][height];
     for (int x = 0; x < width; x++) {
       for (int y = 0; y < height; y++) {
-        elevationGrid[x][y] = elevationValues.get(x + y * width).doubleValue();
+        elevationGrid[x][y] = elevationValues.get(x + y * width);
       }
     }
     return new DefaultBathymetricGrid(modelGrid, elevationGrid);

@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.geography.paths;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
+import static uk.ac.ox.poseidon.core.testing.GlobalFactory.globally;
 import static uk.ac.ox.poseidon.geography.paths.Factories.pathLengthCalculator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -40,8 +40,8 @@ class PathLengthCalculatorFactoryTest {
   private final Simulation simulation = mock(Simulation.class);
   private final Simulation otherSimulation = mock(Simulation.class);
   private final PathLengthCalculatorFactory factory = pathLengthCalculator(
-    object(mock(GridPathFinder.class)),
-    object(mock(DistanceCalculator.class))
+    globally(mock(GridPathFinder.class)),
+    globally(mock(DistanceCalculator.class))
   );
 
   @BeforeEach

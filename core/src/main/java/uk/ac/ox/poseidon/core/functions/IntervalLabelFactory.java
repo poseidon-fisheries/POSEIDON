@@ -22,13 +22,10 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSortedMap;
 import java.util.function.BiFunction;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -43,7 +40,6 @@ import uk.ac.ox.poseidon.core.Scope;
  */
 @Getter
 @ToString
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class IntervalLabelFactory<S extends Scope, C, T>
@@ -58,47 +54,15 @@ public class IntervalLabelFactory<S extends Scope, C, T>
     ? extends Double
   > number;
 
-  @Singular
-  private final ImmutableList<Interval> intervals;
-
   /**
-   * @return an {@link Interval} literal, for use as a
-   *         {@link Factories Factories.intervalLabel(...)} argument
+   * Each interval's label, by the interval's lower bound. An interval runs up
+   * to the next lower bound, and the last one has no upper bound.
    */
-  public static Interval interval(
-    final Double lowerBoundInclusive,
-    final Double upperBoundExclusive,
-    final String value
-  ) {
-    return new Interval(lowerBoundInclusive, upperBoundExclusive, value);
-  }
+  @Singular("labelByLowerBound")
+  private final ImmutableSortedMap<Double, String> labelsByLowerBound;
 
   @Override
   protected BiFunction<C, T, String> newInstance(final S scope) {
-    return new IntervalLabel<>(
-      number.get(scope),
-      intervals
-        .stream()
-        .map(interval ->
-          new IntervalLabel.Interval<>(
-            interval.getLowerBoundInclusive(),
-            interval.getUpperBoundExclusive(),
-            interval.getValue()
-          )
-        )
-        .toList()
-    );
-  }
-
-  /** An interval and its label, as written in a scenario. */
-  @Data
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class Interval {
-
-    // Null means unbounded, as in the intervals of an IntervalLabel.
-    private Double lowerBoundInclusive;
-    private Double upperBoundExclusive;
-    private String value;
+    return new IntervalLabel<>(number.get(scope), labelsByLowerBound);
   }
 }

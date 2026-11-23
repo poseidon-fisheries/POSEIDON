@@ -120,7 +120,7 @@ final class ScenarioDerivation {
     return (
       object instanceof Factory<?, ?> ||
       object instanceof Map<?, ?> ||
-      object instanceof Collection<?>
+      object instanceof List<?>
     );
   }
 
@@ -135,7 +135,6 @@ final class ScenarioDerivation {
     return switch (node) {
       case final Map<?, ?> map -> rebuiltMap(map);
       case final List<?> list -> rebuiltList(list);
-      case final Collection<?> collection -> checkedUnchanged(collection);
       case final Factory<?, ?> factory -> rebuiltBean(factory);
       case final Scenario scenario -> rebuiltBean(scenario);
       case null, default -> node;
@@ -153,15 +152,6 @@ final class ScenarioDerivation {
   private Object rebuiltList(final List<?> list) {
     final List<Object> rebuilt = list.stream().map(this::rebuilt).toList();
     return changed(list, rebuilt) ? ImmutableList.copyOf(rebuilt) : list;
-  }
-
-  private Object checkedUnchanged(final Collection<?> collection) {
-    if (changed(collection, collection.stream().map(this::rebuilt).toList())) {
-      throw new IllegalArgumentException(
-        "Cannot copy a " + collection.getClass().getName()
-      );
-    }
-    return collection;
   }
 
   private static boolean changed(

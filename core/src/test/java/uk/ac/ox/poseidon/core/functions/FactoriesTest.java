@@ -235,7 +235,7 @@ class FactoriesTest {
         Duration.ofHours(context.length());
     final Function<String, Duration> value = combinedDuration(
       contextLengthInHours,
-      constant(Duration.ofHours(1))
+      constant(_ -> Duration.ofHours(1))
     ).get(GLOBAL_SCOPE);
     assertThat(value.apply("ab")).isEqualTo(Duration.ofHours(3));
   }

@@ -46,7 +46,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
   void incorrectNumberOfElevationValuesFails() {
     Stream.of(0, 3, 5)
       .map(n ->
-        Stream.<Number>generate(() -> 0.0)
+        Stream.<Double>generate(() -> 0.0)
           .limit(n)
           .toList()
       )
@@ -78,7 +78,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
     // Three cells wide and two high
     final BathymetricGrid bathymetricGrid = bathymetricGridFromElevationValues(
       new ModelGridFactory(1, -1, 2, -1, 1),
-      List.<Number>of(0.0, 1.0, 2.0, 3.0, 4.0, 5.0)
+      List.<Double>of(0.0, 1.0, 2.0, 3.0, 4.0, 5.0)
     ).get(Scope.GLOBAL_SCOPE);
     assertThat(bathymetricGrid.getElevation(new Cell(0, 0))).isEqualTo(0.0);
     assertThat(bathymetricGrid.getElevation(new Cell(2, 0))).isEqualTo(2.0);
@@ -87,7 +87,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
   }
 
   private static BathymetricGridFromElevationValuesFactory<Scope> factory(
-    final List<Number> elevationValues
+    final List<Double> elevationValues
   ) {
     return bathymetricGridFromElevationValues(
       new ModelGridFactory(1, -1, 1, -1, 1),

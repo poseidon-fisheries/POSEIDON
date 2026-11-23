@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -34,16 +33,36 @@ import uk.ac.ox.poseidon.core.Scope;
  * A {@link GlobalScopeFactory} that always resolves to the given value,
  * unchanged. No separate plain component class here: the produced value is
  * passed through as-is, with nothing to wrap. Built via {@link Factories
- * Factories.object(...)/Factories.listOf(...)/Factories.setOf(...)}.
+ * Factories.object(...)/Factories.listOf(...)}. The value must be a
+ * {@linkplain Literals#isLiteral literal}.
  */
 @Getter
 @ToString
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class ObjectFactory<P> extends GlobalScopeFactory<P> {
 
   private final P value;
+
+  /**
+   * The builder, begun by hand to check the value when it is set:
+   * {@code @SuperBuilder} fills in the rest. Its check for a hand-written
+   * builder constructor does not see one on a generic class.
+   */
+  public abstract static class ObjectFactoryBuilder<
+    P,
+    C extends ObjectFactory<P>,
+    B extends ObjectFactoryBuilder<P, C, B>
+  > extends GlobalScopeFactory.GlobalScopeFactoryBuilder<P, C, B> {
+
+    /**
+     * @throws IllegalArgumentException if the value is not a literal
+     */
+    public B value(final P value) {
+      this.value = Literals.requireLiteral(value, "value");
+      return self();
+    }
+  }
 
   @Override
   protected P newInstance(final Scope scope) {

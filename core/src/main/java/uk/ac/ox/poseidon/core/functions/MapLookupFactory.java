@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.core.functions;
 
 import java.util.Map;
 import java.util.function.BiFunction;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -33,6 +32,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.utils.Literals;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link MapLookup}, built via
@@ -41,7 +41,6 @@ import uk.ac.ox.poseidon.core.Scope;
  */
 @Getter
 @ToString
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class MapLookupFactory<S extends Scope, C, T, K, V>
@@ -59,6 +58,39 @@ public class MapLookupFactory<S extends Scope, C, T, K, V>
 
   /** The value for a key with no entry, or {@code null} to throw instead. */
   private final V defaultValue;
+
+  /**
+   * The builder, begun by hand to check the default value when it is set:
+   * {@code @SuperBuilder} fills in the rest. Its check for a hand-written
+   * builder constructor does not see one on a generic class.
+   */
+  public abstract static class MapLookupFactoryBuilder<
+    S extends Scope,
+    C,
+    T,
+    K,
+    V,
+    C2 extends MapLookupFactory<S, C, T, K, V>,
+    B extends MapLookupFactoryBuilder<S, C, T, K, V, C2, B>
+  > extends RelativeScopeFactory.RelativeScopeFactoryBuilder<
+    S,
+    BiFunction<C, T, V>,
+    C2,
+    B
+  > {
+
+    /**
+     * @throws IllegalArgumentException if the default value is neither
+     *                                  {@code null} nor a literal
+     */
+    public B defaultValue(final V defaultValue) {
+      this.defaultValue =
+        defaultValue == null
+          ? null
+          : Literals.requireLiteral(defaultValue, "defaultValue");
+      return self();
+    }
+  }
 
   @Override
   protected BiFunction<C, T, V> newInstance(final S scope) {

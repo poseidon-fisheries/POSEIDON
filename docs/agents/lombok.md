@@ -30,18 +30,21 @@ every case — match the shape to the class's role:
   when built: it writes by hand the protected builder constructor
   `@SuperBuilder` would generate, with the checks in it, in place of
   `@AllArgsConstructor`, and helpers build it through its builder
-  (`VesselRegisterFactory`). A class without fields has `@NoArgsConstructor`
-  instead of `@AllArgsConstructor`. `ScenarioLoader` builds every factory
-  through its builder, so a factory class without one fails to load
-  (`FactoryBuildersTest` checks them all); `@SuperBuilder` needs every class in
-  the hierarchy to have it, abstract bases included, and `toBuilder` makes
-  changed copies. `ScenarioWriter` writes the properties the getters give, so
-  every getter must be one the builder sets (`FactoryBuildersTest` checks that
-  too): a value derived from the class, such as a quantity's type, is a method
-  not named as a getter. A field with an initialiser needs `@Builder.Default`,
-  or the builder ignores the initialiser. A `List` or `Map` field is an
-  `ImmutableList` or `ImmutableMap` with `@Singular`, so the builder copies what
-  it is given; the static helpers copy their arguments into one.
+  (`VesselRegisterFactory`). Lombok does not see that constructor on a generic
+  class and generates a second one, so a generic factory checks a field in the
+  setter of a builder class it begins by hand (`ObjectFactory`); a check that
+  needs several fields cannot be done there. A class without fields has
+  `@NoArgsConstructor` instead of `@AllArgsConstructor`. `ScenarioLoader` builds
+  every factory through its builder, so a factory class without one fails to
+  load (`FactoryBuildersTest` checks them all); `@SuperBuilder` needs every
+  class in the hierarchy to have it, abstract bases included, and `toBuilder`
+  makes changed copies. `ScenarioWriter` writes the properties the getters give,
+  so every getter must be one the builder sets (`FactoryBuildersTest` checks
+  that too): a value derived from the class, such as a quantity's type, is a
+  method not named as a getter. A field with an initialiser needs
+  `@Builder.Default`, or the builder ignores the initialiser. A `List` or `Map`
+  field is an `ImmutableList` or `ImmutableMap` with `@Singular`, so the builder
+  copies what it is given; the static helpers copy their arguments into one.
   `callSuper = true` makes equality include the superclass's fields. Vessel
   components (`FactoryComponent`, `VaryingComponent`) are global factories with
   a plain `@Builder(toBuilder = true)` and identity equality, since they are the

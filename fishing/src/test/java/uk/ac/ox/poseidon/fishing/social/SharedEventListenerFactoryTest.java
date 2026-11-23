@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.fishing.social;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.social.Factories.fishingActionSharer;
 import static uk.ac.ox.poseidon.fishing.social.Factories.sharedFishingActionListener;
 import static uk.ac.ox.poseidon.fishing.social.Factories.socialNetwork;
@@ -63,7 +62,7 @@ class SharedEventListenerFactoryTest {
     new VesselScope(simulationScope, b),
     componentStoreB
   );
-  private final SocialNetworkFactory network = socialNetwork(object(fleet));
+  private final SocialNetworkFactory network = socialNetwork(_ -> fleet);
   private final EventSharerFactory<FishingActionEvent> fishingActionSharer =
     fishingActionSharer(network);
   private final RecordingListenerFactory listener =

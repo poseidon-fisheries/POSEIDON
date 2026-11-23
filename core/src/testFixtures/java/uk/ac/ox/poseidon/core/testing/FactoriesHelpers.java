@@ -136,7 +136,8 @@ public final class FactoriesHelpers {
       argument = 1f;
     } else if (type == double.class) {
       argument = 1.0;
-    } else if (type == String.class) {
+    } else if (type == String.class || type == Object.class) {
+      // An argument typed by a type parameter must be a literal
       argument = "x";
     } else if (type == LocalDate.class) {
       argument = LocalDate.of(2026, 1, 1);

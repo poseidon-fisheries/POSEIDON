@@ -28,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledByDateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
@@ -135,7 +134,7 @@ class RebuildTest {
     final VesselComponent<?> gear,
     final String rows
   ) {
-    final var fleet = fleet(object(mock(VesselField.class)), object(portGrid));
+    final var fleet = fleet(_ -> mock(VesselField.class), _ -> portGrid);
     final var vesselSpecification = vesselSpecification(
       fleet,
       behaviour,

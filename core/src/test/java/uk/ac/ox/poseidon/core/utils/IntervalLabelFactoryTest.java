@@ -22,10 +22,11 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.functions.Factories.intervalLabel;
-import static uk.ac.ox.poseidon.core.functions.IntervalLabelFactory.interval;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -37,7 +38,8 @@ import uk.ac.ox.poseidon.core.functions.IntervalLabelFactory;
 
 /**
  * The label of the interval a number falls in, the number being read from the
- * thing mapped or, for a value, under the context.
+ * thing mapped or, for a value, under the context. Each interval runs from its
+ * lower bound up to the next one.
  */
 class IntervalLabelFactoryTest {
 
@@ -51,26 +53,105 @@ class IntervalLabelFactoryTest {
     context ->
       (double) context.length();
 
+  private BiFunction<Object, Double, String> threeIntervals() {
+    return intervalLabel(
+      number,
+      entry(0.0, "VL0006"),
+      entry(6.0, "VL0612"),
+      entry(12.0, "VL12XX")
+    ).get(GLOBAL_SCOPE);
+  }
+
   @Test
-  void labelsTheNumberReadFromTheThingMapped() {
+  void aNumberAtABoundTakesThatIntervalsLabel() {
+    final var label = threeIntervals();
+
+    assertThat(label.apply(null, 0.0)).isEqualTo("VL0006");
+    assertThat(label.apply(null, 6.0)).isEqualTo("VL0612");
+    assertThat(label.apply(null, 12.0)).isEqualTo("VL12XX");
+  }
+
+  @Test
+  void aNumberJustBelowABoundTakesThePreviousIntervalsLabel() {
+    final var label = threeIntervals();
+
+    assertThat(label.apply(null, Math.nextDown(6.0))).isEqualTo("VL0006");
+    assertThat(label.apply(null, Math.nextDown(12.0))).isEqualTo("VL0612");
+  }
+
+  @Test
+  void theLastIntervalIsOpenAbove() {
+    assertThat(threeIntervals().apply(null, 1e9)).isEqualTo("VL12XX");
+    assertThat(
+      threeIntervals().apply(null, Double.POSITIVE_INFINITY)
+    ).isEqualTo("VL12XX");
+  }
+
+  @Test
+  void aNumberBelowTheFirstBoundHasNoLabel() {
+    final var label = threeIntervals();
+
+    assertThat(label.apply(null, Math.nextDown(0.0))).isNull();
+    assertThat(label.apply(null, -1.0)).isNull();
+  }
+
+  @Test
+  void aNegativeZeroIsAtABoundOfZero() {
+    assertThat(threeIntervals().apply(null, -0.0)).isEqualTo("VL0006");
+  }
+
+  @Test
+  void aNumberThatIsNotANumberHasNoLabel() {
+    assertThat(threeIntervals().apply(null, Double.NaN)).isNull();
+  }
+
+  @Test
+  void aFirstBoundOfMinusInfinityLabelsEveryNumberBelow() {
     final BiFunction<Object, Double, String> label = intervalLabel(
       number,
-      interval(0.0, 6.0, "VL0006"),
-      interval(6.0, 12.0, "VL0612"),
-      interval(40.0, null, "VL40XX")
+      entry(Double.NEGATIVE_INFINITY, "low"),
+      entry(0.0, "high")
     ).get(GLOBAL_SCOPE);
 
-    assertThat(label.apply(null, 5.999)).isEqualTo("VL0006");
-    assertThat(label.apply(null, 6.0)).isEqualTo("VL0612");
-    assertThat(label.apply(null, 40.0)).isEqualTo("VL40XX");
+    assertThat(label.apply(null, -1e300)).isEqualTo("low");
+    assertThat(label.apply(null, Double.NEGATIVE_INFINITY)).isEqualTo("low");
+    assertThat(label.apply(null, 0.0)).isEqualTo("high");
+  }
+
+  @Test
+  void aLabelCanBeUsedForSeveralIntervals() {
+    final BiFunction<Object, Double, String> label = intervalLabel(
+      number,
+      entry(0.0, "a"),
+      entry(1.0, "b"),
+      entry(2.0, "a")
+    ).get(GLOBAL_SCOPE);
+
+    assertThat(label.apply(null, 0.5)).isEqualTo("a");
+    assertThat(label.apply(null, 1.5)).isEqualTo("b");
+    assertThat(label.apply(null, 2.5)).isEqualTo("a");
+  }
+
+  @Test
+  void theOrderTheIntervalsAreWrittenInDoesNotMatter() {
+    final BiFunction<Object, Double, String> label = intervalLabel(
+      number,
+      entry(12.0, "VL12XX"),
+      entry(0.0, "VL0006"),
+      entry(6.0, "VL0612")
+    ).get(GLOBAL_SCOPE);
+
+    assertThat(label.apply(null, 7.0)).isEqualTo("VL0612");
+    assertThat(label.apply(null, 13.0)).isEqualTo("VL12XX");
+    assertThat(label.apply(null, 1.0)).isEqualTo("VL0006");
   }
 
   @Test
   void labelsAValue() {
     final Function<String, String> label = intervalLabel(
       contextLength,
-      interval(0.0, 3.0, "short"),
-      interval(3.0, null, "long")
+      entry(0.0, "short"),
+      entry(3.0, "long")
     ).get(GLOBAL_SCOPE);
 
     assertThat(label.apply("ab")).isEqualTo("short");
@@ -78,9 +159,26 @@ class IntervalLabelFactoryTest {
   }
 
   @Test
-  void createsIntervalsViaStaticHelper() {
-    assertThat(interval(6.0, 12.0, "VL0612")).isEqualTo(
-      new IntervalLabelFactory.Interval(6.0, 12.0, "VL0612")
-    );
+  void noIntervalsIsRejected() {
+    assertThatThrownBy(() ->
+      IntervalLabelFactory.<Scope, Object, Double>builder()
+        .number(number)
+        .build()
+        .get(GLOBAL_SCOPE)
+    ).isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void aNaNBoundIsRejected() {
+    assertThatThrownBy(() ->
+      intervalLabel(number, entry(Double.NaN, "x")).get(GLOBAL_SCOPE)
+    ).isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void aRepeatedBoundIsRejected() {
+    assertThatThrownBy(() ->
+      intervalLabel(number, entry(1.0, "x"), entry(1.0, "y"))
+    ).isInstanceOf(IllegalArgumentException.class);
   }
 }

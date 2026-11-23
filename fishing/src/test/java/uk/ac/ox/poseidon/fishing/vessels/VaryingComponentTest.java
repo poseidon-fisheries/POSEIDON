@@ -69,8 +69,8 @@ class VaryingComponentTest {
     final Map<String, Object> attributes
   ) {
     final var fleet = fleet(
-      object(mock(VesselField.class)),
-      object(mock(PortGrid.class))
+      _ -> mock(VesselField.class),
+      _ -> mock(PortGrid.class)
     );
     final var specification = vesselSpecification(
       fleet,

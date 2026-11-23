@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.core.utils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.core.utils.Factories.pair;
 import static uk.ac.ox.poseidon.core.utils.Factories.runId;
-import static uk.ac.ox.poseidon.core.utils.Factories.setOf;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Scenario;
@@ -46,10 +46,7 @@ class FactoriesTest {
 
   @Test
   void listOfFactoriesResolvesEachInOrder() {
-    final ListFactory<Scope, Object> factory = listOf(
-      new ObjectFactory<String>("a"),
-      new ObjectFactory<Integer>(1)
-    );
+    final ListFactory<Scope, Object> factory = listOf(object("a"), object(1));
 
     assertThat(factory.get(GLOBAL_SCOPE)).containsExactly("a", 1);
   }
@@ -60,20 +57,10 @@ class FactoriesTest {
   }
 
   @Test
-  void setOfLiteralsDeduplicatesAndPreservesOrder() {
-    assertThat(setOf("a", "b", "a").get(GLOBAL_SCOPE)).containsExactly(
-      "a",
-      "b"
-    );
-  }
-
-  @Test
   void pairResolvesBothInputs() {
-    assertThat(
-      pair(new ObjectFactory<String>("a"), new ObjectFactory<Integer>(1)).get(
-        GLOBAL_SCOPE
-      )
-    ).isEqualTo(Pair.of("a", 1));
+    assertThat(pair(object("a"), object(1)).get(GLOBAL_SCOPE)).isEqualTo(
+      Pair.of("a", 1)
+    );
   }
 
   @Test

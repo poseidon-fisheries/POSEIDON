@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core.utils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -35,11 +36,7 @@ class ListFactoryTest {
   @Test
   void resolvesEachComponentInOrder() {
     final ListFactory<Scope, Object> factory = listOf(
-      List.of(
-        new ObjectFactory<>("a"),
-        new ObjectFactory<>(1),
-        new ObjectFactory<>(2.5)
-      )
+      List.of(object("a"), object(1), object(2.5))
     );
 
     assertThat(factory.get(GLOBAL_SCOPE)).containsExactly("a", 1, 2.5);

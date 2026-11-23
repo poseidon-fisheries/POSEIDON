@@ -31,7 +31,6 @@ import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledByDateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.days;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.catchesByCellPartitionedBy;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.exponentialMovingAverageOfBuckets;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.fishingActionRecorder;
@@ -120,7 +119,7 @@ class FishingEventSharingRouteTest {
   private final Hold hold = mock(Hold.class);
   private final Engine engine = mock(Engine.class);
   private final VesselComponent<Gear> gearComponent = vesselComponent(
-    object(gear)
+    _ -> gear
   );
   private final PartitionedMemoryFactory<
     HasAttributes,
@@ -128,10 +127,7 @@ class FishingEventSharingRouteTest {
     Cell,
     Bucket
   > vesselMemory = catchesByCellPartitionedBy(stringAttribute("gear"));
-  private final FleetFactory baseFleet = fleet(
-    object(vesselField),
-    object(portGrid)
-  );
+  private final FleetFactory baseFleet = fleet(_ -> vesselField, _ -> portGrid);
   private final SocialNetworkFactory network = socialNetwork(baseFleet);
   private final EventSharerFactory<FishingActionEvent> fishingActionSharer =
     fishingActionSharer(network);
@@ -164,8 +160,8 @@ class FishingEventSharingRouteTest {
     final boolean withSharing
   ) {
     final var vesselBehaviour = behaviour(waitFor(constant(days(1))));
-    final var holdComponent = vesselComponent(object(hold));
-    final var engineComponent = vesselComponent(object(engine));
+    final var holdComponent = vesselComponent(_ -> hold);
+    final var engineComponent = vesselComponent(_ -> engine);
     final var vesselSpecification = withSharing
       ? vesselSpecification(
           baseFleet,

@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
+import static uk.ac.ox.poseidon.core.testing.GlobalFactory.globally;
 import static uk.ac.ox.poseidon.geography.paths.Factories.pathFinder;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -55,9 +55,9 @@ class DefaultPathFinderFactoryTest {
   @Test
   void createsOnePathFinderPerSimulation() {
     final DefaultPathFinderFactory factory = pathFinder(
-      object(bathymetricGrid()),
-      object(mock(PortGrid.class)),
-      object(mock(DistanceCalculator.class))
+      globally(bathymetricGrid()),
+      globally(mock(PortGrid.class)),
+      globally(mock(DistanceCalculator.class))
     );
 
     final GridPathFinder first = factory.get(new SimulationScope(simulation));
@@ -71,9 +71,9 @@ class DefaultPathFinderFactoryTest {
   @Test
   void reusesPathFinderWithinSimulation() {
     final DefaultPathFinderFactory factory = pathFinder(
-      object(bathymetricGrid()),
-      object(mock(PortGrid.class)),
-      object(mock(DistanceCalculator.class))
+      globally(bathymetricGrid()),
+      globally(mock(PortGrid.class)),
+      globally(mock(DistanceCalculator.class))
     );
     final SimulationScope scope = new SimulationScope(simulation);
 
@@ -89,9 +89,9 @@ class DefaultPathFinderFactoryTest {
     final BathymetricGrid bathymetricGrid = mock(BathymetricGrid.class);
     when(bathymetricGrid.getModelGrid()).thenReturn(modelGrid);
     final DefaultPathFinderFactory factory = pathFinder(
-      object(bathymetricGrid),
-      object(mock(PortGrid.class)),
-      object(mock(DistanceCalculator.class))
+      globally(bathymetricGrid),
+      globally(mock(PortGrid.class)),
+      globally(mock(DistanceCalculator.class))
     );
     final Cell cell = new Cell(1, 1);
 

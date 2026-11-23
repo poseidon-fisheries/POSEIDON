@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import static com.google.common.base.Preconditions.checkState;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
 
 import java.util.List;
@@ -103,8 +102,8 @@ public class SpeciesBiomassFieldsPortrayalFactory
             LAJOLLA,
             name,
             false,
-            object(biomassGrid),
-            object(carryingCapacityGrid)
+            _ -> biomassGrid,
+            _ -> carryingCapacityGrid
           ).get(scope),
           visible
         );

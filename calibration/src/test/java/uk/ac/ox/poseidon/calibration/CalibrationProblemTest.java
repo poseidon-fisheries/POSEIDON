@@ -26,6 +26,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.ImmutableLongArray;
@@ -48,7 +49,6 @@ import uk.ac.ox.poseidon.calibration.CalibrationProblem.SimulationTimes;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.time.PeriodFactory;
-import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 /**
  * Runs an empty scenario for a day; the evaluator's score is the simulation's
@@ -114,10 +114,7 @@ class CalibrationProblemTest {
   @Test
   void eachCandidateRunsAScenarioDerivedWithItsValues() {
     final CalibrationProblem problem = new CalibrationProblem(
-      new Scenario(
-        LocalDate.of(2020, 1, 1),
-        Map.of("number", new ObjectFactory<>(1.0))
-      ),
+      new Scenario(LocalDate.of(2020, 1, 1), Map.of("number", object(1.0))),
       Period.ofDays(1),
       ImmutableMap.of("number.value", new LinearParameterRange(0, 10)),
       simulation -> simulation.getComponent(Double.class),

@@ -63,7 +63,7 @@ public final class Factories {
     final MappingFactory<? super S, ? super C, ? super T, ? extends K> key,
     final Factory<? super S, ? extends Map<? super K, ? extends V>> map
   ) {
-    return new MapLookupFactory<S, C, T, K, V>(key, map, null);
+    return MapLookupFactory.<S, C, T, K, V>builder().key(key).map(map).build();
   }
 
   /**
@@ -83,11 +83,10 @@ public final class Factories {
     final Factory<? super S, ? extends Map<? super K, ? extends V>> map
   ) {
     return new MappingAsValueFactory<S, C, V>(
-      new MapLookupFactory<S, C, Void, K, V>(
-        new ValueAsMappingFactory<S, C, K>(key),
-        map,
-        null
-      )
+      MapLookupFactory.<S, C, Void, K, V>builder()
+        .key(new ValueAsMappingFactory<S, C, K>(key))
+        .map(map)
+        .build()
     );
   }
 
@@ -112,7 +111,11 @@ public final class Factories {
     final Factory<? super S, ? extends Map<? super K, ? extends V>> map,
     final V defaultValue
   ) {
-    return new MapLookupFactory<S, C, T, K, V>(key, map, defaultValue);
+    return MapLookupFactory.<S, C, T, K, V>builder()
+      .key(key)
+      .map(map)
+      .defaultValue(defaultValue)
+      .build();
   }
 
   /**
@@ -134,11 +137,11 @@ public final class Factories {
     final V defaultValue
   ) {
     return new MappingAsValueFactory<S, C, V>(
-      new MapLookupFactory<S, C, Void, K, V>(
-        new ValueAsMappingFactory<S, C, K>(key),
-        map,
-        defaultValue
-      )
+      MapLookupFactory.<S, C, Void, K, V>builder()
+        .key(new ValueAsMappingFactory<S, C, K>(key))
+        .map(map)
+        .defaultValue(defaultValue)
+        .build()
     );
   }
 
@@ -201,7 +204,7 @@ public final class Factories {
     final Factory<? super S, ? extends Map<? super K, ? extends V>> map,
     final K key
   ) {
-    return new MapEntryFactory<>(map, key);
+    return MapEntryFactory.<S, K, V>builder().map(map).key(key).build();
   }
 
   /**
@@ -317,13 +320,15 @@ public final class Factories {
   }
 
   /**
-   * @param number    the mapping that reads the number to place
-   * @param intervals the non-overlapping intervals to place it among (see
-   *                  {@link IntervalLabelFactory#interval})
+   * @param number the mapping that reads the number to place
+   * @param labels the intervals' labels, each written as
+   *               {@code entry(lowerBound, label)}; an interval runs up to the
+   *               next lower bound, and the last has no upper bound
    * @return a {@link MappingFactory} for an {@link IntervalLabel} of the number
    *         among the given intervals
    * @see IntervalLabel
    */
+  @SafeVarargs
   public static <S extends Scope, C, T> IntervalLabelFactory<
     S,
     C,
@@ -335,35 +340,37 @@ public final class Factories {
       ? super T,
       ? extends Double
     > number,
-    final IntervalLabelFactory.Interval... intervals
+    final Map.Entry<Double, String>... labels
   ) {
-    return new IntervalLabelFactory<S, C, T>(
-      number,
-      ImmutableList.copyOf(intervals)
-    );
+    return IntervalLabelFactory.<S, C, T>builder()
+      .number(number)
+      .labelsByLowerBound(Map.ofEntries(labels))
+      .build();
   }
 
   /**
-   * @param number    the value that is the number to place
-   * @param intervals the non-overlapping intervals to place it among (see
-   *                  {@link IntervalLabelFactory#interval})
+   * @param number the value that is the number to place
+   * @param labels the intervals' labels, each written as
+   *               {@code entry(lowerBound, label)}; an interval runs up to the
+   *               next lower bound, and the last has no upper bound
    * @return a {@link ValueFactory} for an {@link IntervalLabel} of the number
    *         among the given intervals, made a value by {@link MappingAsValue}
    * @see IntervalLabel
    */
+  @SafeVarargs
   public static <S extends Scope, C> MappingAsValueFactory<
     S,
     C,
     String
   > intervalLabel(
     final ValueFactory<? super S, ? super C, ? extends Double> number,
-    final IntervalLabelFactory.Interval... intervals
+    final Map.Entry<Double, String>... labels
   ) {
     return new MappingAsValueFactory<S, C, String>(
-      new IntervalLabelFactory<S, C, Void>(
-        new ValueAsMappingFactory<S, C, Double>(number),
-        ImmutableList.copyOf(intervals)
-      )
+      IntervalLabelFactory.<S, C, Void>builder()
+        .number(new ValueAsMappingFactory<S, C, Double>(number))
+        .labelsByLowerBound(Map.ofEntries(labels))
+        .build()
     );
   }
 }

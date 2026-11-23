@@ -34,7 +34,6 @@ import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 class IndexedDiscardRatesTest {
 
@@ -70,7 +69,7 @@ class IndexedDiscardRatesTest {
     final Set<Species> species = Set.of(adult, juvenile);
 
     final IndexedDiscardRatesFactory<Scope> factory = discardRates(
-      new ObjectFactory<>(species),
+      _ -> species,
       (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->
         adult.equals(s) || juvenile.equals(s) ? 0.25 : 0.0
     );

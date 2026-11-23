@@ -27,7 +27,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.social.Factories.friendshipDynamics;
 import static uk.ac.ox.poseidon.fishing.social.Factories.socialNetwork;
 
@@ -55,7 +54,7 @@ class FriendshipDynamicsFactoryTest {
   private final Vessel a = vessel(simulationEventManager);
   private final Vessel b = vessel(simulationEventManager);
   private final Fleet fleet = fleetOf(a, b);
-  private final SocialNetworkFactory network = socialNetwork(object(fleet));
+  private final SocialNetworkFactory network = socialNetwork(_ -> fleet);
   private final FriendshipDynamicsFactory factory = friendshipDynamics(
     network,
     1,

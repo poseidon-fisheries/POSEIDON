@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.geography.paths;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
+import static uk.ac.ox.poseidon.core.testing.GlobalFactory.globally;
 import static uk.ac.ox.poseidon.geography.paths.Factories.accessibleWaterCellsCache;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -52,8 +52,8 @@ class AccessibleWaterCellsCacheFactoryTest {
   void sharesCacheWhenGridsAreGlobal() {
     final AccessibleWaterCellsCacheFactory<SimulationScope> factory =
       accessibleWaterCellsCache(
-        object(mock(BathymetricGrid.class)),
-        object(mock(PortGrid.class))
+        globally(mock(BathymetricGrid.class)),
+        globally(mock(PortGrid.class))
       );
 
     final AccessibleWaterCellsCache first = factory.get(
@@ -69,9 +69,8 @@ class AccessibleWaterCellsCacheFactoryTest {
   @Test
   void separatesCacheWhenGridsAreSimulationScoped() {
     final AccessibleWaterCellsCacheFactory<SimulationScope> factory =
-      accessibleWaterCellsCache(
-        new SimulationBathymetricGridFactory(),
-        object(mock(PortGrid.class))
+      accessibleWaterCellsCache(new SimulationBathymetricGridFactory(), _ ->
+        mock(PortGrid.class)
       );
 
     final AccessibleWaterCellsCache first = factory.get(

@@ -39,7 +39,7 @@ import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 class VesselSpecificationFactoryTest {
 
-  private final Factory<? super SimulationScope, Fleet> fleet = object(null);
+  private final Factory<? super SimulationScope, Fleet> fleet = _ -> null;
   private final VesselComponent<?> holdComponent = vesselComponent(
     object("hold")
   );
@@ -47,11 +47,16 @@ class VesselSpecificationFactoryTest {
     object("gear")
   );
 
+  @SuppressWarnings("unchecked")
+  private <T> Factory<SimulationScope, T> literalStandIn(final Object literal) {
+    return (Factory<SimulationScope, T>) (Factory<?, ?>) object(literal);
+  }
+
   @Test
   void keepsListingOrder() {
     final var specification = vesselSpecification(
       fleet,
-      behaviour(object(null)),
+      behaviour(_ -> null),
       entry("z", holdComponent),
       entry("a", gearComponent)
     );
@@ -64,12 +69,13 @@ class VesselSpecificationFactoryTest {
 
   @Test
   void keepsListingOrderAfterYamlRoundTrip() {
+    // Stand-ins that YAML can hold: a literal where a fleet and a behaviour go
     final var scenario = Scenario.builder()
       .component(
         "vesselSpecification",
         vesselSpecification(
-          fleet,
-          behaviour(object(null)),
+          this.<Fleet>literalStandIn("fleet"),
+          behaviour(literalStandIn("behaviour")),
           entry("z", holdComponent),
           entry("a", gearComponent)
         )
@@ -94,7 +100,7 @@ class VesselSpecificationFactoryTest {
     assertThatThrownBy(() ->
       vesselSpecification(
         fleet,
-        behaviour(object(null)),
+        behaviour(_ -> null),
         entry("hold", holdComponent),
         entry("hold", gearComponent)
       )

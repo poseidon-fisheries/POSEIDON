@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
+import static uk.ac.ox.poseidon.core.testing.GlobalFactory.globally;
 import static uk.ac.ox.poseidon.geography.grids.Factories.modelGrid;
 import static uk.ac.ox.poseidon.geography.ports.Factories.portsFromCells;
 
@@ -50,7 +50,7 @@ class PortsFromCellsFactoryTest {
   @Test
   void givesOnePortPerCellInOrderAtTheCellsCentre() {
     final List<Pair<Port, Coordinate>> ports = portsFromCells(
-      object(List.of(new Cell(2, 1), new Cell(0, 0))),
+      globally(List.of(new Cell(2, 1), new Cell(0, 0))),
       modelGrid,
       cellCode
     ).get(GLOBAL_SCOPE);
@@ -67,7 +67,7 @@ class PortsFromCellsFactoryTest {
       (context, cell) ->
         null;
     final PortsFromCellsFactory<Scope> ports = portsFromCells(
-      object(List.of(new Cell(2, 1))),
+      globally(List.of(new Cell(2, 1))),
       modelGrid,
       noCode
     );
@@ -80,7 +80,7 @@ class PortsFromCellsFactoryTest {
   @Test
   void twoCellsWithTheSameCodeAreAnError() {
     final PortsFromCellsFactory<Scope> ports = portsFromCells(
-      object(List.of(new Cell(2, 1), new Cell(0, 0))),
+      globally(List.of(new Cell(2, 1), new Cell(0, 0))),
       modelGrid,
       always("P")
     );

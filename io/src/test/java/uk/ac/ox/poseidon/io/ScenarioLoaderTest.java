@@ -110,4 +110,17 @@ class ScenarioLoaderTest {
         .build()
     );
   }
+
+  @Test
+  void rejectsASetWhereAnObjectFactoryHoldsAValue() {
+    final String yaml = """
+    components:
+      members: !!uk.ac.ox.poseidon.core.utils.ObjectFactory
+        value: !!set {a, b}
+    """;
+
+    assertThatThrownBy(() -> new ScenarioLoader().load(yaml))
+      .hasRootCauseInstanceOf(IllegalArgumentException.class)
+      .hasRootCauseMessage("value must be a literal, not [a, b].");
+  }
 }

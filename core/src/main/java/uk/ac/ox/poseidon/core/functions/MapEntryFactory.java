@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.core.functions;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -32,6 +31,7 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.utils.Literals;
 
 /**
  * A {@link RelativeScopeFactory} that resolves a fixed key against a resolved
@@ -46,7 +46,6 @@ import uk.ac.ox.poseidon.core.Scope;
  */
 @Getter
 @ToString
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class MapEntryFactory<
@@ -57,6 +56,28 @@ public class MapEntryFactory<
 
   private final Factory<? super S, ? extends Map<? super K, ? extends V>> map;
   private final K key;
+
+  /**
+   * The builder, begun by hand to check the key when it is set:
+   * {@code @SuperBuilder} fills in the rest. Its check for a hand-written
+   * builder constructor does not see one on a generic class.
+   */
+  public abstract static class MapEntryFactoryBuilder<
+    S extends Scope,
+    K,
+    V,
+    C extends MapEntryFactory<S, K, V>,
+    B extends MapEntryFactoryBuilder<S, K, V, C, B>
+  > extends RelativeScopeFactory.RelativeScopeFactoryBuilder<S, V, C, B> {
+
+    /**
+     * @throws IllegalArgumentException if the key is not a literal
+     */
+    public B key(final K key) {
+      this.key = Literals.requireLiteral(key, "key");
+      return self();
+    }
+  }
 
   @Override
   protected V newInstance(final S scope) {

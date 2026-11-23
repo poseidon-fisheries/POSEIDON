@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import com.google.common.collect.ImmutableList;
 import java.time.LocalDateTime;
@@ -130,7 +131,7 @@ class ScenarioTest {
     final Scenario scenario = scenario(
       Map.of(
         "table",
-        new ObjectFactory<>(Map.of("DBO;adult", 1.0, "HKE;adult", 3.0)),
+        object(Map.of("DBO;adult", 1.0, "HKE;adult", 3.0)),
         "list",
         new ListFactory<>(ImmutableList.of(number(1), number(2)))
       )
@@ -152,7 +153,7 @@ class ScenarioTest {
 
   @Test
   void aContainerTheChangeDoesNotReachIsKeptAsIs() {
-    final Factory<? super SimulationScope, ?> table = new ObjectFactory<>(
+    final Factory<? super SimulationScope, ?> table = object(
       Map.of("key", 1.0)
     );
     final Factory<? super SimulationScope, ?> list = new ListFactory<>(
@@ -206,17 +207,6 @@ class ScenarioTest {
     assertThat(derived.component("set")).isSameAs(set);
   }
 
-  @Test
-  void refusesToCopyACollectionHoldingAChangedNode() {
-    final NumberFactory number = number(1);
-    final SetFactory set = SetFactory.builder().members(Set.of(number)).build();
-    final Scenario scenario = scenario(Map.of("number", number, "set", set));
-
-    assertThatThrownBy(() -> scenario.with("number.value", 2.0))
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageStartingWith("Cannot copy a ");
-  }
-
   @ParameterizedTest
   @ValueSource(
     strings = {
@@ -235,7 +225,7 @@ class ScenarioTest {
         "number",
         number(1),
         "table",
-        new ObjectFactory<>(Map.of("key", 1.0)),
+        object(Map.of("key", 1.0)),
         "list",
         new ListFactory<>(ImmutableList.of(number(1)))
       )
