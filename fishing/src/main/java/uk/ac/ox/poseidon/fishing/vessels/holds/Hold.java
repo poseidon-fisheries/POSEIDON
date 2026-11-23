@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.vessels.holds;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
 
@@ -48,9 +50,39 @@ public interface Hold {
    */
   CategorisedCatch getContent();
 
-  /** @return {@code true} if there's no available capacity left */
+  /**
+   * The relative margin of the requested biomass threshold within which a hold
+   * counts as filled to a proportion: a set fitted to the free capacity by
+   * scaling each species separately can add up to a few ulps short of it.
+   */
+  double FULLNESS_TOLERANCE = 1e-9;
+
+  /**
+   * @param proportion the proportion of the capacity, in (0, 1]
+   * @return {@code true} if the content has reached {@code proportion} of
+   *         {@link #getTotalCapacityInKg()}, within {@link #FULLNESS_TOLERANCE}
+   *         of that biomass threshold; content over the capacity has reached any
+   *         proportion, and a hold of infinite capacity none
+   * @throws IllegalArgumentException if {@code proportion} is not in (0, 1]
+   */
+  default boolean isFilledTo(final double proportion) {
+    checkArgument(
+      proportion > 0 && proportion <= 1,
+      "proportion must be in (0, 1], got %s",
+      proportion
+    );
+    return (
+      getContent().getTotalBiomassInKg() >=
+      proportion * getTotalCapacityInKg() * (1 - FULLNESS_TOLERANCE)
+    );
+  }
+
+  /**
+   * @return {@code true} if the hold is filled to its capacity
+   * @see #isFilledTo(double)
+   */
   default boolean isFull() {
-    return getAvailableCapacityInKg() <= 0;
+    return isFilledTo(1);
   }
 
   /**

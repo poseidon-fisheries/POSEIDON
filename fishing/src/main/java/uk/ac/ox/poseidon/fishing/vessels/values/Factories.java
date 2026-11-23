@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
-import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
+import uk.ac.ox.poseidon.fishing.vessels.holds.Hold;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
@@ -181,7 +181,7 @@ public final class Factories {
   /**
    * @param port the port, read for the vessel tested, to test its docking
    *             against
-   * @return a {@link VesselScope}-relative factory for a
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link VesselIsDockedAt}
    * @see VesselIsDockedAt
    */
@@ -189,6 +189,46 @@ public final class Factories {
     final ValueFactory<? super S, ? super Vessel, Port> port
   ) {
     return new VesselIsDockedAtFactory<>(port);
+  }
+
+  /**
+   * @param hold       the hold to test
+   * @param proportion the proportion of its capacity, in (0, 1], read for the
+   *                   vessel tested, that the hold must have reached
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link VesselHoldIsFilledTo}
+   * @see VesselHoldIsFilledTo
+   */
+  public static <S extends Scope> VesselHoldIsFilledToFactory<S> vesselHoldIsFilledTo(
+    final VesselComponent<? extends Hold> hold,
+    final ValueFactory<? super S, ? super Vessel, Double> proportion
+  ) {
+    return new VesselHoldIsFilledToFactory<>(hold, proportion);
+  }
+
+  /**
+   * @param hold       the hold to test
+   * @param proportion the fixed proportion of its capacity, in (0, 1], that
+   *                   the hold must have reached
+   * @return the same as {@link #vesselHoldIsFilledTo(VesselComponent,
+   *         ValueFactory)}, over a constant {@code proportion}
+   */
+  public static <S extends Scope> VesselHoldIsFilledToFactory<S> vesselHoldIsFilledTo(
+    final VesselComponent<? extends Hold> hold,
+    final double proportion
+  ) {
+    return vesselHoldIsFilledTo(hold, constant(proportion));
+  }
+
+  /**
+   * @param hold the hold to test
+   * @return the same as {@link #vesselHoldIsFilledTo(VesselComponent, double)}
+   *         at the whole capacity
+   */
+  public static <S extends Scope> VesselHoldIsFilledToFactory<S> vesselHoldIsFull(
+    final VesselComponent<? extends Hold> hold
+  ) {
+    return vesselHoldIsFilledTo(hold, 1.0);
   }
 
   /**

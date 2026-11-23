@@ -23,11 +23,14 @@
 package uk.ac.ox.poseidon.fishing.vessels.holds;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
 
 class HoldTest {
@@ -65,5 +68,54 @@ class HoldTest {
     when(hold.getContent()).thenReturn(content);
 
     assertThat(hold.isFull()).isTrue();
+  }
+
+  private static Hold holdWith(
+    final double contentKg,
+    final double capacityKg
+  ) {
+    final CategorisedCatch content = mock(CategorisedCatch.class);
+    when(content.getTotalBiomassInKg()).thenReturn(contentKg);
+    final Hold hold = mock(Hold.class, CALLS_REAL_METHODS);
+    when(hold.getTotalCapacityInKg()).thenReturn(capacityKg);
+    when(hold.getContent()).thenReturn(content);
+    return hold;
+  }
+
+  @Test
+  void aHoldIsFilledToAProportionOnceItsContentReachesIt() {
+    assertThat(holdWith(7.9, 10.0).isFilledTo(0.8)).isFalse();
+    assertThat(holdWith(8.0, 10.0).isFilledTo(0.8)).isTrue();
+    assertThat(holdWith(9.5, 10.0).isFilledTo(0.8)).isTrue();
+  }
+
+  @Test
+  void aHoldFilledToWithinFloatingPointErrorOfItsCapacityIsFull() {
+    assertThat(holdWith(60.0 - 1e-12, 60.0).isFilledTo(1)).isTrue();
+    assertThat(holdWith(60.0 - 1e-3, 60.0).isFilledTo(1)).isFalse();
+  }
+
+  @Test
+  void aHoldOverItsCapacityIsFilledToAnyProportion() {
+    assertThat(holdWith(10.5, 10.0).isFilledTo(1)).isTrue();
+  }
+
+  @Test
+  void anInfiniteHoldIsNeverFilledToAnything() {
+    assertThat(
+      holdWith(1e12, Double.POSITIVE_INFINITY).isFilledTo(1)
+    ).isFalse();
+  }
+
+  @ParameterizedTest
+  @ValueSource(doubles = { 0, -0.1, 1.1, Double.NaN })
+  void rejectsAProportionOutsideZeroExclusiveToOneInclusive(
+    final double proportion
+  ) {
+    final Hold hold = holdWith(5.0, 10.0);
+
+    assertThatIllegalArgumentException().isThrownBy(() ->
+      hold.isFilledTo(proportion)
+    );
   }
 }
