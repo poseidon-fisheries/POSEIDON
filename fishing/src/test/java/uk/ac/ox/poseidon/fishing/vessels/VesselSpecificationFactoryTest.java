@@ -25,34 +25,64 @@ package uk.ac.ox.poseidon.fishing.vessels;
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.io.ScenarioLoader;
+import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 class VesselSpecificationFactoryTest {
 
-  private final Factory<SimulationScope, Fleet> fleet = scope ->
-    mock(Fleet.class);
+  private final Factory<? super SimulationScope, Fleet> fleet = object(null);
   private final VesselComponent<?> holdComponent = vesselComponent(
-    scope -> "hold"
+    object("hold")
   );
   private final VesselComponent<?> gearComponent = vesselComponent(
-    scope -> "gear"
+    object("gear")
   );
 
   @Test
   void keepsListingOrder() {
     final var specification = vesselSpecification(
       fleet,
-      behaviour(scope -> null),
+      behaviour(object(null)),
       entry("z", holdComponent),
       entry("a", gearComponent)
     );
+
+    assertThat(specification.getComponents().keySet()).containsExactly(
+      "z",
+      "a"
+    );
+  }
+
+  @Test
+  void keepsListingOrderAfterYamlRoundTrip() {
+    final var scenario = Scenario.builder()
+      .component(
+        "vesselSpecification",
+        vesselSpecification(
+          fleet,
+          behaviour(object(null)),
+          entry("z", holdComponent),
+          entry("a", gearComponent)
+        )
+      )
+      .build();
+
+    final var loaded = new ScenarioLoader().load(
+      new ScenarioWriter().write(scenario)
+    );
+
+    final var specification = (VesselSpecificationFactory) loaded
+      .getComponents()
+      .get("vesselSpecification");
     assertThat(specification.getComponents().keySet()).containsExactly(
       "z",
       "a"
@@ -64,7 +94,7 @@ class VesselSpecificationFactoryTest {
     assertThatThrownBy(() ->
       vesselSpecification(
         fleet,
-        behaviour(scope -> null),
+        behaviour(object(null)),
         entry("hold", holdComponent),
         entry("hold", gearComponent)
       )
