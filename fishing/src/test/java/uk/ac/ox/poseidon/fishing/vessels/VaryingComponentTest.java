@@ -26,24 +26,32 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
 import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.ERROR;
 import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.NO_COMPONENT;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.componentProperty;
 
+import com.badlogic.gdx.ai.btree.leaf.Success;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.utils.ObjectFactory;
+import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.fishing.vessels.values.ComponentPropertyFactory;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
@@ -56,43 +64,57 @@ class VaryingComponentTest {
   private final Factory<VesselComponentScope, Object> ps = _ -> "PS";
   private final Factory<VesselComponentScope, Object> other = _ -> "other";
 
-  private static Vessel vesselWith(final Map<String, Object> attributes) {
-    final Vessel vessel = mock(Vessel.class);
-    Mockito.when(vessel.getId()).thenReturn("V1");
-    Mockito.when(vessel.getAttributes()).thenReturn(attributes);
-    return vessel;
-  }
-
-  /** The factory selected for the vessel; empty if it has no component. */
-  private static Object factoryOf(
-    final VaryingComponent<?> component,
+  private static <T> Optional<T> componentInSimulation(
+    final VesselComponent<T> component,
     final Map<String, Object> attributes
   ) {
-    return component.factoryFor(vesselWith(attributes)).orElse(null);
-  }
-
-  @Test
-  void selectsTheFactoryForTheAttributeValue() {
-    final var component = varyingBy(
-      "gear",
-      ERROR,
-      entry("PS", ps),
-      entry("OTB", other)
+    final var fleet = fleet(
+      object(mock(VesselField.class)),
+      object(mock(PortGrid.class))
     );
-
-    assertThat(factoryOf(component, Map.of("gear", "PS"))).isSameAs(ps);
-    assertThat(factoryOf(component, Map.of("gear", "OTB"))).isSameAs(other);
+    final var specification = vesselSpecification(
+      fleet,
+      behaviour(scope -> new Success<>()),
+      entry("gear", component)
+    );
+    final var simulation = Scenario.builder()
+      .startingDateTime(dateTime(LocalDateTime.of(2001, 1, 1, 0, 0)))
+      .component("fleet", fleet)
+      .component("specification", specification)
+      .build()
+      .startNewSimulation();
+    final Optional<T> product;
+    try {
+      final Vessel vessel = simulation
+        .getComponent(VesselSpecification.class)
+        .create("V1", Optional.empty(), attributes);
+      simulation.schedule.step(simulation);
+      product = component.findIn(vessel);
+      product.ifPresent(value ->
+        assertThat(component.of(vessel)).isSameAs(value)
+      );
+    } finally {
+      simulation.finish();
+    }
+    return product;
   }
 
   @Test
-  void aListedValueGivesItsFactoryUnderBothHandlings() {
+  void listedValuesGiveTheirFactoriesComponentsUnderBothHandlings() {
     for (final var handling : UnlistedValueHandling.values()) {
+      final var component = varyingBy(
+        "gear",
+        handling,
+        entry("PS", ps),
+        entry("OTB", other)
+      );
+
       assertThat(
-        factoryOf(
-          varyingBy("gear", handling, entry("PS", ps)),
-          Map.of("gear", "PS")
-        )
-      ).isSameAs(ps);
+        componentInSimulation(component, Map.of("gear", "PS"))
+      ).contains("PS");
+      assertThat(
+        componentInSimulation(component, Map.of("gear", "OTB"))
+      ).contains("other");
     }
   }
 
@@ -104,7 +126,7 @@ class VaryingComponentTest {
       entry("PS", ps)
     );
 
-    assertThat(chosen.factoryFor(vesselWith(Map.of("gear", "OTB")))).isEmpty();
+    assertThat(componentInSimulation(chosen, Map.of("gear", "OTB"))).isEmpty();
   }
 
   @Test
@@ -116,7 +138,7 @@ class VaryingComponentTest {
     );
 
     assertThatThrownBy(() ->
-      chosen.factoryFor(vesselWith(Map.of("gear", "OTB")))
+      componentInSimulation(chosen, Map.of("gear", "OTB"))
     )
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("V1")
@@ -133,7 +155,7 @@ class VaryingComponentTest {
         entry("PS", ps)
       );
 
-      assertThatThrownBy(() -> chosen.factoryFor(vesselWith(Map.of())))
+      assertThatThrownBy(() -> componentInSimulation(chosen, Map.of()))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("Vessel V1 has no attribute gear");
     }
@@ -145,7 +167,7 @@ class VaryingComponentTest {
       final var component = varyingBy("gear", handling, entry(1, ps));
 
       assertThatThrownBy(() ->
-        component.factoryFor(vesselWith(Map.of("gear", 1L)))
+        componentInSimulation(component, Map.of("gear", 1L))
       )
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("V1")
@@ -157,17 +179,43 @@ class VaryingComponentTest {
 
   @Test
   void withNoListedValuesThereIsNoTypeToCheck() {
-    final var none = varyingBy("gear", NO_COMPONENT);
-    final var error = varyingBy("gear", ERROR);
+    final var component = varyingBy("gear", NO_COMPONENT);
 
-    assertThat(none.factoryFor(vesselWith(Map.of("gear", "PS")))).isEmpty();
-    assertThat(none.factoryFor(vesselWith(Map.of("gear", 1L)))).isEmpty();
+    assertThat(
+      componentInSimulation(component, Map.of("gear", "PS"))
+    ).isEmpty();
+    assertThat(componentInSimulation(component, Map.of("gear", 1L))).isEmpty();
+  }
+
+  @Test
+  void withNoListedValuesErrorHandlingRejectsEveryValue() {
+    final var component = varyingBy("gear", ERROR);
+
     assertThatThrownBy(() ->
-      error.factoryFor(vesselWith(Map.of("gear", "PS")))
-    ).isInstanceOf(IllegalStateException.class);
+      componentInSimulation(component, Map.of("gear", "PS"))
+    )
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("V1")
+      .hasMessageContaining("gear")
+      .hasMessageContaining("PS");
     assertThatThrownBy(() ->
-      none.factoryFor(vesselWith(Map.of()))
-    ).isInstanceOf(IllegalStateException.class);
+      componentInSimulation(component, Map.of("gear", 1L))
+    )
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("V1")
+      .hasMessageContaining("gear")
+      .hasMessageContaining("1");
+  }
+
+  @Test
+  void withNoListedValuesTheAttributeIsStillRequiredUnderBothHandlings() {
+    for (final var handling : UnlistedValueHandling.values()) {
+      final var component = varyingBy("gear", handling);
+
+      assertThatThrownBy(() -> componentInSimulation(component, Map.of()))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("Vessel V1 has no attribute gear");
+    }
   }
 
   @Test
@@ -205,7 +253,9 @@ class VaryingComponentTest {
       .doesNotContain("Variant")
       .doesNotContain("NoComponent")
       .contains("unlistedValueHandling: NO_COMPONENT")
-      .containsPattern("PS: !!uk\\.ac\\.ox\\.poseidon\\.core\\.utils\\.ObjectFactory");
+      .containsPattern(
+        "PS: !!uk\\.ac\\.ox\\.poseidon\\.core\\.utils\\.ObjectFactory"
+      );
     assertThat(loaded.getAttribute()).isEqualTo("gear");
     assertThat(loaded.getUnlistedValueHandling()).isEqualTo(NO_COMPONENT);
     assertThat(loaded.getFactories().keySet()).containsExactly(
@@ -213,11 +263,13 @@ class VaryingComponentTest {
       "GNS",
       "OTB"
     );
-    assertThat(factoryOf(loaded, Map.of("gear", "PS"))).isEqualTo(object("ps"));
-    assertThat(factoryOf(loaded, Map.of("gear", "OTB"))).isEqualTo(
-      object("otb")
-    );
-    assertThat(factoryOf(loaded, Map.of("gear", "XYZ"))).isNull();
+    assertThat(
+      componentInSimulation(loaded, Map.of("gear", "PS"))
+    ).hasValueSatisfying(value -> assertThat(value).isEqualTo("ps"));
+    assertThat(
+      componentInSimulation(loaded, Map.of("gear", "OTB"))
+    ).hasValueSatisfying(value -> assertThat(value).isEqualTo("otb"));
+    assertThat(componentInSimulation(loaded, Map.of("gear", "XYZ"))).isEmpty();
   }
 
   @Test
@@ -228,7 +280,7 @@ class VaryingComponentTest {
 
     assertThat(loaded.getUnlistedValueHandling()).isEqualTo(ERROR);
     assertThatThrownBy(() ->
-      loaded.factoryFor(vesselWith(Map.of("gear", "OTB")))
+      componentInSimulation(loaded, Map.of("gear", "OTB"))
     ).isInstanceOf(IllegalStateException.class);
   }
 
@@ -264,14 +316,17 @@ class VaryingComponentTest {
 
     final Scenario derived = scenario.with("gear.factories(OTB).value", 5.0);
 
-    final var changed = derived.component("gear", VaryingComponent.class);
+    final var derivedComponent = derived.component(
+      "gear",
+      VaryingComponent.class
+    );
     assertThat(
-      ((ObjectFactory<?>) changed.getFactories().get("OTB")).getValue()
+      ((ObjectFactory<?>) derivedComponent.getFactories().get("OTB")).getValue()
     ).isEqualTo(5.0);
     assertThat(
-      ((ObjectFactory<?>) changed.getFactories().get("PS")).getValue()
+      ((ObjectFactory<?>) derivedComponent.getFactories().get("PS")).getValue()
     ).isEqualTo(1.0);
-    assertThat(changed.getUnlistedValueHandling()).isEqualTo(ERROR);
+    assertThat(derivedComponent.getUnlistedValueHandling()).isEqualTo(ERROR);
   }
 
   @Test
