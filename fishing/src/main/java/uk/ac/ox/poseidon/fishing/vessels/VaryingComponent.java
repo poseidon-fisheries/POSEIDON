@@ -130,8 +130,7 @@ public final class VaryingComponent<T>
       attribute
     );
     final var factory = factories.get(value);
-    if (factory != null) return Optional.of(factory);
-    if (!factories.isEmpty()) {
+    if (factory == null && !factories.isEmpty()) {
       final Class<?> keyType = factories.keySet().iterator().next().getClass();
       checkState(
         value.getClass().equals(keyType),
@@ -144,12 +143,13 @@ public final class VaryingComponent<T>
       );
     }
     checkState(
-      unlistedValueHandling == UnlistedValueHandling.NO_COMPONENT,
+      factory != null ||
+        unlistedValueHandling == UnlistedValueHandling.NO_COMPONENT,
       "Vessel %s has the value %s for %s, which the varying component does not list",
       vessel.getId(),
       value,
       attribute
     );
-    return Optional.empty();
+    return Optional.ofNullable(factory);
   }
 }
