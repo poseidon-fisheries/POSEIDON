@@ -44,6 +44,6 @@ final class FactoriesHelpersTest {
    *         arguments are: its own tests cover it
    */
   private static boolean rejectsDefaultArguments(final Method method) {
-    return method.getName().equals("vesselRegisterEventCodes");
+    return method.getName().equals("vesselRegister");
   }
 }

@@ -28,21 +28,25 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparing;
 import static java.util.Map.entry;
+import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.IntStream;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Singular;
 import lombok.ToString;
 import lombok.Value;
 import lombok.experimental.SuperBuilder;
@@ -80,7 +84,6 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.HomePortUpdate;
  */
 @Getter
 @ToString
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class VesselRegisterFactory
@@ -99,10 +102,80 @@ public class VesselRegisterFactory
     ? super SimulationScope,
     ? extends LocalDateTime
   > startingDateTime;
-  /** What the table's columns mean. */
-  private final VesselRegisterColumns columns;
-  /** The codes of the rows that create, change and exit vessels. */
-  private final VesselRegisterEventCodes eventCodes;
+  /** The column giving each row's vessel id. */
+  private final String vesselIdColumn;
+  /** The column giving each row's event code. */
+  private final String eventCodeColumn;
+  /** The column giving each row's event date. */
+  private final String eventDateColumn;
+  /** The column giving each row's home-port code, stated as the home port. */
+  private final String homePortCodeColumn;
+
+  /** The columns whose values become vessel attributes; possibly none. */
+  @Singular
+  private final ImmutableList<String> attributeColumns;
+
+  /** The codes of the rows that create a vessel; at least one. */
+  @Singular
+  private final ImmutableList<String> creationCodes;
+
+  /** The codes of the rows that change a vessel's attributes or home port. */
+  @Singular
+  private final ImmutableList<String> changeCodes;
+
+  /** The codes of the rows that make a vessel exit. */
+  @Singular
+  private final ImmutableList<String> exitCodes;
+
+  /**
+   * The constructor {@code @SuperBuilder} would generate, with the checks that
+   * need only the fields.
+   *
+   * @throws NullPointerException     if a column name is missing
+   * @throws IllegalArgumentException if there is no creation code, or a code
+   *                                  is in two lists
+   */
+  protected VesselRegisterFactory(final VesselRegisterFactoryBuilder<?, ?> b) {
+    super(b);
+    data = b.data;
+    vesselSpecification = b.vesselSpecification;
+    startingDateTime = b.startingDateTime;
+    vesselIdColumn = requireNonNull(b.vesselIdColumn, "vesselIdColumn");
+    eventCodeColumn = requireNonNull(b.eventCodeColumn, "eventCodeColumn");
+    eventDateColumn = requireNonNull(b.eventDateColumn, "eventDateColumn");
+    homePortCodeColumn = requireNonNull(
+      b.homePortCodeColumn,
+      "homePortCodeColumn"
+    );
+    attributeColumns = copy(b.attributeColumns);
+    creationCodes = copy(b.creationCodes);
+    changeCodes = copy(b.changeCodes);
+    exitCodes = copy(b.exitCodes);
+    checkArgument(
+      !creationCodes.isEmpty(),
+      "A vessel register needs at least one creation code"
+    );
+    final Set<String> seen = new HashSet<>();
+    for (final ImmutableList<String> codes : ImmutableList.of(
+      creationCodes,
+      changeCodes,
+      exitCodes
+    )) {
+      for (final String code : new HashSet<>(codes)) {
+        checkArgument(
+          seen.add(code),
+          "Event code %s is in more than one list",
+          code
+        );
+      }
+    }
+  }
+
+  private static ImmutableList<String> copy(
+    final ImmutableList.Builder<String> builder
+  ) {
+    return builder == null ? ImmutableList.of() : builder.build();
+  }
 
   /**
    * @throws IllegalStateException    if a vessel's rows dated at or before the
@@ -120,8 +193,10 @@ public class VesselRegisterFactory
     final Fleet fleet = specification.getFleet();
     final LocalDateTime start = startingDateTime.get(scope);
     final Table table = data.get(scope);
-    columns
-      .namedColumns()
+    ImmutableList.<String>builder()
+      .add(vesselIdColumn, eventCodeColumn, eventDateColumn, homePortCodeColumn)
+      .addAll(attributeColumns)
+      .build()
       .forEach(column ->
         checkArgument(
           table.containsColumn(column),
@@ -129,7 +204,6 @@ public class VesselRegisterFactory
           column
         )
       );
-    final String eventDateColumn = columns.getEventDateColumn();
     final Map<String, RegisterRow> previousRows = new HashMap<>();
     final Map<String, StartingState> statesAtStart = new LinkedHashMap<>();
     final Map<String, LocalDateTime> exitDatesAtStart = new LinkedHashMap<>();
@@ -139,11 +213,11 @@ public class VesselRegisterFactory
       .mapToObj(table::row)
       .sorted(comparing(row -> row.getDate(eventDateColumn)))
       .forEach(row -> {
-        final String vesselId = row.getString(columns.getVesselIdColumn());
+        final String vesselId = row.getString(vesselIdColumn);
         final LocalDateTime date = row.getDate(eventDateColumn).atStartOfDay();
-        final String eventCode = row.getString(columns.getEventCodeColumn());
+        final String eventCode = row.getString(eventCodeColumn);
         final boolean dueAfterTheStart = date.isAfter(start);
-        if (eventCodes.getCreationCodes().contains(eventCode)) {
+        if (creationCodes.contains(eventCode)) {
           final RegisterRow creationRow = registerRow(row);
           previousRows.put(vesselId, creationRow);
           if (dueAfterTheStart) {
@@ -171,7 +245,7 @@ public class VesselRegisterFactory
               )
             );
           }
-        } else if (eventCodes.getChangeCodes().contains(eventCode)) {
+        } else if (changeCodes.contains(eventCode)) {
           final RegisterRow changeRow = registerRow(row);
           final RegisterRow previousRow = previousRows.getOrDefault(
             vesselId,
@@ -191,7 +265,7 @@ public class VesselRegisterFactory
             checkState(state != null, "Vessel %s does not exist", vesselId);
             statesAtStart.put(vesselId, state.after(statements));
           }
-        } else if (eventCodes.getExitCodes().contains(eventCode)) {
+        } else if (exitCodes.contains(eventCode)) {
           if (dueAfterTheStart) {
             laterStatements.add(
               entry(date, _ -> fleet.queue(vesselId, new Exit()))
@@ -239,14 +313,14 @@ public class VesselRegisterFactory
     final ImmutableMap.Builder<String, Object> values = ImmutableMap.builder();
     final ImmutableSet.Builder<String> absentAttributes =
       ImmutableSet.builder();
-    columns.getAttributeColumns().forEach(column -> {
+    attributeColumns.forEach(column -> {
       if (row.isMissing(column)) absentAttributes.add(column);
       else values.put(column, row.getObject(column));
     });
     return new RegisterRow(
-      row.isMissing(columns.getHomePortColumn())
+      row.isMissing(homePortCodeColumn)
         ? Optional.empty()
-        : Optional.of(row.getString(columns.getHomePortColumn())),
+        : Optional.of(row.getString(homePortCodeColumn)),
       values.build(),
       absentAttributes.build()
     );

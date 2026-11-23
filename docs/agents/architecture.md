@@ -166,11 +166,11 @@ has to write `scope -> "value"` for no gain.
 
 ## Plain scenario nodes
 
-A part of a scenario that builds nothing itself, such as
-`VesselRegisterColumns`, is a plain node: an immutable class implementing
-`ScenarioNode`, held by the factory or node above it and written nested under it
-in the scenario file. To take part in YAML writing and loading, addressing,
-derivation and validation it needs:
+A part of a scenario that builds nothing itself, such as a variant of a varying
+component, is a plain node: an immutable class implementing `ScenarioNode`, held
+by the factory or node above it and written nested under it in the scenario
+file. To take part in YAML writing and loading, addressing, derivation and
+validation it needs:
 
 - a static `builder()` and a `toBuilder()` (`@Builder(toBuilder = true)`): the
   loader builds it through the builder and derivation copies it through

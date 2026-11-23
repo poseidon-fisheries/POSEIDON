@@ -26,23 +26,27 @@ every case — match the shape to the class's role:
 - **`Factory` YAML beans** (`*Factory` classes per the Factory/Scenario pattern
   — see `docs/agents/architecture.md`): immutable, always the same five —
   `@Getter @ToString @AllArgsConstructor @EqualsAndHashCode(callSuper = true) @SuperBuilder(toBuilder = true)`,
-  with `final` fields. A class without fields has `@NoArgsConstructor` instead
-  of `@AllArgsConstructor`. `ScenarioLoader` builds every factory through its
-  builder, so a factory class without one fails to load (`FactoryBuildersTest`
-  checks them all); `@SuperBuilder` needs every class in the hierarchy to have
-  it, abstract bases included, and `toBuilder` makes changed copies.
-  `ScenarioWriter` writes the properties the getters give, so every getter must
-  be one the builder sets (`FactoryBuildersTest` checks that too): a value
-  derived from the class, such as a quantity's type, is a method not named as a
-  getter. A field with an initialiser needs `@Builder.Default`, or the builder
-  ignores the initialiser. A `List` or `Map` field is an `ImmutableList` or
-  `ImmutableMap` with `@Singular`, so the builder copies what it is given; the
-  static helpers copy their arguments into one. `callSuper = true` makes
-  equality include the superclass's fields. The other scenario nodes are
-  immutable beans with a builder and `toBuilder` too, checked by the same test.
-  Vessel components (`FactoryComponent`, `VaryingComponent`) are global
-  factories with a plain `@Builder(toBuilder = true)` and identity equality,
-  since they are the keys a vessel keeps its components under.
+  with `final` fields. The one exception is a factory that checks its own fields
+  when built: it writes by hand the protected builder constructor
+  `@SuperBuilder` would generate, with the checks in it, in place of
+  `@AllArgsConstructor`, and helpers build it through its builder
+  (`VesselRegisterFactory`). A class without fields has `@NoArgsConstructor`
+  instead of `@AllArgsConstructor`. `ScenarioLoader` builds every factory
+  through its builder, so a factory class without one fails to load
+  (`FactoryBuildersTest` checks them all); `@SuperBuilder` needs every class in
+  the hierarchy to have it, abstract bases included, and `toBuilder` makes
+  changed copies. `ScenarioWriter` writes the properties the getters give, so
+  every getter must be one the builder sets (`FactoryBuildersTest` checks that
+  too): a value derived from the class, such as a quantity's type, is a method
+  not named as a getter. A field with an initialiser needs `@Builder.Default`,
+  or the builder ignores the initialiser. A `List` or `Map` field is an
+  `ImmutableList` or `ImmutableMap` with `@Singular`, so the builder copies what
+  it is given; the static helpers copy their arguments into one.
+  `callSuper = true` makes equality include the superclass's fields. The other
+  scenario nodes are immutable beans with a builder and `toBuilder` too, checked
+  by the same test. Vessel components (`FactoryComponent`, `VaryingComponent`)
+  are global factories with a plain `@Builder(toBuilder = true)` and identity
+  equality, since they are the keys a vessel keeps its components under.
 - **`Scenario`**: `@Getter @Builder(toBuilder = true)`, built fluently; its
   `with…` methods derive changed copies through `toBuilder`. Its all-arguments
   constructor is hand-written, to check component names.

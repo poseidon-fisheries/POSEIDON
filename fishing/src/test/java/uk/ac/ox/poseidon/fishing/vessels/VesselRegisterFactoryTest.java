@@ -36,8 +36,6 @@ import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegister;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegisterColumns;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegisterEventCodes;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
 import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 
@@ -52,8 +50,11 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tech.tablesaw.api.Table;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeUpdate;
@@ -112,18 +113,45 @@ class VesselRegisterFactoryTest {
     when(portGrid.getCell(p2)).thenReturn(new Cell(2, 2));
   }
 
-  private static VesselRegisterColumns columns(final String... attributes) {
-    return vesselRegisterColumns(
+  private static VesselRegisterFactory register(
+    final Factory<? super SimulationScope, ? extends Table> table,
+    final Factory<
+      ? super SimulationScope,
+      ? extends VesselSpecification
+    > vesselSpecification,
+    final String eventDateColumn,
+    final List<String> attributeColumns,
+    final List<String> creationCodes,
+    final List<String> changeCodes,
+    final List<String> exitCodes
+  ) {
+    return vesselRegister(
+      table,
+      vesselSpecification,
       "cfr",
       "event",
-      "event_start_date",
+      eventDateColumn,
       "place_of_registration",
-      List.of(attributes)
+      attributeColumns,
+      creationCodes,
+      changeCodes,
+      exitCodes
     );
   }
 
-  private static VesselRegisterEventCodes eventCodes() {
-    return vesselRegisterEventCodes(
+  private static VesselRegisterFactory register(
+    final Factory<? super SimulationScope, ? extends Table> table,
+    final Factory<
+      ? super SimulationScope,
+      ? extends VesselSpecification
+    > vesselSpecification,
+    final List<String> attributeColumns
+  ) {
+    return register(
+      table,
+      vesselSpecification,
+      "event_start_date",
+      attributeColumns,
       List.of("CEN", "CST", "IMP", "CHA"),
       List.of("MOD"),
       List.of("DES", "EXP", "RET")
@@ -132,13 +160,21 @@ class VesselRegisterFactoryTest {
 
   private void startSimulation(final String rows) {
     startSimulation(
-      columns("name_of_vessel", "place_of_registration", "t1", "t2"),
+      List.of("name_of_vessel", "place_of_registration", "t1", "t2"),
       rows
     );
   }
 
   private void startSimulation(
-    final VesselRegisterColumns columns,
+    final List<String> attributeColumns,
+    final String rows
+  ) {
+    startSimulation("event_start_date", attributeColumns, rows);
+  }
+
+  private void startSimulation(
+    final String eventDateColumn,
+    final List<String> attributeColumns,
     final String rows
   ) {
     final var fleet = fleet(object(vesselField), object(portGrid));
@@ -153,11 +189,14 @@ class VesselRegisterFactoryTest {
       .component(
         "vesselRegister",
         scheduledByDateTime(
-          vesselRegister(
+          register(
             tableFromCsvString(COLUMNS + rows),
             vesselSpecification,
-            columns,
-            eventCodes()
+            eventDateColumn,
+            attributeColumns,
+            List.of("CEN", "CST", "IMP", "CHA"),
+            List.of("MOD"),
+            List.of("DES", "EXP", "RET")
           )
         )
       )
@@ -519,7 +558,7 @@ class VesselRegisterFactoryTest {
   @Test
   void onlyListedColumnsBecomeAttributes() {
     startSimulation(
-      columns("t1"),
+      List.of("t1"),
       """
       V1,Vee One,P1,CEN,2001-01-01,,1,a
       """
@@ -533,7 +572,7 @@ class VesselRegisterFactoryTest {
   @Test
   void aRoleColumnIsAnAttributeOnlyIfListed() {
     startSimulation(
-      columns("place_of_registration", "event"),
+      List.of("place_of_registration", "event"),
       """
       V1,Vee One,P1,CEN,2001-01-01,,1,a
       """
@@ -549,7 +588,7 @@ class VesselRegisterFactoryTest {
   @Test
   void anEmptyAttributeListGivesVesselsNoAttributes() {
     startSimulation(
-      columns(),
+      List.of(),
       """
       V1,Vee One,P1,CEN,2001-01-01,,1,a
       V1,Vee Uno,P2,MOD,2001-01-03,,2,b
@@ -564,7 +603,7 @@ class VesselRegisterFactoryTest {
   @Test
   void aListedHomePortAttributeKeepsAnOutsideCodeAsSourceData() {
     startSimulation(
-      columns("place_of_registration"),
+      List.of("place_of_registration"),
       """
       V1,Vee One,P3,CEN,2001-01-01,,1,a
       """
@@ -581,13 +620,8 @@ class VesselRegisterFactoryTest {
   void aMissingRoleColumnIsAnErrorNamingIt() {
     assertThatThrownBy(() ->
       startSimulation(
-        vesselRegisterColumns(
-          "cfr",
-          "event",
-          "start_date",
-          "place_of_registration",
-          List.of("t1")
-        ),
+        "start_date",
+        List.of("t1"),
         "V1,Vee One,P1,CEN,2001-01-01,,1,a\n"
       )
     ).hasStackTraceContaining("start_date");
@@ -597,23 +631,22 @@ class VesselRegisterFactoryTest {
   void aMissingAttributeColumnIsAnErrorNamingIt() {
     assertThatThrownBy(() ->
       startSimulation(
-        columns("t1", "wingspan"),
+        List.of("t1", "wingspan"),
         "V1,Vee One,P1,CEN,2001-01-01,,1,a\n"
       )
     ).hasStackTraceContaining("wingspan");
   }
 
-  /** Only the columns and event codes matter here, so there is no specification. */
-  private String writtenRegister(final VesselRegisterEventCodes eventCodes) {
+  /** Only the format matters here, so there is no specification. */
+  private String writtenRegister() {
     return new ScenarioWriter().write(
       Scenario.builder()
         .component(
           "vesselRegister",
-          vesselRegister(
+          register(
             tableFromCsvString(COLUMNS),
             null,
-            columns("name_of_vessel", "t1"),
-            eventCodes
+            List.of("name_of_vessel", "t1")
           )
         )
         .build()
@@ -621,23 +654,138 @@ class VesselRegisterFactoryTest {
   }
 
   @Test
-  void theRegisterAndItsNodesSurviveAYamlRoundTrip() {
-    final String written = writtenRegister(eventCodes());
+  void theRegisterHoldsItsFormatDirectlyThroughAYamlRoundTrip() {
+    final String written = writtenRegister();
 
     final var loaded = (VesselRegisterFactory) new ScenarioLoader()
       .load(written)
       .getComponents()
       .get("vesselRegister");
 
-    assertThat(loaded.getColumns()).isEqualTo(columns("name_of_vessel", "t1"));
-    assertThat(loaded.getEventCodes()).isEqualTo(eventCodes());
+    assertThat(written)
+      .doesNotContain("columns:")
+      .doesNotContain("eventCodes:");
+    assertThat(loaded.getVesselIdColumn()).isEqualTo("cfr");
+    assertThat(loaded.getEventCodeColumn()).isEqualTo("event");
+    assertThat(loaded.getEventDateColumn()).isEqualTo("event_start_date");
+    assertThat(loaded.getHomePortCodeColumn()).isEqualTo(
+      "place_of_registration"
+    );
+    assertThat(loaded.getAttributeColumns()).containsExactly(
+      "name_of_vessel",
+      "t1"
+    );
+    assertThat(loaded.getCreationCodes()).containsExactly(
+      "CEN",
+      "CST",
+      "IMP",
+      "CHA"
+    );
+    assertThat(loaded.getChangeCodes()).containsExactly("MOD");
+    assertThat(loaded.getExitCodes()).containsExactly("DES", "EXP", "RET");
+    assertThat(loaded).isEqualTo(
+      register(
+        tableFromCsvString(COLUMNS),
+        null,
+        List.of("name_of_vessel", "t1")
+      )
+    );
+  }
+
+  @Test
+  void theHelperRejectsACodeInTwoListsNamingIt() {
+    assertThatThrownBy(() ->
+      register(
+        tableFromCsvString(COLUMNS),
+        null,
+        "event_start_date",
+        List.of(),
+        List.of("CEN"),
+        List.of("MOD"),
+        List.of("MOD")
+      )
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("MOD")
+      .hasMessageContaining("more than one list");
+  }
+
+  @Test
+  void theHelperRejectsAnEmptyCreationList() {
+    assertThatThrownBy(() ->
+      register(
+        tableFromCsvString(COLUMNS),
+        null,
+        "event_start_date",
+        List.of(),
+        List.of(),
+        List.of("MOD"),
+        List.of("DES")
+      )
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("at least one creation code");
+  }
+
+  @Test
+  void aCalibrationAddressIntoARegisterFieldResolvesAndDerives() {
+    final Scenario scenario = Scenario.builder()
+      .component(
+        "vesselRegister",
+        register(tableFromCsvString(COLUMNS), null, List.of())
+      )
+      .build();
+
+    final var derived = scenario
+      .with("vesselRegister.eventDateColumn", "start_date")
+      .with("vesselRegister.exitCodes", List.of("GONE"))
+      .component("vesselRegister", VesselRegisterFactory.class);
+
+    assertThat(derived.getEventDateColumn()).isEqualTo("start_date");
+    assertThat(derived.getExitCodes()).containsExactly("GONE");
+    assertThatThrownBy(() ->
+      scenario.with("vesselRegister.exitCodes", List.of("CEN"))
+    ).hasStackTraceContaining("CEN");
+    assertThatThrownBy(() ->
+      scenario.with("vesselRegister.creationCodes", List.of())
+    ).hasStackTraceContaining("at least one creation code");
+  }
+
+  @Test
+  void aCodeRepeatedWithinOneListIsAccepted() {
+    register(
+      tableFromCsvString(COLUMNS),
+      null,
+      "event_start_date",
+      List.of(),
+      List.of("CEN", "CEN"),
+      List.of(),
+      List.of()
+    );
+  }
+
+  @Test
+  void aMissingColumnNameIsRejectedWhenBuilt() {
+    assertThatThrownBy(() ->
+      VesselRegisterFactory.builder().creationCodes(List.of("CEN")).build()
+    ).isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void aDerivedRegisterWithACodeInTwoListsFailsWhenBuilt() {
+    final var register = register(tableFromCsvString(COLUMNS), null, List.of());
+
+    assertThatThrownBy(() ->
+      register.toBuilder().exitCodes(List.of("MOD")).build()
+    ).hasMessageContaining("MOD");
+    assertThatThrownBy(() ->
+      register.toBuilder().clearCreationCodes().build()
+    ).hasMessageContaining("at least one creation code");
   }
 
   @Test
   void yamlLoadingRejectsACodeInTwoLists() {
-    final String written = writtenRegister(
-      vesselRegisterEventCodes(List.of("CEN"), List.of("MOD"), List.of("DES"))
-    );
+    final String written = writtenRegister();
     final String clashing = written.replace("DES", "MOD");
     assertThat(clashing).isNotEqualTo(written);
 
@@ -648,11 +796,9 @@ class VesselRegisterFactoryTest {
 
   @Test
   void yamlLoadingRejectsAnEmptyCreationList() {
-    final String written = writtenRegister(
-      vesselRegisterEventCodes(List.of("CEN"), List.of("MOD"), List.of("DES"))
-    );
+    final String written = writtenRegister();
     final String noCreation = written.replaceAll(
-      "creationCodes: \\[\\s*CEN\\s*\\]",
+      "creationCodes: \\[[^\\]]*\\]",
       "creationCodes: []"
     );
     assertThat(noCreation).isNotEqualTo(written);

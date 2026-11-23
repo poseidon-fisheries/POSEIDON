@@ -147,8 +147,8 @@ public final class Factories {
   }
 
   /**
-   * The register's table is read through {@code columns} and {@code eventCodes}
-   * and nothing else: only the listed attribute columns become vessel
+   * The register's table is read through the named columns and codes and nothing
+   * else: only the listed attribute columns become vessel
    * attributes. A row whose event code is a creation code creates the vessel
    * with its attributes and home-port code. A change code gives the vessel what
    * differs from its previous row: an attribute update for changed attributes
@@ -161,11 +161,20 @@ public final class Factories {
    *
    * @param data                the vessel register table
    * @param vesselSpecification what the vessels are made of
-   * @param columns             what the table's columns mean
-   * @param eventCodes          the codes that create, change and exit vessels
+   * @param vesselIdColumn      the column giving each row's vessel id
+   * @param eventCodeColumn     the column giving each row's event code
+   * @param eventDateColumn     the column giving each row's event date
+   * @param homePortCodeColumn  the column giving each row's home-port code
+   * @param attributeColumns    the columns that become vessel attributes; only
+   *                            these do, a role column among them included
+   * @param creationCodes       the codes of rows that create a vessel; not empty
+   * @param changeCodes         the codes of rows that change a vessel
+   * @param exitCodes           the codes of rows that make a vessel exit
    * @return a {@link SimulationScopeFactory} for the register's statements,
    *         dated; pass it to
    *         {@link uk.ac.ox.poseidon.core.schedule.Factories#scheduledByDateTime(Factory)}
+   * @throws IllegalArgumentException if there is no creation code, or a code is
+   *                                  in two lists
    * @see VesselRegisterFactory
    */
   public static VesselRegisterFactory vesselRegister(
@@ -174,59 +183,24 @@ public final class Factories {
       ? super SimulationScope,
       ? extends VesselSpecification
     > vesselSpecification,
-    final VesselRegisterColumns columns,
-    final VesselRegisterEventCodes eventCodes
-  ) {
-    return new VesselRegisterFactory(
-      data,
-      vesselSpecification,
-      startingDateTime(),
-      columns,
-      eventCodes
-    );
-  }
-
-  /**
-   * @param vesselIdColumn   the column giving each row's vessel id
-   * @param eventCodeColumn  the column giving each row's event code
-   * @param eventDateColumn  the column giving each row's event date
-   * @param homePortColumn   the column giving each row's home-port code
-   * @param attributeColumns the columns that become vessel attributes; only
-   *                         these do, a role column among them included
-   * @return the meaning of the register's columns
-   * @see VesselRegisterColumns
-   */
-  public static VesselRegisterColumns vesselRegisterColumns(
     final String vesselIdColumn,
     final String eventCodeColumn,
     final String eventDateColumn,
-    final String homePortColumn,
-    final List<String> attributeColumns
-  ) {
-    return VesselRegisterColumns.builder()
-      .vesselIdColumn(vesselIdColumn)
-      .eventCodeColumn(eventCodeColumn)
-      .eventDateColumn(eventDateColumn)
-      .homePortColumn(homePortColumn)
-      .attributeColumns(attributeColumns)
-      .build();
-  }
-
-  /**
-   * @param creationCodes the codes of rows that create a vessel; not empty
-   * @param changeCodes   the codes of rows that change a vessel
-   * @param exitCodes     the codes of rows that make a vessel exit
-   * @return the register's event codes
-   * @throws IllegalArgumentException if there is no creation code, or a code is
-   *                                  in two lists
-   * @see VesselRegisterEventCodes
-   */
-  public static VesselRegisterEventCodes vesselRegisterEventCodes(
+    final String homePortCodeColumn,
+    final List<String> attributeColumns,
     final List<String> creationCodes,
     final List<String> changeCodes,
     final List<String> exitCodes
   ) {
-    return VesselRegisterEventCodes.builder()
+    return VesselRegisterFactory.builder()
+      .data(data)
+      .vesselSpecification(vesselSpecification)
+      .startingDateTime(startingDateTime())
+      .vesselIdColumn(vesselIdColumn)
+      .eventCodeColumn(eventCodeColumn)
+      .eventDateColumn(eventDateColumn)
+      .homePortCodeColumn(homePortCodeColumn)
+      .attributeColumns(attributeColumns)
       .creationCodes(creationCodes)
       .changeCodes(changeCodes)
       .exitCodes(exitCodes)

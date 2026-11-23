@@ -34,8 +34,6 @@ import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegister;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegisterColumns;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegisterEventCodes;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
 import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.ERROR;
 import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.NO_COMPONENT;
@@ -154,18 +152,14 @@ class RebuildTest {
           vesselRegister(
             tableFromCsvString(COLUMNS + rows),
             vesselSpecification,
-            vesselRegisterColumns(
-              "cfr",
-              "event",
-              "event_start_date",
-              "place_of_registration",
-              List.of("place_of_registration", "gear", "t1")
-            ),
-            vesselRegisterEventCodes(
-              List.of("CEN", "CST", "IMP", "CHA"),
-              List.of("MOD"),
-              List.of("DES", "EXP", "RET")
-            )
+            "cfr",
+            "event",
+            "event_start_date",
+            "place_of_registration",
+            List.of("place_of_registration", "gear", "t1"),
+            List.of("CEN", "CST", "IMP", "CHA"),
+            List.of("MOD"),
+            List.of("DES", "EXP", "RET")
           )
         )
       )
