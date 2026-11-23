@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import java.util.function.BiFunction;
 import lombok.EqualsAndHashCode;
@@ -55,14 +56,23 @@ public class IntervalLabelFactory<S extends Scope, C, T>
   > number;
 
   /**
-   * Each interval's label, by the interval's lower bound. An interval runs up
-   * to the next lower bound, and the last one has no upper bound.
+   * Each interval's lower bound, by the interval's label. Labels are unique, and
+   * so are lower bounds. An interval runs up to the next lower bound in
+   * numerical order, whatever order the entries are written in, and the last
+   * one has no upper bound.
    */
-  @Singular("labelByLowerBound")
-  private final ImmutableSortedMap<Double, String> labelsByLowerBound;
+  @Singular("lowerBoundByLabel")
+  private final ImmutableMap<String, Double> lowerBoundsByLabel;
 
   @Override
   protected BiFunction<C, T, String> newInstance(final S scope) {
-    return new IntervalLabel<>(number.get(scope), labelsByLowerBound);
+    final var labelsByLowerBound = ImmutableSortedMap.<
+      Double,
+      String
+    >naturalOrder();
+    lowerBoundsByLabel.forEach((label, bound) ->
+      labelsByLowerBound.put(bound, label)
+    );
+    return new IntervalLabel<>(number.get(scope), labelsByLowerBound.build());
   }
 }

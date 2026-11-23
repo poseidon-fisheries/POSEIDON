@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core.functions;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
@@ -321,9 +322,10 @@ public final class Factories {
 
   /**
    * @param number the mapping that reads the number to place
-   * @param labels the intervals' labels, each written as
-   *               {@code entry(lowerBound, label)}; an interval runs up to the
-   *               next lower bound, and the last has no upper bound
+   * @param lowerBounds the intervals' lower bounds, each written as
+   *               {@code entry(label, lowerBound)}; an interval runs up to the
+   *               next lower bound in numerical order, and the last has no
+   *               upper bound
    * @return a {@link MappingFactory} for an {@link IntervalLabel} of the number
    *         among the given intervals
    * @see IntervalLabel
@@ -340,19 +342,20 @@ public final class Factories {
       ? super T,
       ? extends Double
     > number,
-    final Map.Entry<Double, String>... labels
+    final Map.Entry<String, Double>... lowerBounds
   ) {
     return IntervalLabelFactory.<S, C, T>builder()
       .number(number)
-      .labelsByLowerBound(Map.ofEntries(labels))
+      .lowerBoundsByLabel(ImmutableMap.ofEntries(lowerBounds))
       .build();
   }
 
   /**
    * @param number the value that is the number to place
-   * @param labels the intervals' labels, each written as
-   *               {@code entry(lowerBound, label)}; an interval runs up to the
-   *               next lower bound, and the last has no upper bound
+   * @param lowerBounds the intervals' lower bounds, each written as
+   *               {@code entry(label, lowerBound)}; an interval runs up to the
+   *               next lower bound in numerical order, and the last has no
+   *               upper bound
    * @return a {@link ValueFactory} for an {@link IntervalLabel} of the number
    *         among the given intervals, made a value by {@link MappingAsValue}
    * @see IntervalLabel
@@ -364,12 +367,12 @@ public final class Factories {
     String
   > intervalLabel(
     final ValueFactory<? super S, ? super C, ? extends Double> number,
-    final Map.Entry<Double, String>... labels
+    final Map.Entry<String, Double>... lowerBounds
   ) {
     return new MappingAsValueFactory<S, C, String>(
       IntervalLabelFactory.<S, C, Void>builder()
         .number(new ValueAsMappingFactory<S, C, Double>(number))
-        .labelsByLowerBound(Map.ofEntries(labels))
+        .lowerBoundsByLabel(ImmutableMap.ofEntries(lowerBounds))
         .build()
     );
   }

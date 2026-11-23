@@ -56,9 +56,9 @@ class IntervalLabelFactoryTest {
   private BiFunction<Object, Double, String> threeIntervals() {
     return intervalLabel(
       number,
-      entry(0.0, "VL0006"),
-      entry(6.0, "VL0612"),
-      entry(12.0, "VL12XX")
+      entry("VL0006", 0.0),
+      entry("VL0612", 6.0),
+      entry("VL12XX", 12.0)
     ).get(GLOBAL_SCOPE);
   }
 
@@ -109,8 +109,8 @@ class IntervalLabelFactoryTest {
   void aFirstBoundOfMinusInfinityLabelsEveryNumberBelow() {
     final BiFunction<Object, Double, String> label = intervalLabel(
       number,
-      entry(Double.NEGATIVE_INFINITY, "low"),
-      entry(0.0, "high")
+      entry("low", Double.NEGATIVE_INFINITY),
+      entry("high", 0.0)
     ).get(GLOBAL_SCOPE);
 
     assertThat(label.apply(null, -1e300)).isEqualTo("low");
@@ -119,26 +119,12 @@ class IntervalLabelFactoryTest {
   }
 
   @Test
-  void aLabelCanBeUsedForSeveralIntervals() {
-    final BiFunction<Object, Double, String> label = intervalLabel(
-      number,
-      entry(0.0, "a"),
-      entry(1.0, "b"),
-      entry(2.0, "a")
-    ).get(GLOBAL_SCOPE);
-
-    assertThat(label.apply(null, 0.5)).isEqualTo("a");
-    assertThat(label.apply(null, 1.5)).isEqualTo("b");
-    assertThat(label.apply(null, 2.5)).isEqualTo("a");
-  }
-
-  @Test
   void theOrderTheIntervalsAreWrittenInDoesNotMatter() {
     final BiFunction<Object, Double, String> label = intervalLabel(
       number,
-      entry(12.0, "VL12XX"),
-      entry(0.0, "VL0006"),
-      entry(6.0, "VL0612")
+      entry("VL12XX", 12.0),
+      entry("VL0006", 0.0),
+      entry("VL0612", 6.0)
     ).get(GLOBAL_SCOPE);
 
     assertThat(label.apply(null, 7.0)).isEqualTo("VL0612");
@@ -150,8 +136,8 @@ class IntervalLabelFactoryTest {
   void labelsAValue() {
     final Function<String, String> label = intervalLabel(
       contextLength,
-      entry(0.0, "short"),
-      entry(3.0, "long")
+      entry("short", 0.0),
+      entry("long", 3.0)
     ).get(GLOBAL_SCOPE);
 
     assertThat(label.apply("ab")).isEqualTo("short");
@@ -171,14 +157,21 @@ class IntervalLabelFactoryTest {
   @Test
   void aNaNBoundIsRejected() {
     assertThatThrownBy(() ->
-      intervalLabel(number, entry(Double.NaN, "x")).get(GLOBAL_SCOPE)
+      intervalLabel(number, entry("x", Double.NaN)).get(GLOBAL_SCOPE)
     ).isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void aRepeatedBoundIsRejected() {
     assertThatThrownBy(() ->
-      intervalLabel(number, entry(1.0, "x"), entry(1.0, "y"))
+      intervalLabel(number, entry("x", 1.0), entry("y", 1.0)).get(GLOBAL_SCOPE)
+    ).isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void aRepeatedLabelIsRejected() {
+    assertThatThrownBy(() ->
+      intervalLabel(number, entry("a", 0.0), entry("a", 1.0))
     ).isInstanceOf(IllegalArgumentException.class);
   }
 }
