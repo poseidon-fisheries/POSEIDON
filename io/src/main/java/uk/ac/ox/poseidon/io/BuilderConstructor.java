@@ -37,7 +37,7 @@ import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
 import org.yaml.snakeyaml.nodes.Node;
-import uk.ac.ox.poseidon.core.ScenarioNode;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.utils.Builders;
 
 /**
@@ -149,7 +149,7 @@ class BuilderConstructor extends Constructor {
       final Property readable = readOnlyProperties.getProperty(getType(), name);
       register(readable.getType());
       // The elements of a collection are written without a tag too when their
-      // class is the collection's element type; a scenario node among them is
+      // class is the collection's element type; a factory among them is
       // built through its builder, and a plain value as SnakeYAML builds it
       final Class<?>[] typeArguments = readable.getActualTypeArguments();
       if (
@@ -157,7 +157,7 @@ class BuilderConstructor extends Constructor {
         typeArguments != null
       ) {
         Arrays.stream(typeArguments)
-          .filter(ScenarioNode.class::isAssignableFrom)
+          .filter(Factory.class::isAssignableFrom)
           .forEach(BuilderConstructor.this::register);
       }
       return new Property(name, readable.getType()) {

@@ -42,11 +42,10 @@ every case — match the shape to the class's role:
   or the builder ignores the initialiser. A `List` or `Map` field is an
   `ImmutableList` or `ImmutableMap` with `@Singular`, so the builder copies what
   it is given; the static helpers copy their arguments into one.
-  `callSuper = true` makes equality include the superclass's fields. The other
-  scenario nodes are immutable beans with a builder and `toBuilder` too, checked
-  by the same test. Vessel components (`FactoryComponent`, `VaryingComponent`)
-  are global factories with a plain `@Builder(toBuilder = true)` and identity
-  equality, since they are the keys a vessel keeps its components under.
+  `callSuper = true` makes equality include the superclass's fields. Vessel
+  components (`FactoryComponent`, `VaryingComponent`) are global factories with
+  a plain `@Builder(toBuilder = true)` and identity equality, since they are the
+  keys a vessel keeps its components under.
 - **`Scenario`**: `@Getter @Builder(toBuilder = true)`, built fluently; its
   `with…` methods derive changed copies through `toBuilder`. Its all-arguments
   constructor is hand-written, to check component names.

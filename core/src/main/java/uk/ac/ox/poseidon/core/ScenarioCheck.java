@@ -33,23 +33,22 @@ import lombok.Value;
  */
 public interface ScenarioCheck {
   /**
-   * @param nodes every {@link ScenarioNode} of the scenario, factories
-   *              included, each once, with the node it was
-   *              first reached from, in the order a walk from the scenario's
-   *              components meets them
+   * @param nodes every {@link Factory} of the scenario, each once, with the
+   *              factory it was first reached from, in the order a walk from
+   *              the scenario's components meets them
    * @throws IllegalStateException naming what is wrong
    */
   void check(List<ReachedNode> nodes);
 
-  /** A node of a scenario's description, with where it was reached from. */
+  /** A factory of a scenario's description, with where it was reached from. */
   @Value
   static final class ReachedNode {
 
-    /** A node of the description. */
+    /** A factory of the description. */
     Object node;
 
     /**
-     * The node {@code node} was first reached from, or {@code null} for a
+     * The factory {@code node} was first reached from, or {@code null} for a
      * scenario component.
      */
     Object parent;

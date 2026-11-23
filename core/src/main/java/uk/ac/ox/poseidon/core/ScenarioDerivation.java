@@ -44,11 +44,10 @@ import uk.ac.ox.poseidon.core.utils.Builders;
  * An address starts at a component's name and goes on with commons-beanutils
  * syntax: {@code .property}, {@code (key)} into a map, {@code [index]} into a
  * list. Following it only reads. If the value found is a node (a
- * {@link ScenarioNode}, such as a factory, or a map or a list), it is replaced
- * in every
- * container that holds it, since the same node may be reached in several
- * ways. Any other value is replaced in the container the address ends in,
- * which is then the changed node.
+ * {@link Factory}, or a map or a list), it is replaced in every container that
+ * holds it, since the same node may be reached in several ways. Any other value
+ * is replaced in the container the address ends in, which is then the changed
+ * node.
  * <p>
  * Every node that holds a changed node, directly or not, up to the scenario,
  * is then copied once, through its builder, with each changed child replaced
@@ -119,7 +118,7 @@ final class ScenarioDerivation {
 
   private static boolean isNode(final Object object) {
     return (
-      object instanceof ScenarioNode ||
+      object instanceof Factory<?, ?> ||
       object instanceof Map<?, ?> ||
       object instanceof Collection<?>
     );
@@ -137,7 +136,7 @@ final class ScenarioDerivation {
       case final Map<?, ?> map -> rebuiltMap(map);
       case final List<?> list -> rebuiltList(list);
       case final Collection<?> collection -> checkedUnchanged(collection);
-      case final ScenarioNode scenarioNode -> rebuiltBean(scenarioNode);
+      case final Factory<?, ?> factory -> rebuiltBean(factory);
       case final Scenario scenario -> rebuiltBean(scenario);
       case null, default -> node;
     };
@@ -223,7 +222,7 @@ final class ScenarioDerivation {
 
     @Override
     public Object read(final Object container, final String address) {
-      if (!(container instanceof ScenarioNode)) {
+      if (!(container instanceof Factory<?, ?>)) {
         throw new IllegalArgumentException(
           "No property " + name + " to follow in " + address
         );

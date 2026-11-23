@@ -53,21 +53,8 @@ public class CoordinatesPortrayalFactory
 {
 
   private final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
-  private final DecimalFormat decimalFormat;
-
-  /**
-   * @param modelGrid     the grid whose cells' coordinates are shown
-   * @param decimalPlaces how many decimal places to format each coordinate to
-   */
-  public CoordinatesPortrayalFactory(
-    final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid,
-    final int decimalPlaces
-  ) {
-    this.modelGrid = modelGrid;
-    this.decimalFormat = new DecimalFormat();
-    decimalFormat.setMaximumFractionDigits(decimalPlaces);
-    decimalFormat.setMinimumFractionDigits(decimalPlaces);
-  }
+  /** How many decimal places to format each coordinate to. */
+  private final int decimalPlaces;
 
   /**
    * @return an invisible object-grid portrayal whose tooltip reports each
@@ -75,6 +62,9 @@ public class CoordinatesPortrayalFactory
    */
   @Override
   protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
+    final DecimalFormat decimalFormat = new DecimalFormat();
+    decimalFormat.setMaximumFractionDigits(decimalPlaces);
+    decimalFormat.setMinimumFractionDigits(decimalPlaces);
     final ObjectGridPortrayal2D objectGridPortrayal2D =
       new ObjectGridPortrayal2D();
     objectGridPortrayal2D.setField(modelGrid.get(scope).getCoordinatesGrid());

@@ -72,7 +72,7 @@ final class ScenarioWalk {
       case final Collection<?> collection -> collection.forEach(element ->
         visit(element, parent)
       );
-      case final ScenarioNode node -> visitNode(node, parent);
+      case final Factory<?, ?> factory -> visitNode(factory, parent);
       case null, default -> {
       }
     }

@@ -14,11 +14,10 @@ The model is built around a declarative configuration → runtime object pattern
   programmatically or deserialized from YAML.
 - Scenario-building code composes static helpers only — nested calls all the way
   down. A helper takes all its arguments and returns a finished scenario part,
-  which may be a factory or a plain node (the vessel register's columns);
-  scenario code calls nothing on a helper's result. Never call `.get(scope)`,
-  `.apply(...)`, or `.test(...)` directly in scenario-building code; resolving
-  the graph is the framework's job at simulation-start time, not something
-  scenario code does itself.
+  which is a factory; scenario code calls nothing on a helper's result. Never
+  call `.get(scope)`, `.apply(...)`, or `.test(...)` directly in
+  scenario-building code; resolving the graph is the framework's job at
+  simulation-start time, not something scenario code does itself.
 - When creating a new factory, extend `AbstractFactory`
   (`core/.../AbstractFactory.java`) rather than implementing `Factory` directly
   unless you have a specific reason not to.
@@ -94,7 +93,7 @@ The model is built around a declarative configuration → runtime object pattern
   checked-in file, by hand or by script, even when the result would be
   identical.
 - **When building a `Scenario`, use the static helper methods of each package's
-  `Factories` class, not `new SomeFactory(...)` or a node's constructor
+  `Factories` class, not `new SomeFactory(...)` or a factory's constructor
   directly.**
 - **In scenario-building code, write a factory inline where it is used, and give
   it a local variable only when:**
@@ -125,7 +124,15 @@ setters. Each has one constructor and a Lombok builder:
 - `@SuperBuilder(toBuilder = true)`: `ScenarioLoader` builds factories through
   it, and `toBuilder()` makes a changed copy.
 
-Don't add other constructors to a factory class.
+Don't add other constructors to a factory class, except the hand-written builder
+constructor some factories need.
+
+Validate in the constructor, including that hand-written builder constructor:
+the builder calls it, so construction and YAML loading reject the same inputs.
+
+A scenario has one kind of part: a factory or a literal (a scalar, an enum, a
+list or a map). Every builder property of a factory is a factory, a literal, or
+a list or map of these, recursively; `FactoryPropertiesTest` checks it.
 
 A factory resolves dependencies and constructs its product. Named runtime
 calculations and extractors have concrete product classes, including when they
@@ -163,26 +170,6 @@ enum — stays a plain field, exactly like `separator` on
 `Factory<String>` "for consistency" or "to be safe" is over-engineering: it adds
 a layer of indirection nothing resolves differently through, and every call site
 has to write `scope -> "value"` for no gain.
-
-## Plain scenario nodes
-
-A part of a scenario that builds nothing itself, such as a variant of a varying
-component, is a plain node: an immutable class implementing `ScenarioNode`, held
-by the factory or node above it and written nested under it in the scenario
-file. To take part in YAML writing and loading, addressing, derivation and
-validation it needs:
-
-- a static `builder()` and a `toBuilder()` (`@Builder(toBuilder = true)`): the
-  loader builds it through the builder and derivation copies it through
-  `toBuilder()`;
-- a getter for every property its builder sets, and no other getter, which
-  `FactoryBuildersTest` checks;
-- `@Value`-style equality, so a loaded copy equals the original;
-- any validation in its constructor, which the builder calls, so that
-  construction and YAML loading reject the same inputs.
-
-A static helper in `Factories` returns it like any other scenario part. When a
-part should be a factory and when a plain node is left to the general rule.
 
 ## Live parameters, with a plain-value overload
 
