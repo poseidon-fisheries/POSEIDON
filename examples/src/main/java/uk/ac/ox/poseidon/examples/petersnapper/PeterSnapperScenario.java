@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.examples.petersnapper;
 
 import static java.time.Period.ofDays;
 import static java.time.Period.ofYears;
+import static java.util.Map.entry;
 import static tech.units.indriya.unit.Units.*;
 import static uk.ac.ox.poseidon.biology.allocators.Factories.proportionOfCarryingCapacityAllocator;
 import static uk.ac.ox.poseidon.biology.biomass.Factories.*;
@@ -449,12 +450,12 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     final var vesselSpecification = vesselSpecification(
       fleet,
       behaviour,
-      namedComponent("gear", gear),
-      namedComponent("engine", engine),
-      namedComponent("fuelTank", fuelTank),
-      namedComponent("hold", hold),
-      namedComponent("ownTripRecorder", ownTripRecorder),
-      namedComponent("friendTripRecorder", friendTripRecorder)
+      entry("gear", gear),
+      entry("engine", engine),
+      entry("fuelTank", fuelTank),
+      entry("hold", hold),
+      entry("ownTripRecorder", ownTripRecorder),
+      entry("friendTripRecorder", friendTripRecorder)
     );
 
     // Benoa's vessels are created first, then Kupang's

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.social;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -44,7 +45,6 @@ import static uk.ac.ox.poseidon.fishing.tasks.fishing.Factories.fishingEventAccu
 import static uk.ac.ox.poseidon.fishing.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.namedComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselEventListener;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegister;
@@ -59,7 +59,6 @@ import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +82,6 @@ import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingOutcome;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet;
 import uk.ac.ox.poseidon.fishing.vessels.FleetFactory;
 import uk.ac.ox.poseidon.fishing.vessels.HasAttributes;
-import uk.ac.ox.poseidon.fishing.vessels.NamedComponent;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
@@ -167,51 +165,51 @@ class FishingEventSharingRouteTest {
     final String vesselRegister,
     final boolean withSharing
   ) {
-    final List<NamedComponent> components = new ArrayList<>(
-      List.of(
-        namedComponent("hold", vesselComponent(object(hold))),
-        namedComponent("gear", gearComponent),
-        namedComponent("engine", vesselComponent(object(engine)))
-      )
-    );
-    if (withSharing) {
-      components.add(
-        namedComponent(
-          "ownCatchRecorder",
-          vesselComponent(
-            vesselEventListener(
-              fishingActionRecorder(
-                fishingCell(),
-                retainedCatch(),
-                vesselMemory,
-                exponentialMovingAverageOfBuckets(OWN_ALPHA)
+    final var behaviour = behaviour(waitFor(constant(days(1))));
+    final var holdComponent = vesselComponent(object(hold));
+    final var engineComponent = vesselComponent(object(engine));
+    final var vesselSpecification = withSharing
+      ? vesselSpecification(
+          baseFleet,
+          behaviour,
+          entry("hold", holdComponent),
+          entry("gear", gearComponent),
+          entry("engine", engineComponent),
+          entry(
+            "ownCatchRecorder",
+            vesselComponent(
+              vesselEventListener(
+                fishingActionRecorder(
+                  fishingCell(),
+                  retainedCatch(),
+                  vesselMemory,
+                  exponentialMovingAverageOfBuckets(OWN_ALPHA)
+                )
+              )
+            )
+          ),
+          entry(
+            "friendsCatchRecorder",
+            vesselComponent(
+              sharedFishingActionListener(
+                fishingActionRecorder(
+                  fishingCell(),
+                  retainedCatch(),
+                  vesselMemory,
+                  exponentialMovingAverageOfBuckets(SOCIAL_ALPHA)
+                ),
+                fishingActionSharer
               )
             )
           )
         )
-      );
-      components.add(
-        namedComponent(
-          "friendsCatchRecorder",
-          vesselComponent(
-            sharedFishingActionListener(
-              fishingActionRecorder(
-                fishingCell(),
-                retainedCatch(),
-                vesselMemory,
-                exponentialMovingAverageOfBuckets(SOCIAL_ALPHA)
-              ),
-              fishingActionSharer
-            )
-          )
-        )
-      );
-    }
-    final var vesselSpecification = vesselSpecification(
-      baseFleet,
-      behaviour(waitFor(constant(days(1)))),
-      components.toArray(NamedComponent[]::new)
-    );
+      : vesselSpecification(
+          baseFleet,
+          behaviour,
+          entry("hold", holdComponent),
+          entry("gear", gearComponent),
+          entry("engine", engineComponent)
+        );
     final var scenario = Scenario.builder()
       .startingDateTime(dateTime(LocalDate.of(2000, 1, 1).atStartOfDay()))
       .component("fleet", baseFleet)

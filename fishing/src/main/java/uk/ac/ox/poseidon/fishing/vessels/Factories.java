@@ -87,44 +87,31 @@ public final class Factories {
   }
 
   /**
-   * @param fleet           the fleet the vessels join
-   * @param behaviour       the component that is the behaviour each vessel
-   *                        steps
-   * @param namedComponents the vessel's other components, in the order they
-   *                        are built
+   * @param fleet      the fleet the vessels join
+   * @param behaviour  the component that is the behaviour each vessel steps
+   * @param components the vessel's other components as {@code (name,
+   *                   component)} entries, in the order they are built
    * @return a {@link SimulationScopeFactory} for a
    *         {@link VesselSpecification}
+   * @throws IllegalArgumentException if a component name is given twice
    * @see VesselSpecification
    */
+  @SafeVarargs
   public static VesselSpecificationFactory vesselSpecification(
     final Factory<? super SimulationScope, ? extends Fleet> fleet,
     final VesselComponent<? extends Task<Vessel>> behaviour,
-    final NamedComponent... namedComponents
+    final Map.Entry<String, ? extends VesselComponent<?>>... components
   ) {
-    final var specification = VesselSpecificationFactory.builder()
-      .fleet(fleet)
-      .behaviour(behaviour);
-    for (final NamedComponent namedComponent : namedComponents) {
-      specification.component(
-        namedComponent.getName(),
-        namedComponent.getComponent()
-      );
+    final ImmutableMap.Builder<String, VesselComponent<?>> map =
+      ImmutableMap.builder();
+    for (final var entry : components) {
+      map.put(entry.getKey(), entry.getValue());
     }
-    return specification.build();
-  }
-
-  /**
-   * @param name      the name the component is listed under
-   * @param component the component
-   * @return the component with its name, for
-   *         {@link #vesselSpecification}
-   * @see NamedComponent
-   */
-  public static NamedComponent namedComponent(
-    final String name,
-    final VesselComponent<?> component
-  ) {
-    return new NamedComponent(name, component);
+    return VesselSpecificationFactory.builder()
+      .fleet(fleet)
+      .behaviour(behaviour)
+      .components(map.buildOrThrow())
+      .build();
   }
 
   /**

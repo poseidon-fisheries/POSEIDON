@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.vessels;
 
 import static java.time.Duration.ofDays;
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledByDateTime;
@@ -30,7 +31,6 @@ import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.namedComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.none;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
@@ -141,8 +141,8 @@ class RebuildTest {
     final var vesselSpecification = vesselSpecification(
       fleet,
       behaviour,
-      namedComponent("gear", gear),
-      namedComponent("hold", vesselComponent(componentBuilder("hold")))
+      entry("gear", gear),
+      entry("hold", vesselComponent(componentBuilder("hold")))
     );
     simulation = Scenario.builder()
       .startingDateTime(dateTime(START))

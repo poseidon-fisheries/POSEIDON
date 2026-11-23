@@ -75,14 +75,14 @@ uses but no vessel specification lists fails then, naming the consumer.
 ## Vessel creation
 
 The **vessel specification**
-(`vesselSpecification(fleet, behaviour, namedComponent(...)...)`, one call whose
-trailing named components keep the order they are built in) is what a vessel of
-the scenario is made of, and the only thing that creates vessels: a creation
-source (`createVesselsAtPort`, the vessel register) asks it to create each
-vessel from an id, an `Optional<String>` home-port code and attributes. The
-specification holds no attribute names: each source states the home port itself,
-and a vessel's label is its id. The vessel resolves the code against its port
-grid once, when it is given, and keeps a non-null `Optional<Port>` and
+(`vesselSpecification(fleet, behaviour, entry(...))`, one call whose trailing
+named components keep the order they are built in) is what a vessel of the
+scenario is made of, and the only thing that creates vessels: a creation source
+(`createVesselsAtPort`, the vessel register) asks it to create each vessel from
+an id, an `Optional<String>` home-port code and attributes. The specification
+holds no attribute names: each source states the home port itself, and a
+vessel's label is its id. The vessel resolves the code against its port grid
+once, when it is given, and keeps a non-null `Optional<Port>` and
 `Optional<Cell>`, present only for a modelled port; no code, or a code naming no
 port, leaves them empty and the vessel absent. A creation source supplies the
 code and never a `Port`, so the port grid is the only route to a home port.

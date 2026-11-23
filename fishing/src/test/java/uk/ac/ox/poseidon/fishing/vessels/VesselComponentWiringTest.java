@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -30,7 +31,6 @@ import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.tasks.landings.Factories.landCatches;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.namedComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
 
@@ -87,7 +87,7 @@ class VesselComponentWiringTest {
               object(mock(MarketGrid.class))
             )
           ),
-          namedComponent("hold", listedHold)
+          entry("hold", listedHold)
         )
       )
       .build();
