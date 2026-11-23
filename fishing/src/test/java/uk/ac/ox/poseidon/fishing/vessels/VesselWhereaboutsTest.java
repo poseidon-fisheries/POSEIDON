@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.fishing.vessels;
 
 import static java.time.Duration.ofHours;
 import static java.time.Duration.ofSeconds;
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -33,9 +34,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.when;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT_CODE;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.specificationOf;
+import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.ERROR;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -314,14 +315,12 @@ class VesselWhereaboutsTest {
   @Test
   void anUpdateEqualToTheCurrentStateRebuildsNothing() {
     final List<Object> builtComponents = new ArrayList<>();
+    final Factory<VesselComponentScope, Object> build = _ ->
+      builtComponents.add(new Object());
     final Vessel vessel = createVessel(
       Optional.of(HOME_PORT_CODE),
       Map.of("generation", "old"),
-      varyingBy(
-        "generation",
-        when("old", scope -> builtComponents.add(new Object())),
-        when("new", scope -> builtComponents.add(new Object()))
-      )
+      varyingBy("generation", ERROR, entry("old", build), entry("new", build))
     );
     assertThat(builtComponents).hasSize(1);
 
@@ -350,8 +349,9 @@ class VesselWhereaboutsTest {
       Map.of("generation", "old"),
       varyingBy(
         "generation",
-        when("old", recordingEventsIn(oldEvents)),
-        when("new", recordingEventsIn(newEvents))
+        ERROR,
+        entry("old", recordingEventsIn(oldEvents)),
+        entry("new", recordingEventsIn(newEvents))
       )
     );
 

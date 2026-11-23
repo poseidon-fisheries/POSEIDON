@@ -245,96 +245,38 @@ public final class Factories {
   }
 
   /**
-   * @param attribute the vessel attribute that determines the variant
-   * @param rows the listed values and their variants, from {@link #when}
-   * @return a component varying by {@code attribute}, without a default
+   * @param attribute             the vessel attribute that determines the
+   *                              factory
+   * @param unlistedValueHandling what a vessel with an unlisted value of the
+   *                              listed values' type gets
+   * @param entries               the listed values and the factory that builds
+   *                              the component for each, in the order given
+   * @return a component varying by {@code attribute}
+   * @throws IllegalArgumentException if a value is listed twice, or the listed
+   *                                  values have mixed types
    * @see VaryingComponent
    */
   @SafeVarargs
   public static <T> VaryingComponent<T> varyingBy(
     final String attribute,
-    final Map.Entry<Object, ? extends Variant<? extends T>>... rows
+    final UnlistedValueHandling unlistedValueHandling,
+    final Map.Entry<
+      ?,
+      ? extends Factory<? super VesselComponentScope, ? extends T>
+    >... entries
   ) {
     return VaryingComponent.<T>builder()
       .attribute(attribute)
-      .variants(
-        ImmutableMap.<Object, Variant<? extends T>>builder()
-          .putAll(Arrays.asList(rows))
+      .factories(
+        ImmutableMap.<
+          Object,
+          Factory<? super VesselComponentScope, ? extends T>
+        >builder()
+          .putAll(Arrays.asList(entries))
           .buildOrThrow()
       )
+      .unlistedValueHandling(unlistedValueHandling)
       .build();
-  }
-
-  /**
-   * @param attribute the vessel attribute that determines the variant
-   * @param factory builds the component for unlisted values
-   * @param rows the listed values and their variants, from {@link #when}
-   * @return a component varying by {@code attribute}, with a factory default
-   * @see VaryingComponent
-   */
-  @SafeVarargs
-  public static <T> VaryingComponent<T> varyingBy(
-    final String attribute,
-    final Factory<? super VesselComponentScope, ? extends T> factory,
-    final Map.Entry<Object, ? extends Variant<? extends T>>... rows
-  ) {
-    return varyingBy(attribute, rows)
-      .toBuilder()
-      .defaultVariant(new FactoryVariant<>(factory))
-      .build();
-  }
-
-  /**
-   * @param attribute the vessel attribute that determines the variant
-   * @param noComponent {@link #none}
-   * @param rows the listed values and their variants, from {@link #when}
-   * @return a component varying by {@code attribute}, absent for unlisted values
-   * @see VaryingComponent
-   */
-  @SafeVarargs
-  public static <T> VaryingComponent<T> varyingBy(
-    final String attribute,
-    final NoComponent<T> noComponent,
-    final Map.Entry<Object, ? extends Variant<? extends T>>... rows
-  ) {
-    return varyingBy(attribute, rows)
-      .toBuilder()
-      .defaultVariant(noComponent)
-      .build();
-  }
-
-  /**
-   * @param value the attribute value
-   * @param factory builds the component for this value
-   * @return the value paired with its factory variant
-   * @see VaryingComponent
-   */
-  public static <T> Map.Entry<Object, FactoryVariant<T>> when(
-    final Object value,
-    final Factory<? super VesselComponentScope, ? extends T> factory
-  ) {
-    return Map.entry(value, new FactoryVariant<>(factory));
-  }
-
-  /**
-   * @param value the attribute value
-   * @param noComponent {@link #none}
-   * @return the value paired with deliberate absence
-   * @see VaryingComponent
-   */
-  public static <T> Map.Entry<Object, NoComponent<T>> when(
-    final Object value,
-    final NoComponent<T> noComponent
-  ) {
-    return Map.entry(value, noComponent);
-  }
-
-  /**
-   * @return a variant that gives no component, for what the
-   *         scenario does not model
-   */
-  public static <T> NoComponent<T> none() {
-    return new NoComponent<>();
   }
 
   /**

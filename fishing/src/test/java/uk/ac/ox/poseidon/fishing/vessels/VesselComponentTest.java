@@ -22,16 +22,16 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.none;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.when;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.newVessel;
+import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.NO_COMPONENT;
 
 import com.badlogic.gdx.ai.btree.leaf.Success;
 import java.util.Map;
@@ -121,8 +121,8 @@ class VesselComponentTest {
   void aChoiceOfNoComponentLeavesTheComponentAbsent() {
     final VesselComponent<Object> chosen = varyingBy(
       "gear",
-      none(),
-      when("PS", new NewObjectFactory())
+      NO_COMPONENT,
+      entry("PS", new NewObjectFactory())
     );
     final Vessel vessel = newVessel(
       mock(TemporalSchedule.class),

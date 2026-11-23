@@ -14,7 +14,7 @@ The model is built around a declarative configuration → runtime object pattern
   programmatically or deserialized from YAML.
 - Scenario-building code composes static helpers only — nested calls all the way
   down. A helper takes all its arguments and returns a finished scenario part,
-  which may be a factory or a plain node (a variant, a named component);
+  which may be a factory or a plain node (the vessel register's columns);
   scenario code calls nothing on a helper's result. Never call `.get(scope)`,
   `.apply(...)`, or `.test(...)` directly in scenario-building code; resolving
   the graph is the framework's job at simulation-start time, not something
@@ -166,11 +166,11 @@ has to write `scope -> "value"` for no gain.
 
 ## Plain scenario nodes
 
-A part of a scenario that builds nothing itself, such as `VesselRegisterColumns`
-or a `Variant`, is a plain node: an immutable class implementing `ScenarioNode`,
-held by the factory or node above it and written nested under it in the scenario
-file. To take part in YAML writing and loading, addressing, derivation and
-validation it needs:
+A part of a scenario that builds nothing itself, such as
+`VesselRegisterColumns`, is a plain node: an immutable class implementing
+`ScenarioNode`, held by the factory or node above it and written nested under it
+in the scenario file. To take part in YAML writing and loading, addressing,
+derivation and validation it needs:
 
 - a static `builder()` and a `toBuilder()` (`@Builder(toBuilder = true)`): the
   loader builds it through the builder and derivation copies it through

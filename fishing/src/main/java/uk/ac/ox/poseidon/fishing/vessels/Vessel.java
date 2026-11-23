@@ -552,7 +552,7 @@ public class Vessel implements Oriented2D, HasAttributes {
 
   /**
    * @return what builds {@code component} for this vessel: its single
-   *         factory, or the variant selected by this vessel's attribute;
+   *         factory, or the factory selected by this vessel's attribute;
    *         nothing if that is no component
    */
   private <T> Optional<
@@ -560,21 +560,14 @@ public class Vessel implements Oriented2D, HasAttributes {
   > factoryFor(final VesselComponent<T> component) {
     return switch (component) {
       case final FactoryComponent<T> single -> Optional.of(single.getFactory());
-      case final VaryingComponent<T> chosen -> switch (
-        chosen.variantFor(this)
-      ) {
-        case final FactoryVariant<? extends T> build -> Optional.of(
-          build.getFactory()
-        );
-        case final NoComponent<? extends T> _ -> Optional.empty();
-      };
+      case final VaryingComponent<T> chosen -> chosen.factoryFor(this);
     };
   }
 
   /**
    * Gives this vessel anew every component that varies by an attribute
    * whose value differs from {@code previousAttributes}, even if the same
-   * variant is picked: ends their stores in the reverse of the order its
+   * factory is picked: ends their stores in the reverse of the order its
    * specification builds them, then builds them in that order.
    */
   private void rebuildVaryingAnew(

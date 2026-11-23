@@ -26,27 +26,28 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Optional;
 import java.util.function.Function;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Singular;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /**
- * A component that varies by one vessel attribute. Each listed value gives
- * a factory or deliberately no component, with an optional default for values
- * not listed. All listed values have the same runtime type. A missing
- * attribute, a value of a different type, or an unlisted value without a
- * default is an error. With no listed values, there is no attribute type
- * to check.
+ * A component that varies by one vessel attribute. Each listed value maps to
+ * the factory that builds the component for it; {@link #unlistedValueHandling}
+ * says what a value that is not listed gives. All listed values have the same
+ * runtime type. A missing attribute or a value of a different type is an
+ * error. With no listed values, there is no attribute type to check.
  * <p>
- * The vessel builds the selected variant on creation and again whenever the
- * attribute changes, even if the same variant is selected. Building this
- * factory only builds a reader of the vessel's stored component. Components
- * are compared by identity, as the keys under which vessels store them.
- * Built via {@link Factories Factories.varyingBy(...)}.
+ * The vessel builds the selected factory's component on creation and again
+ * whenever the attribute changes, even if the same factory is selected.
+ * Building this factory only builds a reader of the vessel's stored component.
+ * Components are compared by identity, as the keys under which vessels store
+ * them. Built via {@link Factories Factories.varyingBy(...)}.
  *
  * @param <T> the type of the component
  */
@@ -56,16 +57,20 @@ public final class VaryingComponent<T>
   implements VesselComponent<T>
 {
 
-  /** The vessel attribute that determines the variant. */
+  /** The vessel attribute that determines the factory. */
   @NonNull
   private final String attribute;
 
-  /** The variants for the explicitly listed attribute values. */
+  /** The factories for the explicitly listed attribute values. */
   @NonNull
-  private final ImmutableMap<Object, Variant<? extends T>> variants;
+  private final ImmutableMap<
+    Object,
+    Factory<? super VesselComponentScope, ? extends T>
+  > factories;
 
-  /** The default variant, or {@code null} when unlisted values are errors. */
-  private final Variant<? extends T> defaultVariant;
+  /** What a vessel with an unlisted value of the right type gets. */
+  @NonNull
+  private final UnlistedValueHandling unlistedValueHandling;
 
   /**
    * @throws IllegalArgumentException if the listed values have mixed types
@@ -75,19 +80,19 @@ public final class VaryingComponent<T>
     @NonNull final String attribute,
     @NonNull @Singular final ImmutableMap<
       Object,
-      Variant<? extends T>
-    > variants,
-    final Variant<? extends T> defaultVariant
+      Factory<? super VesselComponentScope, ? extends T>
+    > factories,
+    @NonNull final UnlistedValueHandling unlistedValueHandling
   ) {
     checkArgument(
-      variants.keySet().stream().map(Object::getClass).distinct().count() <= 1,
+      factories.keySet().stream().map(Object::getClass).distinct().count() <= 1,
       "The varying component by %s has keys of mixed types: %s",
       attribute,
-      variants.keySet()
+      factories.keySet()
     );
     this.attribute = attribute;
-    this.variants = variants;
-    this.defaultVariant = defaultVariant;
+    this.factories = factories;
+    this.unlistedValueHandling = unlistedValueHandling;
   }
 
   @Override
@@ -107,12 +112,16 @@ public final class VaryingComponent<T>
   }
 
   /**
-   * @param vessel the vessel whose attribute determines the variant
-   * @return the listed variant or the default
+   * @param vessel the vessel whose attribute determines the factory
+   * @return the listed value's factory, or nothing if the value is unlisted
+   *         and unlisted values give no component
    * @throws IllegalStateException if the attribute is missing, has the wrong
-   *                               type, or is unlisted without a default
+   *                               type, or is unlisted and unlisted values
+   *                               are an error
    */
-  Variant<? extends T> variantFor(final Vessel vessel) {
+  Optional<Factory<? super VesselComponentScope, ? extends T>> factoryFor(
+    final Vessel vessel
+  ) {
     final Object value = vessel.getAttributes().get(attribute);
     checkState(
       value != null,
@@ -120,9 +129,10 @@ public final class VaryingComponent<T>
       vessel.getId(),
       attribute
     );
-    final Variant<? extends T> variant = variants.get(value);
-    if (variant == null && !variants.isEmpty()) {
-      final Class<?> keyType = variants.keySet().iterator().next().getClass();
+    final var factory = factories.get(value);
+    if (factory != null) return Optional.of(factory);
+    if (!factories.isEmpty()) {
+      final Class<?> keyType = factories.keySet().iterator().next().getClass();
       checkState(
         value.getClass().equals(keyType),
         "Vessel %s has value %s of type %s for %s, but the varying component requires %s",
@@ -133,15 +143,13 @@ public final class VaryingComponent<T>
         keyType.getName()
       );
     }
-    final Variant<? extends T> selected =
-      variant == null ? defaultVariant : variant;
     checkState(
-      selected != null,
-      "Vessel %s has the value %s for %s, which the varying component does not list, and it has no default",
+      unlistedValueHandling == UnlistedValueHandling.NO_COMPONENT,
+      "Vessel %s has the value %s for %s, which the varying component does not list",
       vessel.getId(),
       value,
       attribute
     );
-    return selected;
+    return Optional.empty();
   }
 }

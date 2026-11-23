@@ -56,19 +56,20 @@ identity, as the keys they are. What holds the working state of one component
 option values) is vessel-level.
 
 A varying component
-(`varyingBy("main_fishing_gear", none(), when("PS", purseSeine), when("OTB", bottomTrawl))`)
-maps values of one required vessel attribute to variants: a factory or
-deliberate absence, with an optional default. Duplicate keys and mixed key types
-fail when the component is constructed. Missing attributes, wrong attribute
-types on a miss, and unlisted values without a default fail when the vessel is
-given the component. With no listed values, there is no key type to check, but
-the attribute is still required. `Variant` is sealed to `FactoryVariant` and
-`NoComponent`; absence is not a factory. A varying component reads an attribute
-only, never another component, and a component property drawn by `oneValueFrom`
-is drawn when its component is built.
+(`varyingBy("main_fishing_gear", NO_COMPONENT, entry("PS", purseSeine), entry("OTB", bottomTrawl))`)
+maps values of one required vessel attribute directly to the factory that builds
+the component for each. Its `UnlistedValueHandling` says what a vessel with an
+unlisted value of the right type gets: `NO_COMPONENT` (the vessel has none, and
+no store is opened for it) or `ERROR`. Duplicate keys and mixed key types fail
+when the component is constructed. Missing attributes and values of another type
+fail when the vessel is given the component, under both handlings. With no
+listed values, there is no key type to check, but the attribute is still
+required. A varying component reads an attribute only, never another component,
+and a component property drawn by `oneValueFrom` is drawn when its component is
+built.
 
-Only the vessel builds what a component's factory or variants build: building
-the component itself builds only its reader. Before a simulation starts, the
+Only the vessel builds what a component's factories build: building the
+component itself builds only its reader. Before a simulation starts, the
 description's `ScenarioCheck`s run over every node: a component some consumer
 uses but no vessel specification lists fails then, naming the consumer.
 
@@ -118,7 +119,7 @@ changes at once, from any call.
 The vessel compares what a source states with its current state, since another
 source may already have applied it: once the queue is applied, it rebuilds every
 component that varies by an attribute whose value actually changed, even if the
-same variant is picked: their stores end in the reverse of the build order, then
+same factory is picked: their stores end in the reverse of the build order, then
 they are built in that order, each under a fresh store; every other component,
 the vessel's own store (its memories) and its account stay. A hold that still
 holds catch refuses to have its store ended, so a rebuild only ever drops an

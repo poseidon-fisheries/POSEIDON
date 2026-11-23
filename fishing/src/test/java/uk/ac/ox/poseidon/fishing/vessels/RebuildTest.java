@@ -31,14 +31,14 @@ import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.none;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegister;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegisterColumns;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegisterEventCodes;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.when;
+import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.ERROR;
+import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.NO_COMPONENT;
 import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 
 import com.badlogic.gdx.ai.btree.Task;
@@ -182,9 +182,10 @@ class RebuildTest {
   private VesselComponent<Task<Vessel>> behaviourByGear(final int psDays) {
     return varyingBy(
       "gear",
-      when("PS", behaviourBuilder("PS", psDays)),
-      when("OTB", behaviourBuilder("OTB", 1)),
-      when("LLS", behaviourBuilder("LLS", 1))
+      ERROR,
+      entry("PS", behaviourBuilder("PS", psDays)),
+      entry("OTB", behaviourBuilder("OTB", 1)),
+      entry("LLS", behaviourBuilder("LLS", 1))
     );
   }
 
@@ -192,10 +193,10 @@ class RebuildTest {
   private VesselComponent<Object> gearByGear() {
     return varyingBy(
       "gear",
-      none(),
-      when("PS", componentBuilder("gear PS")),
-      when("OTB", componentBuilder("gear OTB")),
-      when("LLS", componentBuilder("gear LLS"))
+      NO_COMPONENT,
+      entry("PS", componentBuilder("gear PS")),
+      entry("OTB", componentBuilder("gear OTB")),
+      entry("LLS", componentBuilder("gear LLS"))
     );
   }
 
@@ -303,7 +304,7 @@ class RebuildTest {
   @Test
   void aChoiceOfNoBehaviourLeavesTheVesselInactiveUntilAChangeGivesItOne() {
     startSimulation(
-      varyingBy("gear", none(), when("PS", behaviourBuilder("PS", 1))),
+      varyingBy("gear", NO_COMPONENT, entry("PS", behaviourBuilder("PS", 1))),
       gearByGear(),
       """
       V1,CEN,2000-01-01,,P1,GNS,1

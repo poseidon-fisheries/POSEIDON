@@ -100,6 +100,18 @@ class BuilderConstructorTest {
       .hasMessageContaining(NoBuilderFactory.class.getName());
   }
 
+  @Test
+  void readsAnEnumByConstantNameWithoutABuilder() {
+    final String yaml = "!!" + Colour.class.getName() + " GREEN";
+
+    assertThat(loader(Object.class).<Object>load(yaml)).isEqualTo(Colour.GREEN);
+  }
+
+  public enum Colour {
+    RED,
+    GREEN
+  }
+
   private static Yaml loader(final Class<?> rootType) {
     final LoaderOptions options = new LoaderOptions();
     options.setTagInspector(tag -> true);

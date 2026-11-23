@@ -22,25 +22,13 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import uk.ac.ox.poseidon.core.Factory;
-
 /**
- * A variant that builds a component with a factory, under a fresh store each
- * time the vessel is given it. Built via {@link Factories
- * Factories.when(...)/Factories.varyingBy(...)}.
- *
- * @param <T> the type of the component
+ * What a {@link VaryingComponent} does for a vessel whose attribute value is
+ * of the right type but not listed.
  */
-@Getter
-@AllArgsConstructor
-@Builder(toBuilder = true)
-public final class FactoryVariant<T> implements Variant<T> {
-
-  /** Builds the component; its own level decides where its product lives. */
-  @NonNull
-  private final Factory<? super VesselComponentScope, ? extends T> factory;
+public enum UnlistedValueHandling {
+  /** The vessel has no component, and no store is opened for it. */
+  NO_COMPONENT,
+  /** Giving the vessel the component fails. */
+  ERROR
 }

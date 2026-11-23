@@ -46,7 +46,8 @@ import uk.ac.ox.poseidon.core.utils.Builders;
  * it can load immutable classes.
  * <p>
  * Every class whose name starts with one of the given prefixes must have a
- * static {@code builder()} method; loading one that does not fails, naming
+ * static {@code builder()} method, except an enum, which is read by constant
+ * name; loading one that does not fails, naming
  * the class, instead of falling back on setters. Other classes (JDK
  * collections and values) are built as SnakeYAML builds them by default. A
  * class is registered the first time the loader meets it: through its tag, or
@@ -90,7 +91,9 @@ class BuilderConstructor extends Constructor {
       builtClassPrefixes.stream().anyMatch(clazz.getName()::startsWith) &&
       // Only a concrete class appears in a tag; an abstract one is only
       // ever a property's declared type, whose values carry their tags.
-      !Modifier.isAbstract(clazz.getModifiers())
+      !Modifier.isAbstract(clazz.getModifiers()) &&
+      // An enum constant is read by name
+      !clazz.isEnum()
     ) {
       if (findBuilderMethod(clazz) == null) {
         throw new YAMLException(

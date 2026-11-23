@@ -32,8 +32,8 @@
  * ({@link uk.ac.ox.poseidon.fishing.vessels.VesselRegisterFactory}), whose
  * later rows change the vessels' attributes or make them exit, through the
  * fleet. Each component is built by a single factory
- * ({@link uk.ac.ox.poseidon.fishing.vessels.FactoryComponent}) or by a variant
- * of one vessel attribute
+ * ({@link uk.ac.ox.poseidon.fishing.vessels.FactoryComponent}) or by the
+ * factory its value of one vessel attribute selects
  * ({@link uk.ac.ox.poseidon.fishing.vessels.VaryingComponent}), which the
  * vessel picks anew whenever an attribute it reads changes.
  * A vessel's hold/gear/engine/behaviour/etc. live in sibling packages

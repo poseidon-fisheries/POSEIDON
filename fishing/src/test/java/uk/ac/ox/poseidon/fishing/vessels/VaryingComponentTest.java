@@ -22,13 +22,14 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.none;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.when;
+import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.ERROR;
+import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.NO_COMPONENT;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.componentProperty;
 
 import java.time.Duration;
@@ -40,6 +41,7 @@ import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scenario;
+import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.fishing.vessels.values.ComponentPropertyFactory;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
@@ -61,57 +63,60 @@ class VaryingComponentTest {
     return vessel;
   }
 
-  private static Object factoryOf(final Variant<?> outcome) {
-    return ((FactoryVariant<?>) outcome).getFactory();
+  /** The factory selected for the vessel; empty if it has no component. */
+  private static Object factoryOf(
+    final VaryingComponent<?> component,
+    final Map<String, Object> attributes
+  ) {
+    return component.factoryFor(vesselWith(attributes)).orElse(null);
   }
 
   @Test
-  void selectsTheVariantForTheAttributeValue() {
-    final var component = varyingBy("gear", when("PS", ps), when("OTB", other));
-
-    assertThat(
-      factoryOf(component.variantFor(vesselWith(Map.of("gear", "PS"))))
-    ).isSameAs(ps);
-    assertThat(
-      factoryOf(component.variantFor(vesselWith(Map.of("gear", "OTB"))))
-    ).isSameAs(other);
-  }
-
-  @Test
-  void unlistedValuesTakeTheDefault() {
-    final VaryingComponent<Object> chosen = varyingBy(
+  void selectsTheFactoryForTheAttributeValue() {
+    final var component = varyingBy(
       "gear",
-      other,
-      when("PS", ps)
+      ERROR,
+      entry("PS", ps),
+      entry("OTB", other)
     );
 
-    assertThat(
-      factoryOf(chosen.variantFor(vesselWith(Map.of("gear", "OTB"))))
-    ).isSameAs(other);
+    assertThat(factoryOf(component, Map.of("gear", "PS"))).isSameAs(ps);
+    assertThat(factoryOf(component, Map.of("gear", "OTB"))).isSameAs(other);
   }
 
   @Test
-  void aListedVariantOrADefaultMayGiveNoComponent() {
+  void aListedValueGivesItsFactoryUnderBothHandlings() {
+    for (final var handling : UnlistedValueHandling.values()) {
+      assertThat(
+        factoryOf(
+          varyingBy("gear", handling, entry("PS", ps)),
+          Map.of("gear", "PS")
+        )
+      ).isSameAs(ps);
+    }
+  }
+
+  @Test
+  void unlistedValuesGiveNoComponentUnderNoComponent() {
     final VaryingComponent<Object> chosen = varyingBy(
       "gear",
-      none(),
-      when("GNS", none())
+      NO_COMPONENT,
+      entry("PS", ps)
     );
 
-    assertThat(
-      chosen.variantFor(vesselWith(Map.of("gear", "GNS")))
-    ).isInstanceOf(NoComponent.class);
-    assertThat(
-      chosen.variantFor(vesselWith(Map.of("gear", "OTB")))
-    ).isInstanceOf(NoComponent.class);
+    assertThat(chosen.factoryFor(vesselWith(Map.of("gear", "OTB")))).isEmpty();
   }
 
   @Test
-  void unlistedValuesWithoutADefaultFailNamingTheVesselAndValue() {
-    final VaryingComponent<Object> chosen = varyingBy("gear", when("PS", ps));
+  void unlistedValuesFailNamingTheVesselAttributeAndValueUnderError() {
+    final VaryingComponent<Object> chosen = varyingBy(
+      "gear",
+      ERROR,
+      entry("PS", ps)
+    );
 
     assertThatThrownBy(() ->
-      chosen.variantFor(vesselWith(Map.of("gear", "OTB")))
+      chosen.factoryFor(vesselWith(Map.of("gear", "OTB")))
     )
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("V1")
@@ -120,22 +125,55 @@ class VaryingComponentTest {
   }
 
   @Test
-  void anAbsentAttributeIsAnErrorEvenWithADefault() {
-    final VaryingComponent<Object> chosen = varyingBy(
-      "gear",
-      other,
-      when("PS", ps)
-    );
+  void aMissingAttributeIsAnErrorUnderBothHandlings() {
+    for (final var handling : UnlistedValueHandling.values()) {
+      final VaryingComponent<Object> chosen = varyingBy(
+        "gear",
+        handling,
+        entry("PS", ps)
+      );
 
-    assertThatThrownBy(() -> chosen.variantFor(vesselWith(Map.of())))
-      .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("Vessel V1 has no attribute gear");
+      assertThatThrownBy(() -> chosen.factoryFor(vesselWith(Map.of())))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("Vessel V1 has no attribute gear");
+    }
+  }
+
+  @Test
+  void aWrongTypeValueIsAnErrorUnderBothHandlings() {
+    for (final var handling : UnlistedValueHandling.values()) {
+      final var component = varyingBy("gear", handling, entry(1, ps));
+
+      assertThatThrownBy(() ->
+        component.factoryFor(vesselWith(Map.of("gear", 1L)))
+      )
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("V1")
+        .hasMessageContaining("gear")
+        .hasMessageContaining("java.lang.Long")
+        .hasMessageContaining("java.lang.Integer");
+    }
+  }
+
+  @Test
+  void withNoListedValuesThereIsNoTypeToCheck() {
+    final var none = varyingBy("gear", NO_COMPONENT);
+    final var error = varyingBy("gear", ERROR);
+
+    assertThat(none.factoryFor(vesselWith(Map.of("gear", "PS")))).isEmpty();
+    assertThat(none.factoryFor(vesselWith(Map.of("gear", 1L)))).isEmpty();
+    assertThatThrownBy(() ->
+      error.factoryFor(vesselWith(Map.of("gear", "PS")))
+    ).isInstanceOf(IllegalStateException.class);
+    assertThatThrownBy(() ->
+      none.factoryFor(vesselWith(Map.of()))
+    ).isInstanceOf(IllegalStateException.class);
   }
 
   @Test
   void duplicateKeysAreAnError() {
     assertThatThrownBy(() ->
-      varyingBy("gear", when("PS", ps), when("PS", other))
+      varyingBy("gear", ERROR, entry("PS", ps), entry("PS", other))
     )
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining("PS");
@@ -143,114 +181,67 @@ class VaryingComponentTest {
 
   @Test
   void rejectsMixedKeyTypes() {
-    assertThatThrownBy(() -> varyingBy("gear", when("PS", ps), when(1, other)))
+    assertThatThrownBy(() ->
+      varyingBy("gear", ERROR, entry("PS", ps), entry(1, other))
+    )
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining("mixed types");
   }
 
   @Test
-  void rejectsTheWrongAttributeTypeOnAMissEvenWithADefault() {
-    final var component = varyingBy("gear", other, when(1, ps));
+  void survivesAYamlRoundTripKeepingValuesHandlingAndOrder() {
+    final VaryingComponent<Object> chosen = varyingBy(
+      "gear",
+      NO_COMPONENT,
+      entry("PS", object("ps")),
+      entry("GNS", object("gns")),
+      entry("OTB", object("otb"))
+    );
 
-    assertThatThrownBy(() ->
-      component.variantFor(vesselWith(Map.of("gear", 1L)))
-    )
-      .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("V1")
-      .hasMessageContaining("gear")
-      .hasMessageContaining("java.lang.Long")
-      .hasMessageContaining("java.lang.Integer");
+    final String written = write(chosen);
+    final VaryingComponent<?> loaded = roundTrip(chosen);
+
+    assertThat(written)
+      .doesNotContain("Variant")
+      .doesNotContain("NoComponent")
+      .contains("unlistedValueHandling: NO_COMPONENT")
+      .containsPattern("PS: !!uk\\.ac\\.ox\\.poseidon\\.core\\.utils\\.ObjectFactory");
+    assertThat(loaded.getAttribute()).isEqualTo("gear");
+    assertThat(loaded.getUnlistedValueHandling()).isEqualTo(NO_COMPONENT);
+    assertThat(loaded.getFactories().keySet()).containsExactly(
+      "PS",
+      "GNS",
+      "OTB"
+    );
+    assertThat(factoryOf(loaded, Map.of("gear", "PS"))).isEqualTo(object("ps"));
+    assertThat(factoryOf(loaded, Map.of("gear", "OTB"))).isEqualTo(
+      object("otb")
+    );
+    assertThat(factoryOf(loaded, Map.of("gear", "XYZ"))).isNull();
   }
 
   @Test
-  void aDefaultWithoutListedValuesStillRequiresTheAttribute() {
-    final var component = varyingBy("gear", ps);
+  void errorHandlingSurvivesAYamlRoundTrip() {
+    final var loaded = roundTrip(
+      varyingBy("gear", ERROR, entry("PS", object("ps")))
+    );
 
-    assertThat(
-      factoryOf(component.variantFor(vesselWith(Map.of("gear", 1L))))
-    ).isSameAs(ps);
-    assertThatThrownBy(() -> component.variantFor(vesselWith(Map.of())))
-      .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("has no attribute gear");
-  }
-
-  @Test
-  void anAbsentDefaultWithoutListedValuesStillRequiresTheAttribute() {
-    final var component = varyingBy("gear", none());
-
-    assertThat(
-      component.variantFor(vesselWith(Map.of("gear", "PS")))
-    ).isInstanceOf(NoComponent.class);
+    assertThat(loaded.getUnlistedValueHandling()).isEqualTo(ERROR);
     assertThatThrownBy(() ->
-      component.variantFor(vesselWith(Map.of()))
+      loaded.factoryFor(vesselWith(Map.of("gear", "OTB")))
     ).isInstanceOf(IllegalStateException.class);
   }
 
   @Test
-  void noVariantsAndNoDefaultCannotSelectAComponent() {
-    final var component = varyingBy("gear");
-
-    assertThatThrownBy(() ->
-      component.variantFor(vesselWith(Map.of("gear", "PS")))
-    )
-      .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("no default");
-  }
-
-  @Test
-  void survivesAYamlRoundTrip() {
-    final VaryingComponent<Object> chosen = varyingBy(
-      "gear",
-      object("other"),
-      when("PS", object("ps")),
-      when("GNS", none())
-    );
-    final String written = new ScenarioWriter().write(
-      Scenario.builder()
-        .component("size", componentProperty(chosen, "size"))
-        .build()
-    );
-
-    final ComponentPropertyFactory<?> loaded =
-      (ComponentPropertyFactory<?>) new ScenarioLoader()
-        .load(written)
-        .getComponents()
-        .get("size");
-    final VaryingComponent<?> loadedChoice =
-      (VaryingComponent<?>) loaded.getComponent();
-    assertThat(loadedChoice.getAttribute()).isEqualTo("gear");
-    assertThat(
-      factoryOf(loadedChoice.variantFor(vesselWith(Map.of("gear", "PS"))))
-    ).isEqualTo(object("ps"));
-    assertThat(
-      loadedChoice.variantFor(vesselWith(Map.of("gear", "GNS")))
-    ).isInstanceOf(NoComponent.class);
-    assertThat(
-      factoryOf(loadedChoice.variantFor(vesselWith(Map.of("gear", "OTB"))))
-    ).isEqualTo(object("other"));
-  }
-
-  @Test
-  void variantsOfTwoGearClassesGiveAComponentOfAGear() {
+  void factoriesOfTwoGearClassesGiveAComponentOfAGear() {
     final Factory<VesselComponentScope, SeineGear> seine = _ -> new SeineGear();
     final Factory<VesselComponentScope, TrawlGear> trawl = _ -> new TrawlGear();
 
-    final var gear = varyingBy(
-      "gear",
-      none(),
-      when("PS", seine),
-      when("OTB", trawl)
+    final var gear = takesAGear(
+      varyingBy("gear", NO_COMPONENT, entry("PS", seine), entry("OTB", trawl))
     );
 
-    assertThat(takesAGear(gear).getVariants()).hasSize(2);
-    assertThat(
-      takesAGear(varyingBy("gear", seine, when("OTB", trawl))).getVariants()
-    ).hasSize(1);
-    assertThat(
-      takesAGear(
-        varyingBy("gear", when("PS", seine), when("OTB", trawl))
-      ).getVariants()
-    ).hasSize(2);
+    assertThat(gear.getFactories()).hasSize(2);
   }
 
   private static VaryingComponent<? extends Gear> takesAGear(
@@ -260,39 +251,37 @@ class VaryingComponentTest {
   }
 
   @Test
-  void absentAndMissingDefaultsSurviveYamlRoundTrips() {
-    final var absentDefault = roundTrip(
-      varyingBy("gear", none(), when("PS", object("ps")))
+  void aCalibrationAddressIntoTheFactoryMapResolvesAndDerives() {
+    final var gear = varyingBy(
+      "gear",
+      ERROR,
+      entry("PS", object(1.0)),
+      entry("OTB", object(2.0))
     );
-    final var noDefault = roundTrip(
-      varyingBy("gear", when("PS", object("ps")))
-    );
+    final Scenario scenario = Scenario.builder()
+      .component("gear", gear)
+      .build();
 
+    final Scenario derived = scenario.with("gear.factories(OTB).value", 5.0);
+
+    final var changed = derived.component("gear", VaryingComponent.class);
     assertThat(
-      absentDefault.variantFor(vesselWith(Map.of("gear", "OTB")))
-    ).isInstanceOf(NoComponent.class);
-    assertThatThrownBy(() ->
-      noDefault.variantFor(vesselWith(Map.of("gear", "OTB")))
-    )
-      .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("no default");
+      ((ObjectFactory<?>) changed.getFactories().get("OTB")).getValue()
+    ).isEqualTo(5.0);
     assertThat(
-      factoryOf(noDefault.variantFor(vesselWith(Map.of("gear", "PS"))))
-    ).isEqualTo(object("ps"));
+      ((ObjectFactory<?>) changed.getFactories().get("PS")).getValue()
+    ).isEqualTo(1.0);
+    assertThat(changed.getUnlistedValueHandling()).isEqualTo(ERROR);
   }
 
   @Test
-  void duplicateVariantKeysInYamlAreAnError() {
-    final String yaml = """
-    components:
-      gearReader: !!uk.ac.ox.poseidon.fishing.vessels.values.ComponentPropertyFactory
-        component: !!uk.ac.ox.poseidon.fishing.vessels.VaryingComponent
-          attribute: gear
-          variants:
-            PS: !!uk.ac.ox.poseidon.fishing.vessels.NoComponent {}
-            PS: !!uk.ac.ox.poseidon.fishing.vessels.NoComponent {}
-        propertyPath: size
-    """;
+  void duplicateKeysInYamlAreAnError() {
+    final String yaml = yamlWith(
+      """
+          PS: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {value: 1}
+          PS: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {value: 2}
+      """
+    );
 
     assertThatThrownBy(() -> new ScenarioLoader().load(yaml))
       .isInstanceOf(org.yaml.snakeyaml.constructor.DuplicateKeyException.class)
@@ -300,33 +289,47 @@ class VaryingComponentTest {
   }
 
   @Test
-  void mixedVariantKeyTypesInYamlAreAnError() {
-    final String yaml = """
-    components:
-      gearReader: !!uk.ac.ox.poseidon.fishing.vessels.values.ComponentPropertyFactory
-        component: !!uk.ac.ox.poseidon.fishing.vessels.VaryingComponent
-          attribute: gear
-          variants:
-            PS: !!uk.ac.ox.poseidon.fishing.vessels.NoComponent {}
-            1: !!uk.ac.ox.poseidon.fishing.vessels.NoComponent {}
-        propertyPath: size
-    """;
+  void mixedKeyTypesInYamlAreAnError() {
+    final String yaml = yamlWith(
+      """
+          PS: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {value: 1}
+          1: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {value: 2}
+      """
+    );
 
     assertThatThrownBy(() ->
       new ScenarioLoader().load(yaml)
     ).hasStackTraceContaining("mixed types");
   }
 
-  private static VaryingComponent<?> roundTrip(
-    final VaryingComponent<?> component
-  ) {
-    final String yaml = new ScenarioWriter().write(
+  private static String yamlWith(final String factoryEntries) {
+    return (
+      """
+      components:
+        gearReader: !!uk.ac.ox.poseidon.fishing.vessels.values.ComponentPropertyFactory
+          component: !!uk.ac.ox.poseidon.fishing.vessels.VaryingComponent
+            attribute: gear
+            unlistedValueHandling: ERROR
+            factories:
+      """ +
+      factoryEntries.indent(4) +
+      "    propertyPath: size\n"
+    );
+  }
+
+  private static String write(final VaryingComponent<?> component) {
+    return new ScenarioWriter().write(
       Scenario.builder()
         .component("reader", componentProperty(component, "size"))
         .build()
     );
+  }
+
+  private static VaryingComponent<?> roundTrip(
+    final VaryingComponent<?> component
+  ) {
     final var reader = (ComponentPropertyFactory<?>) new ScenarioLoader()
-      .load(yaml)
+      .load(write(component))
       .getComponents()
       .get("reader");
     return (VaryingComponent<?>) reader.getComponent();
