@@ -39,13 +39,13 @@ class FixedCostCollectorTest {
 
   private final Vessel small = vessel(true);
   private final Vessel large = vessel(true);
-  private final Vessel absent = vessel(false);
+  private final Vessel absentVessel = vessel(false);
   private final Map<Vessel, Money> costs = Map.of(
     small,
     Money.of(CurrencyUnit.EUR, 10),
     large,
     Money.of(CurrencyUnit.EUR, 25),
-    absent,
+    absentVessel,
     Money.of(CurrencyUnit.EUR, 50)
   );
   private final FixedCostCollector collector = new FixedCostCollector(
@@ -74,12 +74,12 @@ class FixedCostCollectorTest {
   void step_doesNotChargeAbsentVessels() {
     collector.step(mock(SimState.class));
 
-    assertThat(absent.getAccount().getBalances()).isEmpty();
+    assertThat(absentVessel.getAccount().getBalances()).isEmpty();
   }
 
   private Fleet fleet() {
     final Fleet fleet = mock(Fleet.class);
-    when(fleet.getVessels()).thenReturn(Set.of(small, large, absent));
+    when(fleet.getVessels()).thenReturn(Set.of(small, large, absentVessel));
     return fleet;
   }
 
