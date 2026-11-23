@@ -162,9 +162,9 @@ class VaryingComponentTest {
   }
 
   @Test
-  void aWrongTypeValueIsAnErrorUnderBothHandlings() {
+  void aNonStringValueIsAnErrorUnderBothHandlings() {
     for (final var handling : UnlistedValueHandling.values()) {
-      final var component = varyingBy("gear", handling, entry(1, ps));
+      final var component = varyingBy("gear", handling, entry("1", ps));
 
       assertThatThrownBy(() ->
         componentInSimulation(component, Map.of("gear", 1L))
@@ -173,18 +173,22 @@ class VaryingComponentTest {
         .hasMessageContaining("V1")
         .hasMessageContaining("gear")
         .hasMessageContaining("java.lang.Long")
-        .hasMessageContaining("java.lang.Integer");
+        .hasMessageContaining("String");
     }
   }
 
   @Test
-  void withNoListedValuesThereIsNoTypeToCheck() {
+  void withNoListedValuesANonStringValueIsStillAnError() {
     final var component = varyingBy("gear", NO_COMPONENT);
 
     assertThat(
       componentInSimulation(component, Map.of("gear", "PS"))
     ).isEmpty();
-    assertThat(componentInSimulation(component, Map.of("gear", 1L))).isEmpty();
+    assertThatThrownBy(() ->
+      componentInSimulation(component, Map.of("gear", 1L))
+    )
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("java.lang.Long");
   }
 
   @Test
@@ -225,15 +229,6 @@ class VaryingComponentTest {
     )
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining("PS");
-  }
-
-  @Test
-  void rejectsMixedKeyTypes() {
-    assertThatThrownBy(() ->
-      varyingBy("gear", ERROR, entry("PS", ps), entry(1, other))
-    )
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("mixed types");
   }
 
   @Test
@@ -341,20 +336,6 @@ class VaryingComponentTest {
     assertThatThrownBy(() -> new ScenarioLoader().load(yaml))
       .isInstanceOf(org.yaml.snakeyaml.constructor.DuplicateKeyException.class)
       .hasMessageContaining("duplicate key PS");
-  }
-
-  @Test
-  void mixedKeyTypesInYamlAreAnError() {
-    final String yaml = yamlWith(
-      """
-          PS: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {value: 1}
-          1: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {value: 2}
-      """
-    );
-
-    assertThatThrownBy(() ->
-      new ScenarioLoader().load(yaml)
-    ).hasStackTraceContaining("mixed types");
   }
 
   private static String yamlWith(final String factoryEntries) {

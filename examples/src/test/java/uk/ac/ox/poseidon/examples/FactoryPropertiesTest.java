@@ -45,7 +45,8 @@ import uk.ac.ox.poseidon.core.utils.Literals;
  * A scenario has one kind of part: a factory or a literal. So every builder
  * property of a factory is a factory, a literal (a primitive or boxed scalar, a
  * {@code String} or an enum), a list or a map, and the elements of a list and
- * the values of a map obey the same rule.
+ * the values of a map obey the same rule. The keys of a map are literals, and so
+ * are the elements and keys of any list or map used as a key.
  */
 class FactoryPropertiesTest {
 
@@ -89,6 +90,48 @@ class FactoryPropertiesTest {
   }
 
   @Test
+  void aPlainBeanAsAMapKeyIsReported() {
+    assertThat(offendingProperties(BeanKeyFactory.class)).containsExactly(
+      BeanKeyFactory.class.getName() + ".beans"
+    );
+  }
+
+  @Test
+  void aFactoryAsAMapKeyIsReported() {
+    assertThat(offendingProperties(FactoryKeyFactory.class)).containsExactly(
+      FactoryKeyFactory.class.getName() + ".factories"
+    );
+  }
+
+  @Test
+  void aPlainBeanInAListKeyIsReported() {
+    assertThat(offendingProperties(ListKeyFactory.class)).containsExactly(
+      ListKeyFactory.class.getName() + ".beans"
+    );
+  }
+
+  @Test
+  void aPlainBeanKeyInAMapInAListIsReported() {
+    assertThat(offendingProperties(MapInListFactory.class)).containsExactly(
+      MapInListFactory.class.getName() + ".beans"
+    );
+  }
+
+  @Test
+  void aPlainBeanKeyInAMapInAMapIsReported() {
+    assertThat(offendingProperties(MapInMapFactory.class)).containsExactly(
+      MapInMapFactory.class.getName() + ".beans"
+    );
+  }
+
+  @Test
+  void aDeclaredObjectMapKeyIsReported() {
+    assertThat(offendingProperties(ObjectKeyFactory.class)).containsExactly(
+      ObjectKeyFactory.class.getName() + ".values"
+    );
+  }
+
+  @Test
   void factoriesAndLiteralsAreAccepted() {
     assertThat(offendingProperties(FineFactory.class)).isEmpty();
   }
@@ -117,12 +160,7 @@ class FactoryPropertiesTest {
       case final ParameterizedType parameterized -> isCollection(
         parameterized.getRawType()
       )
-        ? isFactoryOrLiteral(
-            // The elements of a list, the values of a map
-            parameterized.getActualTypeArguments()[
-              parameterized.getActualTypeArguments().length - 1
-            ]
-          )
+        ? isFactoryOrLiteralCollection(parameterized)
         : isFactoryOrLiteral(parameterized.getRawType());
       case final WildcardType wildcard -> Arrays.stream(
         wildcard.getUpperBounds()
@@ -130,15 +168,57 @@ class FactoryPropertiesTest {
       // A type parameter bounded only by Object holds a literal of any type,
       // which erasure hides: the factory checks it with Literals.isLiteral
       // when it is built
-      case final TypeVariable<?> variable -> Arrays.equals(
-        variable.getBounds(),
-        new Type[] { Object.class }
-      ) ||
+      case final TypeVariable<?> variable -> isBoundedOnlyByObject(variable) ||
         Arrays.stream(variable.getBounds()).allMatch(
           FactoryPropertiesTest::isFactoryOrLiteral
         );
       default -> false;
     };
+  }
+
+  /**
+   * The elements of a list and the values of a map are a factory or a literal;
+   * the keys of a map are literals.
+   */
+  private static boolean isFactoryOrLiteralCollection(
+    final ParameterizedType collection
+  ) {
+    final Type[] arguments = collection.getActualTypeArguments();
+    return (
+      isFactoryOrLiteral(arguments[arguments.length - 1]) &&
+      Arrays.stream(arguments, 0, arguments.length - 1).allMatch(
+        FactoryPropertiesTest::isLiteral
+      )
+    );
+  }
+
+  /**
+   * A scalar, or a list or map of literals, recursively: a factory is not a
+   * literal.
+   */
+  private static boolean isLiteral(final Type type) {
+    return switch (type) {
+      case final Class<?> clazz -> Literals.isScalarType(clazz);
+      case final ParameterizedType parameterized -> isCollection(
+        parameterized.getRawType()
+      )
+        ? Arrays.stream(parameterized.getActualTypeArguments()).allMatch(
+            FactoryPropertiesTest::isLiteral
+          )
+        : isLiteral(parameterized.getRawType());
+      case final WildcardType wildcard -> Arrays.stream(
+        wildcard.getUpperBounds()
+      ).allMatch(FactoryPropertiesTest::isLiteral);
+      case final TypeVariable<?> variable -> isBoundedOnlyByObject(variable) ||
+        Arrays.stream(variable.getBounds()).allMatch(
+          FactoryPropertiesTest::isLiteral
+        );
+      default -> false;
+    };
+  }
+
+  private static boolean isBoundedOnlyByObject(final TypeVariable<?> variable) {
+    return Arrays.equals(variable.getBounds(), new Type[] { Object.class });
   }
 
   /** A list, or a map: whose elements, or values, are checked in turn. */
@@ -188,7 +268,53 @@ class FactoryPropertiesTest {
     }
   }
 
+  public static final class BeanKeyFactory extends TestFactory {
+
+    public Map<Bean, String> getBeans() {
+      return null;
+    }
+  }
+
+  public static final class FactoryKeyFactory extends TestFactory {
+
+    public Map<Factory<Scope, Object>, String> getFactories() {
+      return null;
+    }
+  }
+
+  public static final class ListKeyFactory extends TestFactory {
+
+    public Map<List<Bean>, String> getBeans() {
+      return null;
+    }
+  }
+
+  public static final class MapInListFactory extends TestFactory {
+
+    public List<Map<Bean, String>> getBeans() {
+      return null;
+    }
+  }
+
+  public static final class MapInMapFactory extends TestFactory {
+
+    public Map<String, Map<Bean, String>> getBeans() {
+      return null;
+    }
+  }
+
+  public static final class ObjectKeyFactory extends TestFactory {
+
+    public Map<Object, String> getValues() {
+      return null;
+    }
+  }
+
   public static final class FineFactory extends TestFactory {
+
+    public Map<List<String>, Factory<Scope, Object>> getListKeyed() {
+      return null;
+    }
 
     public int getCount() {
       return 0;

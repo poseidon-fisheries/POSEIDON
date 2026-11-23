@@ -221,13 +221,12 @@ public final class Factories {
   /**
    * @param attribute             the vessel attribute that determines the
    *                              factory
-   * @param unlistedValueHandling what a vessel with an unlisted value of the
-   *                              listed values' type gets
-   * @param entries               the listed values and the factory that builds
-   *                              the component for each, in the order given
+   * @param unlistedValueHandling what a vessel with an unlisted value gets
+   * @param entries               the listed values, which are strings, and the
+   *                              factory that builds the component for each,
+   *                              in the order given
    * @return a component varying by {@code attribute}
-   * @throws IllegalArgumentException if a value is listed twice, or the listed
-   *                                  values have mixed types
+   * @throws IllegalArgumentException if a value is listed twice
    * @see VaryingComponent
    */
   @SafeVarargs
@@ -235,7 +234,7 @@ public final class Factories {
     final String attribute,
     final UnlistedValueHandling unlistedValueHandling,
     final Map.Entry<
-      ?,
+      String,
       ? extends Factory<? super VesselComponentScope, ? extends T>
     >... entries
   ) {
@@ -243,7 +242,7 @@ public final class Factories {
       .attribute(attribute)
       .factories(
         ImmutableMap.<
-          Object,
+          String,
           Factory<? super VesselComponentScope, ? extends T>
         >builder()
           .putAll(Arrays.asList(entries))

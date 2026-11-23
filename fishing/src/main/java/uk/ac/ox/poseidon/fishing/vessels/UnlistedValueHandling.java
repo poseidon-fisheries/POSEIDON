@@ -23,8 +23,8 @@
 package uk.ac.ox.poseidon.fishing.vessels;
 
 /**
- * What a {@link VaryingComponent} does for a vessel whose attribute value is
- * of the right type but not listed.
+ * What a {@link VaryingComponent} does for a vessel whose attribute value is a
+ * string but not listed.
  */
 public enum UnlistedValueHandling {
   /** The vessel has no component, and no store is opened for it. */
