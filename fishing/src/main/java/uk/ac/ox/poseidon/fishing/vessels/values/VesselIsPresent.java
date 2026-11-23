@@ -23,26 +23,13 @@
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
 import java.util.function.Function;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
-/**
- * A {@link GlobalScopeFactory} counterpart of {@link VesselIsActive}, built via
- * {@link Factories#vesselIsActive()}.
- */
-@NoArgsConstructor
-@SuperBuilder(toBuilder = true)
-public class VesselIsActiveFactory
-  extends GlobalScopeFactory<Function<Vessel, Boolean>>
-  implements ValueFactory<Scope, Vessel, Boolean>
-{
+/** Holds for a vessel that is present: docked or at sea, not absent. */
+public class VesselIsPresent implements Function<Vessel, Boolean> {
 
   @Override
-  protected Function<Vessel, Boolean> newInstance(final Scope scope) {
-    return new VesselIsActive();
+  public Boolean apply(final Vessel vessel) {
+    return vessel.isPresent();
   }
 }

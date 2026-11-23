@@ -83,8 +83,8 @@ import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.currentTripDest
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.currentTripEventManager;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.homePort;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.other;
-import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselIsActive;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselIsDockedAt;
+import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselIsPresent;
 import static uk.ac.ox.poseidon.geography.Factories.coordinate;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.supplierAllocator;
@@ -338,7 +338,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       socialNetwork,
       2,
       allOf(
-        other(vesselIsActive()),
+        other(vesselIsPresent()),
         condition(other(homePort()), equal(homePort()))
       )
     );

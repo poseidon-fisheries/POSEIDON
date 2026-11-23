@@ -34,8 +34,6 @@ import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegister;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
-import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.ERROR;
-import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.NO_COMPONENT;
 import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 
 import com.badlogic.gdx.ai.btree.Task;
@@ -175,18 +173,16 @@ class RebuildTest {
   private VesselComponent<Task<Vessel>> behaviourByGear(final int psDays) {
     return varyingBy(
       "gear",
-      ERROR,
       entry("PS", behaviourBuilder("PS", psDays)),
       entry("OTB", behaviourBuilder("OTB", 1)),
       entry("LLS", behaviourBuilder("LLS", 1))
     );
   }
 
-  /** The gear chosen by gear, for PS, OTB and LLS, and none for the rest. */
+  /** The gear chosen by gear, for PS, OTB and LLS. */
   private VesselComponent<Object> gearByGear() {
     return varyingBy(
       "gear",
-      NO_COMPONENT,
       entry("PS", componentBuilder("gear PS")),
       entry("OTB", componentBuilder("gear OTB")),
       entry("LLS", componentBuilder("gear LLS"))
@@ -295,9 +291,9 @@ class RebuildTest {
   }
 
   @Test
-  void aChoiceOfNoBehaviourLeavesTheVesselInactiveUntilAChangeGivesItOne() {
+  void aValueTheBehaviourDoesNotListKeepsTheVesselAbsentAndBuildingNothingUntilItIsListed() {
     startSimulation(
-      varyingBy("gear", NO_COMPONENT, entry("PS", behaviourBuilder("PS", 1))),
+      varyingBy("gear", entry("PS", behaviourBuilder("PS", 1))),
       gearByGear(),
       """
       V1,CEN,2000-01-01,,P1,GNS,1
@@ -306,15 +302,15 @@ class RebuildTest {
     );
     stepUntil(START.plusDays(1));
     final Vessel vessel = fleet.getVessel("V1").orElseThrow();
-    assertThat(vessel.isActive()).isFalse();
-    assertThat(events).containsExactly("build hold");
+    assertThat(vessel.isPresent()).isFalse();
+    assertThat(events).isEmpty();
 
     stepUntil(START.plusDays(2).plusSeconds(1));
-    assertThat(vessel.isActive()).isTrue();
+    assertThat(vessel.isPresent()).isTrue();
     assertThat(events).containsExactly(
-      "build hold",
       "build behaviour PS",
-      "build gear PS"
+      "build gear PS",
+      "build hold"
     );
   }
 
@@ -324,7 +320,7 @@ class RebuildTest {
       behaviour(behaviourBuilder("single", 1)),
       gearByGear(),
       """
-      V1,CEN,2000-01-01,,P1,GNS,1
+      V1,CEN,2000-01-01,,P1,OTB,1
       V1,MOD,2001-01-02,,P1,PS,1
       V1,RET,2001-01-04,,P1,PS,1
       """
@@ -333,7 +329,9 @@ class RebuildTest {
 
     assertThat(events).containsExactly(
       "build behaviour single",
+      "build gear OTB",
       "build hold",
+      "end gear OTB",
       "build gear PS",
       "end hold",
       "end gear PS",

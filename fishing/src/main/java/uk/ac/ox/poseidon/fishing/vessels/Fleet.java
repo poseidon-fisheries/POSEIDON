@@ -87,7 +87,7 @@ public class Fleet implements VesselsGetter {
    *
    * @param vesselId      the new vessel's id
    * @param specification what the vessel is made of
-   * @return a freshly constructed, inactive vessel with no attribute and no
+   * @return a freshly constructed, absent vessel with no attribute and no
    *         component yet built
    * @throws IllegalStateException if {@code vesselId} is in use, or was used
    *                               by a vessel that exited

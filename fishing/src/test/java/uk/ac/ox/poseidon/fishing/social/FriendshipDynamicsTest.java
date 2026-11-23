@@ -44,21 +44,21 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 class FriendshipDynamicsTest {
 
-  private final Vessel self = activeVessel();
+  private final Vessel self = presentVessel();
   private final List<Vessel> candidates = new ArrayList<>(List.of(self));
   private final SocialNetwork network = new SocialNetwork(() -> candidates);
   private final MersenneTwisterFast rng = new MersenneTwisterFast(42);
 
-  private static Vessel activeVessel() {
+  private static Vessel presentVessel() {
     final Vessel vessel = mock(Vessel.class);
-    when(vessel.isActive()).thenReturn(true);
+    when(vessel.isPresent()).thenReturn(true);
     return vessel;
   }
 
   private List<Vessel> addCandidates(final int count) {
     final List<Vessel> added = new ArrayList<>();
     for (int i = 0; i < count; i++) {
-      added.add(activeVessel());
+      added.add(presentVessel());
     }
     candidates.addAll(added);
     return added;
@@ -71,8 +71,8 @@ class FriendshipDynamicsTest {
     return new FriendshipDynamics(network, target, condition, rng);
   }
 
-  private FriendshipDynamics dynamicsOfActiveFriends(final int target) {
-    return dynamics(vessel -> target, (vessel, other) -> other.isActive());
+  private FriendshipDynamics dynamicsOfPresentFriends(final int target) {
+    return dynamics(vessel -> target, (vessel, other) -> other.isPresent());
   }
 
   private static FishingTrip tripOf(final Vessel vessel) {
@@ -90,7 +90,7 @@ class FriendshipDynamicsTest {
 
   @Test
   void listensForFishingTripStarts() {
-    assertThat(dynamicsOfActiveFriends(1).getEventClass()).isEqualTo(
+    assertThat(dynamicsOfPresentFriends(1).getEventClass()).isEqualTo(
       FishingTripStartEvent.class
     );
   }
@@ -99,7 +99,7 @@ class FriendshipDynamicsTest {
   void drawsTiesFromTheCandidatesToTheStartingVesselUpToTheTarget() {
     addCandidates(5);
 
-    startTrip(dynamicsOfActiveFriends(3), self);
+    startTrip(dynamicsOfPresentFriends(3), self);
 
     assertThat(network.getSources(self)).hasSize(3).doesNotContain(self);
     assertThat(network.getRecipients(self)).isEmpty();
@@ -109,15 +109,15 @@ class FriendshipDynamicsTest {
   void drawsEveryCandidateWhenThereAreFewerThanTheTarget() {
     final List<Vessel> others = addCandidates(2);
 
-    startTrip(dynamicsOfActiveFriends(3), self);
+    startTrip(dynamicsOfPresentFriends(3), self);
 
     assertThat(network.getSources(self)).containsExactlyElementsOf(others);
   }
 
   @Test
   void drawsOnlyCandidatesTheConditionRelatesToTheVessel() {
-    final Vessel sameGroup = activeVessel();
-    final Vessel otherGroup = activeVessel();
+    final Vessel sameGroup = presentVessel();
+    final Vessel otherGroup = presentVessel();
     candidates.addAll(List.of(sameGroup, otherGroup));
 
     startTrip(
@@ -136,7 +136,7 @@ class FriendshipDynamicsTest {
   @Test
   void leavesTheTiesAloneBetweenTripStartsOfAVesselWithEnoughFriends() {
     addCandidates(5);
-    final FriendshipDynamics dynamics = dynamicsOfActiveFriends(3);
+    final FriendshipDynamics dynamics = dynamicsOfPresentFriends(3);
     startTrip(dynamics, self);
     final var first = network.getSources(self);
 
@@ -151,7 +151,7 @@ class FriendshipDynamicsTest {
     addCandidates(3);
     network.addTie(friend, self);
 
-    startTrip(dynamicsOfActiveFriends(2), self);
+    startTrip(dynamicsOfPresentFriends(2), self);
 
     assertThat(network.getSources(self)).hasSize(2).contains(friend);
   }
@@ -159,9 +159,9 @@ class FriendshipDynamicsTest {
   @Test
   void dropsASourceFailingTheCondition() {
     final Vessel friend = addCandidates(1).getFirst();
-    final FriendshipDynamics dynamics = dynamicsOfActiveFriends(1);
+    final FriendshipDynamics dynamics = dynamicsOfPresentFriends(1);
     startTrip(dynamics, self);
-    when(friend.isActive()).thenReturn(false);
+    when(friend.isPresent()).thenReturn(false);
 
     startTrip(dynamics, self);
 
@@ -171,9 +171,9 @@ class FriendshipDynamicsTest {
   @Test
   void replacesASourceFailingTheConditionWithANewTie() {
     final Vessel friend = addCandidates(1).getFirst();
-    final FriendshipDynamics dynamics = dynamicsOfActiveFriends(1);
+    final FriendshipDynamics dynamics = dynamicsOfPresentFriends(1);
     startTrip(dynamics, self);
-    when(friend.isActive()).thenReturn(false);
+    when(friend.isPresent()).thenReturn(false);
     final Vessel newcomer = addCandidates(1).getFirst();
 
     startTrip(dynamics, self);
@@ -187,7 +187,7 @@ class FriendshipDynamicsTest {
     final int[] target = { 4 };
     final FriendshipDynamics dynamics = dynamics(
       vessel -> target[0],
-      (vessel, other) -> other.isActive()
+      (vessel, other) -> other.isPresent()
     );
     startTrip(dynamics, self);
     final var four = network.getSources(self);
@@ -204,7 +204,7 @@ class FriendshipDynamicsTest {
     final int[] target = { 2 };
     final FriendshipDynamics dynamics = dynamics(
       vessel -> target[0],
-      (vessel, other) -> other.isActive()
+      (vessel, other) -> other.isPresent()
     );
     startTrip(dynamics, self);
 
@@ -227,7 +227,7 @@ class FriendshipDynamicsTest {
           reads.incrementAndGet();
           return 2;
         },
-        (vessel, other) -> other.isActive()
+        (vessel, other) -> other.isPresent()
       ),
       self
     );
@@ -245,7 +245,7 @@ class FriendshipDynamicsTest {
     network.addTie(another, other);
     network.addTie(self, friend);
 
-    startTrip(dynamicsOfActiveFriends(0), self);
+    startTrip(dynamicsOfPresentFriends(0), self);
 
     assertThat(network.getRecipients(self)).containsExactlyInAnyOrder(
       other,
@@ -261,7 +261,7 @@ class FriendshipDynamicsTest {
   void onlyAFishingTripStartTriggersRecruitment() {
     addCandidates(3);
     final SimpleEventManager eventManager = new SimpleEventManager();
-    eventManager.addListener(dynamicsOfActiveFriends(2));
+    eventManager.addListener(dynamicsOfPresentFriends(2));
     final FishingTrip trip = tripOf(self);
 
     eventManager.broadcast(new FishingTripEndEvent(trip));
@@ -275,7 +275,7 @@ class FriendshipDynamicsTest {
   void aTripHomeTriggersNoRecruitment() {
     addCandidates(3);
     final SimpleEventManager eventManager = new SimpleEventManager();
-    eventManager.addListener(dynamicsOfActiveFriends(2));
+    eventManager.addListener(dynamicsOfPresentFriends(2));
     final Trip tripHome = mock(Trip.class);
     when(tripHome.getVessel()).thenReturn(self);
 
@@ -288,7 +288,7 @@ class FriendshipDynamicsTest {
   void rejectsANegativeTarget() {
     addCandidates(1);
 
-    assertThatThrownBy(() -> startTrip(dynamicsOfActiveFriends(-1), self))
+    assertThatThrownBy(() -> startTrip(dynamicsOfPresentFriends(-1), self))
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining("-1");
   }

@@ -71,8 +71,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * task of a gdx-ai behaviour tree, which the vessel runs: it repeatedly steps
  * the tree, rescheduling itself either after the running task's
  * {@link #taskDuration} (while the behaviour is running) or on the very next
- * tick (once it isn't). It steps its behaviour only while {@link #isActive()}
- * holds.
+ * tick (once it isn't). It steps its behaviour only while it is
+ * {@link #isPresent() present}.
  * <p>
  * What a source states about it, an update of its attributes or home port, or
  * its exit, joins
@@ -94,20 +94,25 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * Docking ({@link #dockAt}) and undocking ({@link #undock}) are explicit acts,
  * each at a time, and the vessel cannot move while docked: a cell can hold
  * several ports, so the port a vessel is docked at is never inferred from its
- * cell. A vessel is absent exactly when it has no modelled home port, once its
- * statements are applied: one whose home port stops being modelled while it is
- * docked becomes absent, and one whose home port is modelled again becomes
- * present, docked there. Each change announces itself, once, as a
- * {@link BecameAbsentEvent} or {@link BecamePresentEvent}, after the rebuild.
+ * cell. A vessel is present when its home port is a port of the port grid and
+ * its behaviour has a factory for its attributes, and absent otherwise, once
+ * its statements are applied. An absent vessel is modelled elsewhere, if at
+ * all. One that stops
+ * resolving while docked becomes absent, and one that resolves again becomes
+ * present, docked at its home port. An absent vessel builds nothing: becoming
+ * absent drops every component, becoming present builds them all, and a
+ * present vessel always has its behaviour. Each change announces itself,
+ * once, as a {@link BecameAbsentEvent} or {@link BecamePresentEvent}, after
+ * the components are dropped or built.
  * A vessel at sea cannot become absent, or exit.
  * <p>
  * A vessel has at most one step pending on the schedule. It holds no
  * schedule: its fleet gives it a {@link StepScheduler} that schedules its step
  * and nothing else, and refuses to schedule a second one. Nothing outside the
  * vessel can schedule its step. Its first step is at the instant it is
- * created; outside a step, an active vessel always has a step pending. A
- * vessel that becomes inactive schedules nothing more, until a statement
- * gives it a step.
+ * created; outside a step, a present vessel always has a step pending. A
+ * vessel that becomes absent schedules nothing more, until a statement gives
+ * it a step.
  * <p>
  * Nor does it hold a clock: what reads the date takes the clock as an input,
  * and gives the vessel the dates it records, such as those of its trips.
@@ -177,7 +182,7 @@ public class Vessel implements Oriented2D, HasAttributes {
   private final @NonNull PortGrid portGrid;
 
   /**
-   * Creates an inactive vessel, with no behaviour built yet. It starts stepping
+   * Creates an absent vessel, with no behaviour built yet. It starts stepping
    * once its first step is scheduled ({@link #scheduleFirstStep}).
    *
    * @param newStepScheduler makes, from this vessel's step (which is given
@@ -265,14 +270,9 @@ public class Vessel implements Oriented2D, HasAttributes {
   /** The vessel's current trip, or {@code null} if it isn't on one. */
   private Trip currentTrip;
 
-  /** @return whether this vessel is present and has its behaviour */
-  public boolean isActive() {
-    return !isAbsent() && tree != null;
-  }
-
-  /** @return whether this vessel is absent from the simulated area */
-  public boolean isAbsent() {
-    return whereabouts instanceof Absent;
+  /** @return whether this vessel is in the model: docked or at sea */
+  public boolean isPresent() {
+    return !(whereabouts instanceof Absent);
   }
 
   /** @return whether this vessel is at sea */
@@ -287,15 +287,16 @@ public class Vessel implements Oriented2D, HasAttributes {
 
   /**
    * Steps the running task, if the behaviour tree is running. If the tree is
-   * then not running, applies the queued statements and, if the vessel has not
-   * exited and is active, starts the tree afresh, in this same step. Then, if
-   * the vessel is active, schedules the next step after {@link #taskDuration}.
+   * then not running, applies the queued statements and, if the vessel is
+   * present, starts the tree afresh, in this same step. Then, if the vessel is
+   * present, schedules the next step after {@link #taskDuration}.
    *
    * @param dateTime the date-time of the step, which goes only in the events
    *                 this vessel broadcasts
-   * @throws IllegalStateException if the tree, started afresh, finishes
-   *                               without starting a task: restarting it would
-   *                               never move time on
+   * @throws IllegalStateException if the vessel is present without a behaviour
+   *                               tree, or if the tree, started afresh,
+   *                               finishes without starting a task: restarting
+   *                               it would never move time on
    */
   private void step(final LocalDateTime dateTime) {
     if (isBehaviourRunning()) {
@@ -303,7 +304,12 @@ public class Vessel implements Oriented2D, HasAttributes {
     }
     if (!isBehaviourRunning()) {
       applyStatements(dateTime);
-      if (isActive()) {
+      if (isPresent()) {
+        checkState(
+          tree != null,
+          "Vessel %s is present without a behaviour.",
+          id
+        );
         stepBehaviour();
         checkState(
           isBehaviourRunning(),
@@ -312,7 +318,7 @@ public class Vessel implements Oriented2D, HasAttributes {
         );
       }
     }
-    if (isActive()) {
+    if (isPresent()) {
       final Duration delay = checkNotNull(
         taskDuration,
         "Vessel %s's behaviour is running, but no task set a duration this step.",
@@ -324,15 +330,16 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Applies the queued statements in order and rebuilds what their changes
-   * choose anew; an exit ends this vessel, and the statements after it are
-   * never applied. Once they are applied, the vessel is absent exactly when it
-   * has no home port, and announces the one net change in its whereabouts, if
-   * there is one, after the rebuild.
+   * Applies the queued statements in order; an exit ends this vessel, and the
+   * statements after it are never applied. Once they are applied, the vessel
+   * reconciles its whereabouts ({@link #reconcileWhereabouts}). A vessel that
+   * became absent drops its components, one that became present builds them,
+   * and one that stayed present rebuilds what the changes choose anew. Then it
+   * announces the one net change in its whereabouts, if there is one.
    *
-   * @throws IllegalStateException if the vessel is at sea and has no home port
-   *                               once the statements are applied, or exits at
-   *                               sea
+   * @throws IllegalStateException if the vessel is at sea and its home port or
+   *                               behaviour no longer resolves once the
+   *                               statements are applied, or exits at sea
    */
   private void applyStatements(final LocalDateTime dateTime) {
     applyStatementsSince(attributes, whereabouts, dateTime);
@@ -345,8 +352,15 @@ public class Vessel implements Oriented2D, HasAttributes {
   ) {
     switch (statements.poll()) {
       case null -> {
-        placeToAgreeWithHomePort();
-        rebuildVaryingAnew(previousAttributes);
+        reconcileWhereabouts();
+        final boolean wasPresent = !(previousWhereabouts instanceof Absent);
+        if (wasPresent && isPresent()) {
+          rebuildVaryingAnew(previousAttributes);
+        } else if (wasPresent) {
+          dropComponents();
+        } else {
+          buildComponents();
+        }
         announceWhereaboutsChange(previousWhereabouts, whereabouts, dateTime);
       }
       case final AttributeUpdate update -> {
@@ -362,20 +376,26 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Places this vessel to agree with its home port: absent if it has none,
-   * docked at it if the vessel was absent, and where it is otherwise.
+   * Places this vessel where its home port and behaviour put it: absent unless
+   * its home port is a port of the port grid and its behaviour has a factory
+   * for its attributes; docked at its home port if it was absent; and where it
+   * is otherwise.
    *
-   * @throws IllegalStateException if the vessel is at sea and has no home port
+   * @throws IllegalStateException if the vessel is at sea and its home port or
+   *                               behaviour does not resolve
    */
-  private void placeToAgreeWithHomePort() {
-    if (homePort.isEmpty()) {
+  private void reconcileWhereabouts() {
+    final boolean homePortAndBehaviourResolve =
+      homePort.isPresent() &&
+      factoryFor(specification.getBehaviour()).isPresent();
+    if (!homePortAndBehaviourResolve) {
       checkState(
         !isAtSea(),
-        "Vessel %s has no modelled home port, so cannot be absent at sea.",
+        "Vessel %s's home port or behaviour does not resolve, so it cannot be absent at sea.",
         id
       );
       placeAt(new Absent());
-    } else if (isAbsent()) {
+    } else if (!isPresent()) {
       placeAt(new Docked(homePort.get()));
     }
   }
@@ -489,8 +509,8 @@ public class Vessel implements Oriented2D, HasAttributes {
   /**
    * Checks this vessel is not at sea; ends its component stores, in the reverse
    * of the order its specification builds them, and drops the components,
-   * which are no longer its own, so that it has no behaviour and is inactive;
-   * ends its own store; takes it off the vessel field and makes it absent;
+   * which are no longer its own, so that it has no behaviour; ends its own
+   * store; takes it off the vessel field and makes it absent;
    * broadcasts a {@link BecameAbsentEvent} if it was docked when the statements
    * began; and takes it out of its fleet, which announces the exit. Exiting
    * while absent is valid, and announces nothing.
@@ -504,12 +524,7 @@ public class Vessel implements Oriented2D, HasAttributes {
     final LocalDateTime dateTime
   ) {
     checkState(!isAtSea(), "Vessel %s cannot exit at sea.", id);
-    specification
-      .listedComponents()
-      .toList()
-      .reversed()
-      .forEach(this::dropComponent);
-    tree = null;
+    dropComponents();
     productStore.end();
     placeAt(new Absent());
     announceWhereaboutsChange(previousWhereabouts, whereabouts, dateTime);
@@ -517,43 +532,65 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Builds every component this vessel's specification lists, in its order:
-   * the behaviour first, then the others as listed.
+   * Builds every component this vessel's specification lists, in its order,
+   * if the vessel is present: the behaviour first, then the others as listed.
+   * An absent vessel builds nothing.
    */
   void buildComponents() {
-    specification.listedComponents().forEach(this::buildComponent);
+    if (isPresent()) {
+      specification.listedComponents().forEach(this::buildComponent);
+    }
   }
 
   /**
-   * Builds what {@code component} gives this vessel, if anything: under a
-   * scope carrying a fresh store, which this vessel keeps for it. Renews the
-   * tree if that is the behaviour. The behaviour must not be running, and
-   * this vessel must have nothing built for {@code component}.
+   * Ends the stores of every component this vessel has and drops what they
+   * built, in the reverse of the order its specification builds them, so that
+   * it has no behaviour.
+   */
+  private void dropComponents() {
+    specification
+      .listedComponents()
+      .toList()
+      .reversed()
+      .forEach(this::dropComponent);
+    tree = null;
+  }
+
+  /**
+   * Builds what {@code component} gives this vessel, under a scope carrying a
+   * fresh store, which this vessel keeps for it. Renews the tree if that is the
+   * behaviour. This vessel must be present, its behaviour must not be running,
+   * and it must have nothing built for {@code component}.
+   *
+   * @throws IllegalStateException if {@code component} varies by an attribute
+   *                               whose value for this vessel it does not list
    */
   private <T> void buildComponent(final VesselComponent<T> component) {
-    factoryFor(component).ifPresent(factory -> {
-      final ProductStore store = new ProductStore();
-      componentStores.put(component, store);
-      components.put(
-        component,
-        factory.get(
-          new VesselComponentScope(specification.scopeOf(this), store)
+    final var factory = factoryFor(component).orElseThrow(() -> {
+      final String attribute = ((VaryingComponent<T>) component).getAttribute();
+      return new IllegalStateException(
+        "Vessel %s has the value %s for %s, which the varying component does not list".formatted(
+          id,
+          attributes.get(attribute),
+          attribute
         )
       );
     });
+    final ProductStore store = new ProductStore();
+    componentStores.put(component, store);
+    components.put(
+      component,
+      factory.get(new VesselComponentScope(specification.scopeOf(this), store))
+    );
     if (component == specification.getBehaviour()) {
-      tree = specification
-        .getBehaviour()
-        .findIn(this)
-        .map(task -> new BehaviorTree<Vessel>(task))
-        .orElse(null);
+      tree = new BehaviorTree<>(specification.getBehaviour().of(this));
     }
   }
 
   /**
    * @return what builds {@code component} for this vessel: its single
    *         factory, or the factory selected by this vessel's attribute;
-   *         nothing if that is no component
+   *         nothing if the attribute's value is not listed
    */
   private <T> Optional<
     Factory<? super VesselComponentScope, ? extends T>
@@ -667,7 +704,7 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   private void checkPresent() {
-    checkState(!isAbsent(), "Vessel %s is absent, so has no position.", id);
+    checkState(isPresent(), "Vessel %s is absent, so has no position.", id);
   }
 
   /**
@@ -764,16 +801,17 @@ public class Vessel implements Oriented2D, HasAttributes {
 
   /**
    * Gives this vessel its starting state, its home port and its attributes,
-   * and places it to agree with its home port: docked at it if the vessel was
-   * absent, absent if there is none. That is the vessel's initial state, not a
-   * docking, so it has no time and broadcasts nothing; the statements a vessel
-   * applies later announce their changes in whereabouts instead.
+   * and reconciles its whereabouts with them ({@link #reconcileWhereabouts}).
+   * That is the vessel's initial state, not a docking, so it has no time and
+   * broadcasts nothing; the statements a vessel applies later announce their
+   * changes in whereabouts instead.
    *
    * @param homePortCode the code of the home port, or nothing if there is none
    * @param attributes   the attributes
    * @throws NullPointerException  if {@code attributes} holds a {@code null}
    *                               name or value
-   * @throws IllegalStateException if the vessel is at sea and has no home port
+   * @throws IllegalStateException if the vessel is at sea and its home port or
+   *                               behaviour does not resolve
    */
   void setStartingState(
     final Optional<String> homePortCode,
@@ -781,7 +819,7 @@ public class Vessel implements Oriented2D, HasAttributes {
   ) {
     replaceAttributes(attributes);
     replaceHomePort(homePortCode);
-    placeToAgreeWithHomePort();
+    reconcileWhereabouts();
   }
 
   /** Puts {@code attributes} in place of this vessel's attributes. */

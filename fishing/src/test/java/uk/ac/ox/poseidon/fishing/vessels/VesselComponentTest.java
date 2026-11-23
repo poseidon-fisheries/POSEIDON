@@ -22,16 +22,15 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
+import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT_CODE;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.newVessel;
-import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.NO_COMPONENT;
+import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.portGridWithTheHomePort;
 
 import com.badlogic.gdx.ai.btree.leaf.Success;
 import java.util.Map;
@@ -40,7 +39,6 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
  * A vessel keeps each of its components, with a store of its own; a component
@@ -58,10 +56,11 @@ class VesselComponentTest {
     final Vessel vessel = newVessel(
       mock(TemporalSchedule.class),
       mock(VesselField.class),
-      mock(PortGrid.class),
+      portGridWithTheHomePort(),
       behaviour(scope -> new Success<>()),
       components
     );
+    vessel.setStartingState(Optional.of(HOME_PORT_CODE), Map.of());
     vessel.buildComponents();
     return vessel;
   }
@@ -115,29 +114,6 @@ class VesselComponentTest {
     assertThatThrownBy(() -> component.findIn(vessel)).isInstanceOf(
       IllegalStateException.class
     );
-  }
-
-  @Test
-  void aChoiceOfNoComponentLeavesTheComponentAbsent() {
-    final VesselComponent<Object> chosen = varyingBy(
-      "gear",
-      NO_COMPONENT,
-      entry("PS", new NewObjectFactory())
-    );
-    final Vessel vessel = newVessel(
-      mock(TemporalSchedule.class),
-      mock(VesselField.class),
-      mock(PortGrid.class),
-      behaviour(scope -> new Success<>()),
-      chosen
-    );
-    vessel.setStartingState(Optional.empty(), Map.of("gear", "GNS"));
-    vessel.buildComponents();
-
-    assertThat(chosen.findIn(vessel)).isEmpty();
-    assertThatThrownBy(() -> chosen.of(vessel))
-      .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("Vessel vessel");
   }
 
   private static final class NewObjectFactory

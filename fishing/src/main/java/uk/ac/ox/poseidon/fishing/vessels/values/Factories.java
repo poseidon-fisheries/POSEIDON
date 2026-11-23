@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 /**
  * Factories for values of a vessel: functions given the vessel to read. They
  * read its state (its cell, trips, event managers), test it (whether it is
- * active, where it is) or derive a value from it (a property, a trip cost).
+ * present, where it is) or derive a value from it (a property, a trip cost).
  * {@link #other} reads such a value off another vessel, in a test relating the
  * two.
  */
@@ -124,11 +124,11 @@ public final class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   *         {@link VesselIsActive}
-   * @see VesselIsActive
+   *         {@link VesselIsPresent}
+   * @see VesselIsPresent
    */
-  public static VesselIsActiveFactory vesselIsActive() {
-    return new VesselIsActiveFactory();
+  public static VesselIsPresentFactory vesselIsPresent() {
+    return new VesselIsPresentFactory();
   }
 
   /**

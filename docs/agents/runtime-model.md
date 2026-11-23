@@ -56,17 +56,18 @@ identity, as the keys they are. What holds the working state of one component
 option values) is vessel-level.
 
 A varying component
-(`varyingBy("main_fishing_gear", NO_COMPONENT, entry("PS", purseSeine), entry("OTB", bottomTrawl))`)
+(`varyingBy("main_fishing_gear", entry("PS", purseSeine), entry("OTB", bottomTrawl))`)
 maps values of one required vessel attribute directly to the factory that builds
-the component for each. Its `UnlistedValueHandling` says what a vessel with an
-unlisted value of the right type gets: `NO_COMPONENT` (the vessel has none, and
-no store is opened for it) or `ERROR`. Duplicate keys and mixed key types fail
-when the component is constructed. Missing attributes and values of another type
-fail when the vessel is given the component, under both handlings. With no
-listed values, there is no key type to check, but the attribute is still
-required. A varying component reads an attribute only, never another component,
-and a component property drawn by `oneValueFrom` is drawn when its component is
-built.
+the component for each. A value it does not list gives no factory: for the
+behaviour, the vessel is then absent, so the behaviour's listing states which
+values the model covers; any other component of a present vessel fails to build,
+naming the vessel, the attribute and the value. A present vessel thus has every
+component its specification lists. Duplicate keys and mixed key types fail when
+the component is constructed. Missing attributes and values of another type fail
+when the vessel is given the component. With no listed values, there is no key
+type to check, but the attribute is still required. A varying component reads an
+attribute only, never another component, and a component property drawn by
+`oneValueFrom` is drawn when its component is built.
 
 Only the vessel builds what a component's factories build: building the
 component itself builds only its reader. Before a simulation starts, the
@@ -94,8 +95,9 @@ vessel, if there is none, as do `HomePortCatchValuation` and
 `RouteViaDestination`: they run inside a present vessel's behaviour.
 
 Creation runs in a fixed order: the vessel joins the fleet with an account,
-takes its home port and attributes (which place it at its home port, if it has
-one), and builds its components, the behaviour first, then the others as listed;
+takes its home port and attributes (which place it at its home port if it is
+present; see "Whereabouts"), and, if present, builds its components, the
+behaviour first, then the others as listed; an absent vessel builds nothing;
 only then does the fleet announce its entry to its entry listeners
 (`addEntryListener`), so a listener only ever sees a complete vessel, before its
 first step.
@@ -117,22 +119,24 @@ vessel takes its first step at the instant it is created. A vessel's account
 changes at once, from any call.
 
 The vessel compares what a source states with its current state, since another
-source may already have applied it: once the queue is applied, it rebuilds every
-component that varies by an attribute whose value actually changed, even if the
-same factory is picked: their stores end in the reverse of the build order, then
-they are built in that order, each under a fresh store; every other component,
-the vessel's own store (its memories) and its account stay. A hold that still
-holds catch refuses to have its store ended, so a rebuild only ever drops an
-empty hold.
+source may already have applied it: once the queue is applied, a vessel that
+stays present rebuilds every component that varies by an attribute whose value
+actually changed, even if the same factory is picked: their stores end in the
+reverse of the build order, then they are built in that order, each under a
+fresh store; every other component, the vessel's own store (its memories) and
+its account stay. A hold that still holds catch refuses to have its store ended,
+so a rebuild, an absence or an exit only ever drops an empty hold.
 
-Once the queue is applied, a vessel is absent exactly when it has no modelled
-home port; see "Whereabouts". An exit ends the queue: the vessel checks it is
-not at sea, ends its component stores in the reverse of the build order, then
-its own store; it leaves the vessel field and becomes absent, announcing
-`BecameAbsentEvent` if it was docked when the queue started; then it leaves the
-fleet, which announces the exit to its exit listeners (`addExitListener`) and
-keeps the id with its exit date, so that a later statement about it is an error
-and ids are never reused.
+Once the queue is applied, the vessel is present or absent as "Whereabouts"
+says. One that becomes absent drops every component, ending their stores in the
+reverse of the build order, and one that becomes present builds them all, in
+order; one that stays absent builds nothing. An exit ends the queue: the vessel
+checks it is not at sea, ends its component stores in the reverse of the build
+order, then its own store; it leaves the vessel field and becomes absent,
+announcing `BecameAbsentEvent` if it was docked when the queue started; then it
+leaves the fleet, which announces the exit to its exit listeners
+(`addExitListener`) and keeps the id with its exit date, so that a later
+statement about it is an error and ids are never reused.
 
 ## Whereabouts
 
@@ -140,27 +144,33 @@ A vessel's `Whereabouts` are exactly one of `Absent`, `Docked` (holding the
 port) or `AtSea`; the vessel field agrees, and an absent vessel is off it.
 Absent is neither docked nor at sea: it has no position, so `getCell`,
 `getPoint` and `getCoordinate` fail on it, `setCurrentCell` requires at sea, and
-`isActive()` means present and having a behaviour. Every transition is checked
+`isPresent()` is the one check: true unless absent. A present vessel always has
+its behaviour, which it checks before stepping it. Every transition is checked
 against the current whereabouts: undock (docked to at sea, `UndockingEvent`),
 dock (at sea to docked, `DockingEvent`), docked to absent (`BecameAbsentEvent`)
 and absent to docked (`BecamePresentEvent`). At sea to absent is an error, and
 absent to at sea has no path. `isDocked()`, `isDockedAt(port)` and
 `getPortDockedAt()` read the whereabouts; the last fails unless docked.
 
-A vessel is created absent, and placed docked at its home port, silently, if its
-home-port code names a port in the port grid. Becoming absent and becoming
-present follow from the statements: a vessel whose code matches no port, or
-whose home port is cleared, is absent; one whose home port becomes a modelled
-port again becomes present, docked there. A move between modelled home ports
-leaves the vessel where it is and announces nothing: whether and when it travels
-to its new home port is up to the scenario's behaviour. The vessel compares its
-whereabouts before and after its whole queue, announces at most one net change
-after the rebuild, and checks the at-sea error on the net result. Both events
-carry the vessel, the date and the port, go on the vessel's own event manager
-(which forwards to the fleet's), and are distinct from docking events, so trip
-and effort listeners never read them as departures or arrivals. The date is the
-step's, which `StepScheduler` passes to the vessel; the vessel holds no clock.
-Both `DockingEvent` and `BecamePresentEvent` are a `PortStayStartEvent`, which
+A vessel is present when its home-port code names a port in the port grid and
+its behaviour component has a factory for its attributes (asked without building
+it), and absent otherwise: modelled elsewhere, if at all. So a scenario states
+which attribute values it covers once, in its behaviour's listing, with "no
+component" for the rest. A vessel is created absent, and placed docked at its
+home port, silently, if it is present. Becoming absent and becoming present
+follow from the statements: a vessel whose code matches no port, whose home port
+is cleared, or whose behaviour no longer resolves becomes absent; one that
+resolves again becomes present, docked at its home port. A move between modelled
+home ports leaves the vessel where it is and announces nothing: whether and when
+it travels to its new home port is up to the scenario's behaviour. The vessel
+compares its whereabouts before and after its whole queue, announces at most one
+net change after the components are dropped, built or rebuilt, and checks the
+at-sea error on the net result. Both events carry the vessel, the date and the
+port, go on the vessel's own event manager (which forwards to the fleet's), and
+are distinct from docking events, so trip and effort listeners never read them
+as departures or arrivals. The date is the step's, which `StepScheduler` passes
+to the vessel; the vessel holds no clock. Both `DockingEvent` and
+`BecamePresentEvent` are a `PortStayStartEvent`, which
 `CurrentPortStayStartDateTime` listens for to restart the port stay.
 
 A fleet-wide listener (`addEntryListener`) sees a vessel's whereabouts at entry

@@ -98,13 +98,13 @@ class CliqueDynamicsPropertyTest {
   ) {
     final List<Vessel> fleet = new ArrayList<>();
     final Map<Vessel, String> keys = new HashMap<>();
-    final Map<Vessel, Boolean> activity = new HashMap<>();
+    final Map<Vessel, Boolean> presence = new HashMap<>();
     for (int i = 0; i < fleetSize; i++) {
       final Vessel vessel = mock(Vessel.class);
-      when(vessel.isActive()).thenAnswer(_ -> activity.get(vessel));
+      when(vessel.isPresent()).thenAnswer(_ -> presence.get(vessel));
       fleet.add(vessel);
       keys.put(vessel, KEYS.getFirst());
-      activity.put(vessel, true);
+      presence.put(vessel, true);
     }
     final SocialNetwork network = new SocialNetwork(() -> fleet);
     final CliqueDynamics dynamics = new CliqueDynamics(
@@ -120,13 +120,13 @@ class CliqueDynamicsPropertyTest {
           startTrip(dynamics, vessel);
           assertThat(network.getRecipients(vessel)).allMatch(
             partner ->
-              activity.get(vessel) &&
-              activity.get(partner) &&
+              presence.get(vessel) &&
+              presence.get(partner) &&
               keys.get(partner).equals(keys.get(vessel))
           );
         }
         case KEY_CHANGE -> keys.put(vessel, KEYS.get(step.getKeyIndex()));
-        case ACTIVITY_CHANGE -> activity.put(vessel, !activity.get(vessel));
+        case PRESENCE_CHANGE -> presence.put(vessel, !presence.get(vessel));
       }
       assertCliqueInvariants(network, fleet, maximumCliqueSize);
     }
@@ -147,7 +147,7 @@ class CliqueDynamicsPropertyTest {
   enum StepKind {
     TRIP_START,
     KEY_CHANGE,
-    ACTIVITY_CHANGE
+    PRESENCE_CHANGE
   }
 
   @Value

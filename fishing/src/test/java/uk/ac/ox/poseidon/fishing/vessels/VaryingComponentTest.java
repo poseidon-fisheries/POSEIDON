@@ -32,11 +32,10 @@ import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
-import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.ERROR;
-import static uk.ac.ox.poseidon.fishing.vessels.UnlistedValueHandling.NO_COMPONENT;
+import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT_CODE;
+import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.portGridWithTheHomePort;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.componentProperty;
 
-import com.badlogic.gdx.ai.btree.leaf.Success;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -49,9 +48,9 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
+import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.fishing.vessels.values.ComponentPropertyFactory;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
@@ -64,17 +63,26 @@ class VaryingComponentTest {
   private final Factory<VesselComponentScope, Object> ps = _ -> "PS";
   private final Factory<VesselComponentScope, Object> other = _ -> "other";
 
+  /** A behaviour that runs for a day, so that a present vessel can step. */
+  private static final class WaitingADay extends VesselTask {
+
+    @Override
+    public Status execute() {
+      return runFor(Duration.ofDays(1));
+    }
+  }
+
   private static <T> Optional<T> componentInSimulation(
     final VesselComponent<T> component,
     final Map<String, Object> attributes
   ) {
     final var fleet = fleet(
       _ -> mock(VesselField.class),
-      _ -> mock(PortGrid.class)
+      _ -> portGridWithTheHomePort()
     );
     final var specification = vesselSpecification(
       fleet,
-      behaviour(scope -> new Success<>()),
+      behaviour(scope -> new WaitingADay()),
       entry("gear", component)
     );
     final var simulation = Scenario.builder()
@@ -87,7 +95,7 @@ class VaryingComponentTest {
     try {
       final Vessel vessel = simulation
         .getComponent(VesselSpecification.class)
-        .create("V1", Optional.empty(), attributes);
+        .create("V1", Optional.of(HOME_PORT_CODE), attributes);
       simulation.schedule.step(simulation);
       product = component.findIn(vessel);
       product.ifPresent(value ->
@@ -100,42 +108,24 @@ class VaryingComponentTest {
   }
 
   @Test
-  void listedValuesGiveTheirFactoriesComponentsUnderBothHandlings() {
-    for (final var handling : UnlistedValueHandling.values()) {
-      final var component = varyingBy(
-        "gear",
-        handling,
-        entry("PS", ps),
-        entry("OTB", other)
-      );
+  void listedValuesGiveTheirFactoriesComponents() {
+    final var component = varyingBy(
+      "gear",
+      entry("PS", ps),
+      entry("OTB", other)
+    );
 
-      assertThat(
-        componentInSimulation(component, Map.of("gear", "PS"))
-      ).contains("PS");
-      assertThat(
-        componentInSimulation(component, Map.of("gear", "OTB"))
-      ).contains("other");
-    }
+    assertThat(componentInSimulation(component, Map.of("gear", "PS"))).contains(
+      "PS"
+    );
+    assertThat(
+      componentInSimulation(component, Map.of("gear", "OTB"))
+    ).contains("other");
   }
 
   @Test
-  void unlistedValuesGiveNoComponentUnderNoComponent() {
-    final VaryingComponent<Object> chosen = varyingBy(
-      "gear",
-      NO_COMPONENT,
-      entry("PS", ps)
-    );
-
-    assertThat(componentInSimulation(chosen, Map.of("gear", "OTB"))).isEmpty();
-  }
-
-  @Test
-  void unlistedValuesFailNamingTheVesselAttributeAndValueUnderError() {
-    final VaryingComponent<Object> chosen = varyingBy(
-      "gear",
-      ERROR,
-      entry("PS", ps)
-    );
+  void anUnlistedValueOfAPresentVesselFailsNamingTheVesselAttributeAndValue() {
+    final VaryingComponent<Object> chosen = varyingBy("gear", entry("PS", ps));
 
     assertThatThrownBy(() ->
       componentInSimulation(chosen, Map.of("gear", "OTB"))
@@ -147,43 +137,39 @@ class VaryingComponentTest {
   }
 
   @Test
-  void aMissingAttributeIsAnErrorUnderBothHandlings() {
-    for (final var handling : UnlistedValueHandling.values()) {
-      final VaryingComponent<Object> chosen = varyingBy(
-        "gear",
-        handling,
-        entry("PS", ps)
-      );
+  void aMissingAttributeIsAnError() {
+    final VaryingComponent<Object> chosen = varyingBy("gear", entry("PS", ps));
 
-      assertThatThrownBy(() -> componentInSimulation(chosen, Map.of()))
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("Vessel V1 has no attribute gear");
-    }
+    assertThatThrownBy(() -> componentInSimulation(chosen, Map.of()))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("Vessel V1 has no attribute gear");
   }
 
   @Test
-  void aNonStringValueIsAnErrorUnderBothHandlings() {
-    for (final var handling : UnlistedValueHandling.values()) {
-      final var component = varyingBy("gear", handling, entry("1", ps));
+  void aNonStringValueIsAnError() {
+    final var component = varyingBy("gear", entry("1", ps));
 
-      assertThatThrownBy(() ->
-        componentInSimulation(component, Map.of("gear", 1L))
-      )
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("V1")
-        .hasMessageContaining("gear")
-        .hasMessageContaining("java.lang.Long")
-        .hasMessageContaining("String");
-    }
+    assertThatThrownBy(() ->
+      componentInSimulation(component, Map.of("gear", 1L))
+    )
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("V1")
+      .hasMessageContaining("gear")
+      .hasMessageContaining("java.lang.Long")
+      .hasMessageContaining("String");
   }
 
   @Test
-  void withNoListedValuesANonStringValueIsStillAnError() {
-    final var component = varyingBy("gear", NO_COMPONENT);
+  void withNoListedValuesEveryValueIsRejected() {
+    final VaryingComponent<Object> component = varyingBy("gear");
 
-    assertThat(
+    assertThatThrownBy(() ->
       componentInSimulation(component, Map.of("gear", "PS"))
-    ).isEmpty();
+    )
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("V1")
+      .hasMessageContaining("gear")
+      .hasMessageContaining("PS");
     assertThatThrownBy(() ->
       componentInSimulation(component, Map.of("gear", 1L))
     )
@@ -192,50 +178,27 @@ class VaryingComponentTest {
   }
 
   @Test
-  void withNoListedValuesErrorHandlingRejectsEveryValue() {
-    final var component = varyingBy("gear", ERROR);
+  void withNoListedValuesTheAttributeIsStillRequired() {
+    final VaryingComponent<Object> component = varyingBy("gear");
 
-    assertThatThrownBy(() ->
-      componentInSimulation(component, Map.of("gear", "PS"))
-    )
+    assertThatThrownBy(() -> componentInSimulation(component, Map.of()))
       .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("V1")
-      .hasMessageContaining("gear")
-      .hasMessageContaining("PS");
-    assertThatThrownBy(() ->
-      componentInSimulation(component, Map.of("gear", 1L))
-    )
-      .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("V1")
-      .hasMessageContaining("gear")
-      .hasMessageContaining("1");
-  }
-
-  @Test
-  void withNoListedValuesTheAttributeIsStillRequiredUnderBothHandlings() {
-    for (final var handling : UnlistedValueHandling.values()) {
-      final var component = varyingBy("gear", handling);
-
-      assertThatThrownBy(() -> componentInSimulation(component, Map.of()))
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("Vessel V1 has no attribute gear");
-    }
+      .hasMessageContaining("Vessel V1 has no attribute gear");
   }
 
   @Test
   void duplicateKeysAreAnError() {
     assertThatThrownBy(() ->
-      varyingBy("gear", ERROR, entry("PS", ps), entry("PS", other))
+      varyingBy("gear", entry("PS", ps), entry("PS", other))
     )
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining("PS");
   }
 
   @Test
-  void survivesAYamlRoundTripKeepingValuesHandlingAndOrder() {
+  void survivesAYamlRoundTripKeepingValuesAndOrder() {
     final VaryingComponent<Object> chosen = varyingBy(
       "gear",
-      NO_COMPONENT,
       entry("PS", object("ps")),
       entry("GNS", object("gns")),
       entry("OTB", object("otb"))
@@ -247,12 +210,11 @@ class VaryingComponentTest {
     assertThat(written)
       .doesNotContain("Variant")
       .doesNotContain("NoComponent")
-      .contains("unlistedValueHandling: NO_COMPONENT")
+      .doesNotContain("unlistedValueHandling")
       .containsPattern(
         "PS: !!uk\\.ac\\.ox\\.poseidon\\.core\\.utils\\.ObjectFactory"
       );
     assertThat(loaded.getAttribute()).isEqualTo("gear");
-    assertThat(loaded.getUnlistedValueHandling()).isEqualTo(NO_COMPONENT);
     assertThat(loaded.getFactories().keySet()).containsExactly(
       "PS",
       "GNS",
@@ -264,19 +226,6 @@ class VaryingComponentTest {
     assertThat(
       componentInSimulation(loaded, Map.of("gear", "OTB"))
     ).hasValueSatisfying(value -> assertThat(value).isEqualTo("otb"));
-    assertThat(componentInSimulation(loaded, Map.of("gear", "XYZ"))).isEmpty();
-  }
-
-  @Test
-  void errorHandlingSurvivesAYamlRoundTrip() {
-    final var loaded = roundTrip(
-      varyingBy("gear", ERROR, entry("PS", object("ps")))
-    );
-
-    assertThat(loaded.getUnlistedValueHandling()).isEqualTo(ERROR);
-    assertThatThrownBy(() ->
-      componentInSimulation(loaded, Map.of("gear", "OTB"))
-    ).isInstanceOf(IllegalStateException.class);
   }
 
   @Test
@@ -285,7 +234,7 @@ class VaryingComponentTest {
     final Factory<VesselComponentScope, TrawlGear> trawl = _ -> new TrawlGear();
 
     final var gear = takesAGear(
-      varyingBy("gear", NO_COMPONENT, entry("PS", seine), entry("OTB", trawl))
+      varyingBy("gear", entry("PS", seine), entry("OTB", trawl))
     );
 
     assertThat(gear.getFactories()).hasSize(2);
@@ -301,7 +250,6 @@ class VaryingComponentTest {
   void aCalibrationAddressIntoTheFactoryMapResolvesAndDerives() {
     final var gear = varyingBy(
       "gear",
-      ERROR,
       entry("PS", object(1.0)),
       entry("OTB", object(2.0))
     );
@@ -321,7 +269,6 @@ class VaryingComponentTest {
     assertThat(
       ((ObjectFactory<?>) derivedComponent.getFactories().get("PS")).getValue()
     ).isEqualTo(1.0);
-    assertThat(derivedComponent.getUnlistedValueHandling()).isEqualTo(ERROR);
   }
 
   @Test
@@ -345,7 +292,6 @@ class VaryingComponentTest {
         gearReader: !!uk.ac.ox.poseidon.fishing.vessels.values.ComponentPropertyFactory
           component: !!uk.ac.ox.poseidon.fishing.vessels.VaryingComponent
             attribute: gear
-            unlistedValueHandling: ERROR
             factories:
       """ +
       factoryEntries.indent(4) +

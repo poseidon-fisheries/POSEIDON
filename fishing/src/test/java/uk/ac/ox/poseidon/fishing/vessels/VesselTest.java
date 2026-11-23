@@ -151,20 +151,14 @@ class VesselTest {
   }
 
   @Test
-  void aVesselWithItsBehaviourAndAHomePortIsActive() {
-    assertThat(vessel.isActive()).isTrue();
+  void aVesselWithItsBehaviourAndAHomePortIsPresent() {
+    assertThat(vessel.isPresent()).isTrue();
   }
 
   @Test
-  void aVesselWithoutAHomePortIsInactive() {
+  void aVesselWithoutAHomePortIsAbsent() {
     vessel.setStartingState(Optional.empty(), Map.of());
-    assertThat(vessel.isActive()).isFalse();
-  }
-
-  @Test
-  void aVesselWhoseBehaviourIsNotBuiltIsInactive() {
-    final Vessel vessel = vesselWithAHomePort(behaviour(scope -> behaviour));
-    assertThat(vessel.isActive()).isFalse();
+    assertThat(vessel.isPresent()).isFalse();
   }
 
   @Test

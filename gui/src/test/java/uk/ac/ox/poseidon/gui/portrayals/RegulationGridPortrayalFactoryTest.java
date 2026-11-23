@@ -132,7 +132,7 @@ class RegulationGridPortrayalFactoryTest {
 
   private static Vessel vessel() {
     final Vessel vessel = mock(Vessel.class);
-    when(vessel.isActive()).thenReturn(true);
+    when(vessel.isPresent()).thenReturn(true);
     when(vessel.getHomePort()).thenReturn(Optional.of(mock(Port.class)));
     return vessel;
   }

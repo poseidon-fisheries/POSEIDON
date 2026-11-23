@@ -315,7 +315,7 @@ class VesselRegisterFactoryTest {
   }
 
   @Test
-  void aHomePortCodeNamingNoPortLeavesTheVesselInactiveUntilAChangeNamesOne() {
+  void aHomePortCodeNamingNoPortLeavesTheVesselAbsentUntilAChangeNamesOne() {
     startSimulation(
       """
       V1,Vee One,P3,CEN,2000-01-01,,1,a
@@ -325,12 +325,12 @@ class VesselRegisterFactoryTest {
     stepUntil(START.plusDays(2));
     final Vessel vessel = vessel("V1");
     assertThat(vessel.getHomePort()).isEmpty();
-    assertThat(vessel.isActive()).isFalse();
+    assertThat(vessel.isPresent()).isFalse();
     assertThat(attributesSeen).isEmpty();
     verify(vesselField, never()).setCell(vessel, P1_CELL);
 
     stepUntil(START.plusDays(2).plusSeconds(1));
-    assertThat(vessel.isActive()).isTrue();
+    assertThat(vessel.isPresent()).isTrue();
     verify(vesselField).setCell(vessel, P1_CELL);
     assertThat(attributesSeen.get("V1")).hasSize(1);
   }
@@ -402,7 +402,7 @@ class VesselRegisterFactoryTest {
     stepUntil(START.plusSeconds(1));
 
     assertThat(vessel("V1").getHomePort()).isEmpty();
-    assertThat(vessel("V1").isActive()).isFalse();
+    assertThat(vessel("V1").isPresent()).isFalse();
   }
 
   @Test

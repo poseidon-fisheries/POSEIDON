@@ -178,7 +178,7 @@ class FleetTest {
   }
 
   @Test
-  void anExitedVesselHasNoComponentLeftAndIsInactive() {
+  void anExitedVesselHasNoComponentLeftAndIsAbsent() {
     final Vessel vessel = create("V1");
     fleet.queue("V1", new Exit());
     stepFor(ofSeconds(1));
@@ -191,7 +191,7 @@ class FleetTest {
         .stream()
         .map(component -> component.findIn(vessel))
     ).allMatch(Optional::isEmpty);
-    assertThat(vessel.isActive()).isFalse();
+    assertThat(vessel.isPresent()).isFalse();
   }
 
   @Test

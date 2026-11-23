@@ -167,8 +167,8 @@ class TripBalanceTest {
     })
       .when(vessel)
       .setTaskDuration(any());
-    vessel.buildComponents();
     vessel.setStartingState(Optional.of(HOME_PORT_CODE), Map.of());
+    vessel.buildComponents();
     vessel.getAccount().add(Money.of(CurrencyUnit.EUR, 1000));
     final var market = biomassMarket(_ -> port, "market", "EUR").get(scope);
     market.setPrice(

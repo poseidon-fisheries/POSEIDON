@@ -59,11 +59,11 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
  * A {@link SimulationScopeFactory} that overlays a checkered texture on cells
- * where fishing is currently forbidden for every active vessel of a fleet, i.e.
- * cells closed to the whole fleet, recomputed once per
+ * where fishing is currently forbidden for every present vessel of a fleet,
+ * i.e. cells closed to the whole fleet, recomputed once per
  * {@link UpdateFrequency#EVERY_DAY day} rather than on every draw. Cells closed
  * to only part of the fleet, e.g. to the vessels of a port under a temporary
- * closure, are not marked. If no vessel of the fleet is active, no cell is
+ * closure, are not marked. If no vessel of the fleet is present, no cell is
  * marked.
  */
 @Getter
@@ -225,7 +225,7 @@ public class RegulationGridPortrayalFactory
         vesselField.getField().allObjects,
         Vessel.class
       )
-        .filter(Vessel::isActive)
+        .filter(Vessel::isPresent)
         .filter(fleet::apply)
         .toList();
       bathymetricGrid.getActiveWaterCells().forEach(cell -> {

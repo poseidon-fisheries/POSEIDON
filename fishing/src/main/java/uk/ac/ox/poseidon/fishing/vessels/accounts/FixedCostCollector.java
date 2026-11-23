@@ -32,7 +32,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
  * A {@link Steppable} that, on each step, subtracts {@code cost}'s
- * result from the {@link Account} of every active vessel in {@code fleet}.
+ * result from the {@link Account} of every present vessel in {@code fleet}.
  */
 @RequiredArgsConstructor
 public class FixedCostCollector implements Steppable {
@@ -41,7 +41,7 @@ public class FixedCostCollector implements Steppable {
   private final Function<? super Vessel, ? extends Money> cost;
 
   /**
-   * Subtracts {@code cost}'s result from every active vessel's
+   * Subtracts {@code cost}'s result from every present vessel's
    * {@link Account}.
    */
   @Override
@@ -49,7 +49,7 @@ public class FixedCostCollector implements Steppable {
     fleet
       .getVessels()
       .stream()
-      .filter(Vessel::isActive)
+      .filter(Vessel::isPresent)
       .forEach(vessel -> {
         vessel.getAccount().subtract(cost.apply(vessel));
       });

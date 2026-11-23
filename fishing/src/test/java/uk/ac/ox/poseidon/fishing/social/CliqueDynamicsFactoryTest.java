@@ -76,7 +76,7 @@ class CliqueDynamicsFactoryTest {
   private static Vessel vessel(final EventManager simulationEventManager) {
     final Vessel vessel = mock(Vessel.class);
     when(vessel.getProductStore()).thenReturn(new ProductStore());
-    when(vessel.isActive()).thenReturn(true);
+    when(vessel.isPresent()).thenReturn(true);
     when(vessel.getEventManager()).thenReturn(
       new ForwardingEventManager(simulationEventManager)
     );

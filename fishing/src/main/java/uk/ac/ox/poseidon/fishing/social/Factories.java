@@ -122,7 +122,7 @@ public final class Factories {
   /**
    * @param network           the network whose ties the dynamics add and remove
    * @param groupingValues    give the values that group vessels: vessels are
-   *                          eligible for each other when both are active and
+   *                          eligible for each other when both are present and
    *                          each of these gives them equal values
    * @param maximumCliqueSize the largest clique a vessel joins, itself
    *                          included; 1 means no vessel ever has partners

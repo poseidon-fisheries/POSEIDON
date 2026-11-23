@@ -23,14 +23,18 @@
 package uk.ac.ox.poseidon.fishing.vessels;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableMap;
+import java.util.Optional;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
+import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
@@ -43,6 +47,18 @@ final class SpecificationFixtures {
   static final String HOME_PORT_CODE = "P1";
 
   private SpecificationFixtures() {}
+
+  /**
+   * @return a mocked port grid with one port, of code {@link #HOME_PORT_CODE},
+   *         on the cell (0, 0)
+   */
+  static PortGrid portGridWithTheHomePort() {
+    final PortGrid portGrid = mock(PortGrid.class);
+    final Port port = mock(Port.class);
+    when(portGrid.getObject(HOME_PORT_CODE)).thenReturn(Optional.of(port));
+    when(portGrid.getCell(port)).thenReturn(new Cell(0, 0));
+    return portGrid;
+  }
 
   /**
    * @return a specification of vessels with {@code behaviour} and the other

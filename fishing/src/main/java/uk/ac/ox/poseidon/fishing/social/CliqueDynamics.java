@@ -37,9 +37,9 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
  * Network dynamics that keep vessels in cliques of at most
- * {@link #maximumCliqueSize} vessels eligible for each other: both active, with
- * equal values for every one of the {@link #groupingValues} (in NW Med, the
- * same home port and gear). Every tie goes both ways, so a vessel's clique is
+ * {@link #maximumCliqueSize} vessels eligible for each other: both present,
+ * with equal values for every one of the {@link #groupingValues} (in NW Med,
+ * the same home port and gear). Every tie goes both ways, so a vessel's clique is
  * itself and its partners, its recipients in the network.
  */
 public class CliqueDynamics implements Listener<FishingTripStartEvent> {
@@ -138,8 +138,8 @@ public class CliqueDynamics implements Listener<FishingTripStartEvent> {
   /** Reads the grouping values in order, only until one differs. */
   private boolean areEligible(final Vessel a, final Vessel b) {
     return (
-      a.isActive() &&
-      b.isActive() &&
+      a.isPresent() &&
+      b.isPresent() &&
       groupingValues
         .stream()
         .allMatch(value -> Objects.equals(value.apply(a), value.apply(b)))

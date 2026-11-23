@@ -41,7 +41,7 @@ public final class Factories {
   private Factories() {}
 
   /**
-   * @param fleet         the fleet whose active vessels get charged
+   * @param fleet         the fleet whose present vessels get charged
    * @param cost computes the amount to subtract from each vessel's
    *                      account
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a

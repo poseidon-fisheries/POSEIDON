@@ -181,7 +181,7 @@ class VesselSpecificationTest {
   }
 
   @Test
-  void aHomePortCodeNamingNoPortGivesNoHomePortAndAnInactiveVessel() {
+  void aHomePortCodeNamingNoPortGivesNoHomePortAndAnAbsentVessel() {
     when(portGrid.getObject("P9")).thenReturn(Optional.empty());
 
     final Vessel vessel = specification.create(
@@ -192,7 +192,7 @@ class VesselSpecificationTest {
 
     assertThat(vessel.getHomePort()).isEmpty();
     assertThat(vessel.getHomePortCell()).isEmpty();
-    assertThat(vessel.isActive()).isFalse();
+    assertThat(vessel.isPresent()).isFalse();
   }
 
   @Test

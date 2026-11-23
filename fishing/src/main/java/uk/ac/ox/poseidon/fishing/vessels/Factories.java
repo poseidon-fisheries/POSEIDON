@@ -219,12 +219,9 @@ public final class Factories {
   }
 
   /**
-   * @param attribute             the vessel attribute that determines the
-   *                              factory
-   * @param unlistedValueHandling what a vessel with an unlisted value gets
-   * @param entries               the listed values, which are strings, and the
-   *                              factory that builds the component for each,
-   *                              in the order given
+   * @param attribute the vessel attribute that determines the factory
+   * @param entries   the listed values, which are strings, and the factory that
+   *                  builds the component for each, in the order given
    * @return a component varying by {@code attribute}
    * @throws IllegalArgumentException if a value is listed twice
    * @see VaryingComponent
@@ -232,7 +229,6 @@ public final class Factories {
   @SafeVarargs
   public static <T> VaryingComponent<T> varyingBy(
     final String attribute,
-    final UnlistedValueHandling unlistedValueHandling,
     final Map.Entry<
       String,
       ? extends Factory<? super VesselComponentScope, ? extends T>
@@ -248,7 +244,6 @@ public final class Factories {
           .putAll(Arrays.asList(entries))
           .buildOrThrow()
       )
-      .unlistedValueHandling(unlistedValueHandling)
       .build();
   }
 

@@ -41,10 +41,10 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 class CliqueDynamicsTest {
 
-  private final Vessel a = activeVessel();
-  private final Vessel b = activeVessel();
-  private final Vessel c = activeVessel();
-  private final Vessel d = activeVessel();
+  private final Vessel a = presentVessel();
+  private final Vessel b = presentVessel();
+  private final Vessel c = presentVessel();
+  private final Vessel d = presentVessel();
   private final SocialNetwork network = new SocialNetwork(() ->
     List.of(a, b, c, d)
   );
@@ -53,9 +53,9 @@ class CliqueDynamicsTest {
   );
   private final CliqueDynamics dynamics = dynamics(5);
 
-  private static Vessel activeVessel() {
+  private static Vessel presentVessel() {
     final Vessel vessel = mock(Vessel.class);
-    when(vessel.isActive()).thenReturn(true);
+    when(vessel.isPresent()).thenReturn(true);
     return vessel;
   }
 
@@ -131,9 +131,9 @@ class CliqueDynamicsTest {
   }
 
   @Test
-  void anInactiveMemberLosesAllItsTies() {
+  void anAbsentMemberLosesAllItsTies() {
     tieAll(a, b, c);
-    when(b.isActive()).thenReturn(false);
+    when(b.isPresent()).thenReturn(false);
 
     dynamics.settle(a);
 
@@ -195,7 +195,7 @@ class CliqueDynamicsTest {
   void aVesselWithNoEligibleVesselWithRoomStaysAlone() {
     ports.put(b, "Y");
     ports.put(c, "Y");
-    when(d.isActive()).thenReturn(false);
+    when(d.isPresent()).thenReturn(false);
 
     dynamics.join(a);
 
@@ -261,7 +261,7 @@ class CliqueDynamicsTest {
   private List<Set<Integer>> cliquesAfterJoining(final int fleetSize) {
     final List<Vessel> fleet = new ArrayList<>();
     for (int i = 0; i < fleetSize; i++) {
-      fleet.add(activeVessel());
+      fleet.add(presentVessel());
     }
     final SocialNetwork network = new SocialNetwork(() -> fleet);
     final CliqueDynamics dynamics = new CliqueDynamics(
@@ -314,7 +314,7 @@ class CliqueDynamicsTest {
   @Test
   void vesselsMovingIntoAFullCliquesPortNeitherOverfillItNorLeaveOneWayTies() {
     // The 2026-10-09 review's case, with A, B, D, E and F as a, b, c, d and e.
-    final Vessel e = activeVessel();
+    final Vessel e = presentVessel();
     final List<Vessel> fleet = List.of(a, b, c, d, e);
     final SocialNetwork network = new SocialNetwork(() -> fleet);
     final CliqueDynamics dynamics = new CliqueDynamics(

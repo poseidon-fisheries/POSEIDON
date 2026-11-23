@@ -39,13 +39,13 @@ class FixedCostCollectorTest {
 
   private final Vessel small = vessel(true);
   private final Vessel large = vessel(true);
-  private final Vessel inactive = vessel(false);
+  private final Vessel absent = vessel(false);
   private final Map<Vessel, Money> costs = Map.of(
     small,
     Money.of(CurrencyUnit.EUR, 10),
     large,
     Money.of(CurrencyUnit.EUR, 25),
-    inactive,
+    absent,
     Money.of(CurrencyUnit.EUR, 50)
   );
   private final FixedCostCollector collector = new FixedCostCollector(
@@ -54,7 +54,7 @@ class FixedCostCollectorTest {
   );
 
   @Test
-  void step_chargesEachActiveVesselItsOwnCostOnce() {
+  void step_chargesEachPresentVesselItsOwnCostOnce() {
     collector.step(mock(SimState.class));
 
     assertThat(balance(small)).isEqualTo(Money.of(CurrencyUnit.EUR, -10));
@@ -71,22 +71,22 @@ class FixedCostCollectorTest {
   }
 
   @Test
-  void step_doesNotChargeInactiveVessels() {
+  void step_doesNotChargeAbsentVessels() {
     collector.step(mock(SimState.class));
 
-    assertThat(inactive.getAccount().getBalances()).isEmpty();
+    assertThat(absent.getAccount().getBalances()).isEmpty();
   }
 
   private Fleet fleet() {
     final Fleet fleet = mock(Fleet.class);
-    when(fleet.getVessels()).thenReturn(Set.of(small, large, inactive));
+    when(fleet.getVessels()).thenReturn(Set.of(small, large, absent));
     return fleet;
   }
 
-  private static Vessel vessel(final boolean active) {
+  private static Vessel vessel(final boolean present) {
     final Vessel vessel = mock(Vessel.class);
     final Account account = new Account();
-    when(vessel.isActive()).thenReturn(active);
+    when(vessel.isPresent()).thenReturn(present);
     when(vessel.getAccount()).thenReturn(account);
     return vessel;
   }

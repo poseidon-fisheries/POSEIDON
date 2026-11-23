@@ -20,15 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.fishing.vessels;
+package uk.ac.ox.poseidon.fishing.vessels.values;
+
+import java.util.function.Function;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * What a {@link VaryingComponent} does for a vessel whose attribute value is a
- * string but not listed.
+ * A {@link GlobalScopeFactory} counterpart of {@link VesselIsPresent}, built
+ * via {@link Factories#vesselIsPresent()}.
  */
-public enum UnlistedValueHandling {
-  /** The vessel has no component, and no store is opened for it. */
-  NO_COMPONENT,
-  /** Giving the vessel the component fails. */
-  ERROR
+@NoArgsConstructor
+@SuperBuilder(toBuilder = true)
+public class VesselIsPresentFactory
+  extends GlobalScopeFactory<Function<Vessel, Boolean>>
+  implements ValueFactory<Scope, Vessel, Boolean>
+{
+
+  @Override
+  protected Function<Vessel, Boolean> newInstance(final Scope scope) {
+    return new VesselIsPresent();
+  }
 }

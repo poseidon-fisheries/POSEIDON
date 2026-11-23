@@ -30,7 +30,7 @@ import static uk.ac.ox.poseidon.core.predicates.Factories.equal;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.homePort;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.other;
-import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselIsActive;
+import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselIsPresent;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -44,10 +44,10 @@ class OtherTest {
   private final Port home = mock(Port.class);
   private final Port elsewhere = mock(Port.class);
 
-  private static Vessel vessel(final Port homePort, final boolean active) {
+  private static Vessel vessel(final Port homePort, final boolean present) {
     final Vessel vessel = mock(Vessel.class);
     when(vessel.getHomePort()).thenReturn(Optional.of(homePort));
-    when(vessel.isActive()).thenReturn(active);
+    when(vessel.isPresent()).thenReturn(present);
     return vessel;
   }
 
@@ -57,7 +57,9 @@ class OtherTest {
     final Vessel otherVessel = vessel(elsewhere, false);
 
     assertThat(
-      other(vesselIsActive()).get(Scope.GLOBAL_SCOPE).apply(vessel, otherVessel)
+      other(vesselIsPresent())
+        .get(Scope.GLOBAL_SCOPE)
+        .apply(vessel, otherVessel)
     ).isFalse();
   }
 
@@ -65,7 +67,7 @@ class OtherTest {
   void relatesTheOtherVesselToTheVesselTheCallIsFor() {
     final BiFunction<? super Vessel, ? super Vessel, Boolean> friendship =
       allOf(
-        other(vesselIsActive()),
+        other(vesselIsPresent()),
         condition(other(homePort()), equal(homePort()))
       ).get(Scope.GLOBAL_SCOPE);
     final Vessel vessel = vessel(home, false);

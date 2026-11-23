@@ -37,13 +37,15 @@ import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A component that varies by one vessel attribute. Each listed value maps to
- * the factory that builds the component for it; {@link #unlistedValueHandling}
- * says what a value that is not listed gives. The listed values are strings,
+ * the factory that builds the component for it. The listed values are strings,
  * since the component selects by category. A missing attribute or a value that
- * is not a string is an error.
+ * is not a string is an error. A value that is not listed gives no factory:
+ * for the behaviour, the vessel is then absent; for any other component of a
+ * present vessel, building it fails.
  * <p>
- * The vessel builds the selected factory's component on creation and again
- * whenever the attribute changes, even if the same factory is selected.
+ * A present vessel builds the selected factory's component when it becomes
+ * present and again whenever the attribute changes, even if the same factory
+ * is selected.
  * Building this factory only builds a reader of the vessel's stored component.
  * Components are compared by identity, as the keys under which vessels store
  * them. Built via {@link Factories Factories.varyingBy(...)}.
@@ -67,22 +69,16 @@ public final class VaryingComponent<T>
     Factory<? super VesselComponentScope, ? extends T>
   > factories;
 
-  /** What a vessel with an unlisted value gets. */
-  @NonNull
-  private final UnlistedValueHandling unlistedValueHandling;
-
   @Builder(toBuilder = true)
   private VaryingComponent(
     @NonNull final String attribute,
     @NonNull @Singular final ImmutableMap<
       String,
       Factory<? super VesselComponentScope, ? extends T>
-    > factories,
-    @NonNull final UnlistedValueHandling unlistedValueHandling
+    > factories
   ) {
     this.attribute = attribute;
     this.factories = factories;
-    this.unlistedValueHandling = unlistedValueHandling;
   }
 
   @Override
@@ -104,10 +100,8 @@ public final class VaryingComponent<T>
   /**
    * @param vessel the vessel whose attribute determines the factory
    * @return the listed value's factory, or nothing if the value is unlisted
-   *         and unlisted values give no component
-   * @throws IllegalStateException if the attribute is missing, is not a
-   *                               string, or is unlisted and unlisted values
-   *                               are an error
+   * @throws IllegalStateException if the attribute is missing or is not a
+   *                               string
    */
   Optional<Factory<? super VesselComponentScope, ? extends T>> factoryFor(
     final Vessel vessel
@@ -127,15 +121,6 @@ public final class VaryingComponent<T>
       value.getClass().getName(),
       attribute
     );
-    final var factory = factories.get(value);
-    checkState(
-      factory != null ||
-        unlistedValueHandling == UnlistedValueHandling.NO_COMPONENT,
-      "Vessel %s has the value %s for %s, which the varying component does not list",
-      vessel.getId(),
-      value,
-      attribute
-    );
-    return Optional.ofNullable(factory);
+    return Optional.ofNullable(factories.get(value));
   }
 }
