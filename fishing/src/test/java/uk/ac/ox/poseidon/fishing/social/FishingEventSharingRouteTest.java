@@ -165,13 +165,13 @@ class FishingEventSharingRouteTest {
     final String vesselRegister,
     final boolean withSharing
   ) {
-    final var behaviour = behaviour(waitFor(constant(days(1))));
+    final var vesselBehaviour = behaviour(waitFor(constant(days(1))));
     final var holdComponent = vesselComponent(object(hold));
     final var engineComponent = vesselComponent(object(engine));
     final var vesselSpecification = withSharing
       ? vesselSpecification(
           baseFleet,
-          behaviour,
+          vesselBehaviour,
           entry("hold", holdComponent),
           entry("gear", gearComponent),
           entry("engine", engineComponent),
@@ -205,7 +205,7 @@ class FishingEventSharingRouteTest {
         )
       : vesselSpecification(
           baseFleet,
-          behaviour,
+          vesselBehaviour,
           entry("hold", holdComponent),
           entry("gear", gearComponent),
           entry("engine", engineComponent)

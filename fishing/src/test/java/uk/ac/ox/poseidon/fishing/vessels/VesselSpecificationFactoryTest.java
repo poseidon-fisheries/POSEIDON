@@ -30,29 +30,33 @@ import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 
-class VesselSpecificationEntriesTest {
+class VesselSpecificationFactoryTest {
 
   private final Factory<SimulationScope, Fleet> fleet = scope ->
     mock(Fleet.class);
-  private final VesselComponent<?> a = vesselComponent(scope -> "a");
-  private final VesselComponent<?> b = vesselComponent(scope -> "b");
+  private final VesselComponent<?> holdComponent = vesselComponent(
+    scope -> "hold"
+  );
+  private final VesselComponent<?> gearComponent = vesselComponent(
+    scope -> "gear"
+  );
 
   @Test
   void keepsListingOrder() {
     final var specification = vesselSpecification(
       fleet,
       behaviour(scope -> null),
-      entry("z", a),
-      entry("a", b)
+      entry("z", holdComponent),
+      entry("a", gearComponent)
     );
-    assertThat(
-      List.copyOf(specification.getComponents().keySet())
-    ).containsExactly("z", "a");
+    assertThat(specification.getComponents().keySet()).containsExactly(
+      "z",
+      "a"
+    );
   }
 
   @Test
@@ -61,8 +65,8 @@ class VesselSpecificationEntriesTest {
       vesselSpecification(
         fleet,
         behaviour(scope -> null),
-        entry("hold", a),
-        entry("hold", b)
+        entry("hold", holdComponent),
+        entry("hold", gearComponent)
       )
     ).isInstanceOf(IllegalArgumentException.class);
   }

@@ -89,8 +89,8 @@ public final class Factories {
   /**
    * @param fleet      the fleet the vessels join
    * @param behaviour  the component that is the behaviour each vessel steps
-   * @param components the vessel's other components as {@code (name,
-   *                   component)} entries, in the order they are built
+   * @param components the vessel's other components as name and component
+   *                   entries, in the order they are built
    * @return a {@link SimulationScopeFactory} for a
    *         {@link VesselSpecification}
    * @throws IllegalArgumentException if a component name is given twice
@@ -102,15 +102,14 @@ public final class Factories {
     final VesselComponent<? extends Task<Vessel>> behaviour,
     final Map.Entry<String, ? extends VesselComponent<?>>... components
   ) {
-    final ImmutableMap.Builder<String, VesselComponent<?>> map =
-      ImmutableMap.builder();
-    for (final var entry : components) {
-      map.put(entry.getKey(), entry.getValue());
-    }
     return VesselSpecificationFactory.builder()
       .fleet(fleet)
       .behaviour(behaviour)
-      .components(map.buildOrThrow())
+      .components(
+        ImmutableMap.<String, VesselComponent<?>>builder()
+          .putAll(Arrays.asList(components))
+          .buildOrThrow()
+      )
       .build();
   }
 
