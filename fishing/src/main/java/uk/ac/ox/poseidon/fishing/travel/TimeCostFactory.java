@@ -22,13 +22,14 @@
 
 package uk.ac.ox.poseidon.fishing.travel;
 
-import java.util.function.Function;
+import java.time.Duration;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
@@ -36,18 +37,24 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link TimeCost}, built via
- * {@link Factories#timeCost(ValueFactory)}.
+ * {@link Factories#timeCost(MappingFactory, ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class TimeCostFactory<S extends Scope>
-  extends RelativeScopeFactory<S, Function<Vessel, Function<Route, Money>>>
-  implements ValueFactory<S, Vessel, Function<Route, Money>>
-{
+public class TimeCostFactory<
+  S extends Scope,
+  T
+> extends RelativeScopeFactory<S, TimeCost<T>> {
 
+  private final MappingFactory<
+    ? super S,
+    ? super Vessel,
+    ? super T,
+    ? extends Duration
+  > travelTime;
   private final ValueFactory<
     ? super S,
     ? super Vessel,
@@ -55,9 +62,7 @@ public class TimeCostFactory<S extends Scope>
   > hourlyCost;
 
   @Override
-  protected Function<Vessel, Function<Route, Money>> newInstance(
-    final S scope
-  ) {
-    return new TimeCost(hourlyCost.get(scope));
+  protected TimeCost<T> newInstance(final S scope) {
+    return new TimeCost<>(travelTime.get(scope), hourlyCost.get(scope));
   }
 }

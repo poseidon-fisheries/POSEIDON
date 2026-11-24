@@ -22,44 +22,45 @@
 
 package uk.ac.ox.poseidon.fishing.travel;
 
+import java.time.Duration;
 import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.functions.ObjectProperty;
+import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
+import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
+import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link RouteProperty}, built
- * via {@link Factories Factories.routeProperty(...)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link TravelTimeHomeFromCell},
+ * built via {@link Factories#travelTimeHomeFromCell(VesselComponent, Factory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class RoutePropertyFactory<S extends Scope, C, T, R>
-  extends RelativeScopeFactory<S, BiFunction<C, T, R>>
-  implements MappingFactory<S, C, T, R>
+public class TravelTimeHomeFromCellFactory<S extends Scope>
+  extends RelativeScopeFactory<S, BiFunction<Vessel, Cell, Duration>>
+  implements MappingFactory<S, Vessel, Cell, Duration>
 {
 
-  private final MappingFactory<
+  private final VesselComponent<? extends Engine> engine;
+  private final Factory<
     ? super S,
-    ? super C,
-    ? super T,
-    ? extends Route
-  > route;
-  private final String propertyPath;
+    ? extends PathLengthCalculator
+  > pathLengthCalculator;
 
   @Override
-  protected BiFunction<C, T, R> newInstance(final S scope) {
-    return new RouteProperty<>(
-      route.get(scope),
-      new ObjectProperty<>(Route.class, propertyPath)
-    );
+  protected BiFunction<Vessel, Cell, Duration> newInstance(final S scope) {
+    return new TravelTimeHomeFromCell(engine, pathLengthCalculator.get(scope));
   }
 }

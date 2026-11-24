@@ -47,7 +47,6 @@ import uk.ac.ox.poseidon.fishing.market.UniformMarketPricesFactory;
 import uk.ac.ox.poseidon.fishing.money.MoneyFactory;
 import uk.ac.ox.poseidon.fishing.social.EventSharerFactory;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEventPropertyFactory;
-import uk.ac.ox.poseidon.fishing.travel.RoutePropertyFactory;
 import uk.ac.ox.poseidon.fishing.vessels.gears.FixedBiomassProportionGearFactory;
 import uk.ac.ox.poseidon.fishing.vessels.gears.IndexedBiomassCatchabilityGearFactory;
 import uk.ac.ox.poseidon.fishing.vessels.values.CurrentPortStayStartDateTimeFactory;
@@ -68,7 +67,6 @@ final class FactoryProductsTest {
     EventSharerFactory.class,
     // The property path is resolved on a real class: it has no getter x.
     FishingEventPropertyFactory.class,
-    RoutePropertyFactory.class,
     VesselPropertyFactory.class,
     // The creation, change and exit codes must differ: a mock gives each "x".
     VesselRegisterFactory.class,

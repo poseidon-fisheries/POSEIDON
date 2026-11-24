@@ -21,11 +21,11 @@
  */
 
 /**
- * Travel as something with a cost:
- * {@link uk.ac.ox.poseidon.fishing.travel.Route} describes a route a vessel
- * would travel, and
- * {@link uk.ac.ox.poseidon.fishing.travel.RouteViaDestination} gives the route
- * to fish at a cell and return to port. See
+ * Travel as something with a time and a cost:
+ * {@link uk.ac.ox.poseidon.fishing.travel.TravelTimeToCell} and
+ * {@link uk.ac.ox.poseidon.fishing.travel.TravelTimeHomeFromCell} give how long
+ * a vessel takes to travel to a cell and home from it, and
+ * {@link uk.ac.ox.poseidon.fishing.travel.TimeCost} charges for the time. See
  * {@link uk.ac.ox.poseidon.fishing.travel.Factories} for the entry points. The
  * travel tasks themselves are in {@code uk.ac.ox.poseidon.fishing.tasks.travel}.
  */

@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.fishing.travel;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.time.Duration;
 import java.util.function.BiFunction;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
@@ -33,22 +34,19 @@ import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 
 /**
- * The {@link Route} a vessel would travel to fish at a destination cell: from
- * its current cell to the destination, then back to its home port (from port,
- * the round trip). The vessel's cell, home port and cruising speed are read at
- * each call.
+ * How long a vessel takes to travel from its current cell to a cell, at its
+ * cruising speed. The vessel's cell and cruising speed are read at each call.
  */
-public class RouteViaDestination implements BiFunction<Vessel, Cell, Route> {
+public class TravelTimeToCell implements BiFunction<Vessel, Cell, Duration> {
 
   private final VesselComponent<? extends Engine> engine;
   private final PathLengthCalculator pathLengthCalculator;
 
   /**
-   * @param engine               the engine whose speed gives the route's
-   *                             duration
-   * @param pathLengthCalculator measures the route's two legs
+   * @param engine               the engine whose speed gives the travel time
+   * @param pathLengthCalculator measures the path to the cell
    */
-  RouteViaDestination(
+  TravelTimeToCell(
     final VesselComponent<? extends Engine> engine,
     final PathLengthCalculator pathLengthCalculator
   ) {
@@ -57,30 +55,16 @@ public class RouteViaDestination implements BiFunction<Vessel, Cell, Route> {
   }
 
   /**
-   * @param vessel      the vessel that would travel the route
-   * @param destination the cell to fish at
-   * @return the route from the vessel's current cell to {@code destination},
-   *         then back to its home port
-   * @throws IllegalArgumentException if either leg has no path
+   * @param vessel the vessel that would travel
+   * @param cell   the cell travelled to
+   * @return the time to travel from the vessel's current cell to {@code cell}
+   * @throws IllegalArgumentException if there is no path
    */
   @Override
-  public Route apply(final Vessel vessel, final Cell destination) {
-    final Cell homePortCell = vessel
-      .getHomePortCell()
-      .orElseThrow(() ->
-        new IllegalStateException(
-          "Vessel %s has no modelled home port.".formatted(vessel.getId())
-        )
-      );
-    final double distanceInKm =
-      pathLengthCalculator.lengthInKm(vessel.getCell(), destination) +
-      pathLengthCalculator.lengthInKm(destination, homePortCell);
-    return new Route(
-      distanceInKm,
-      DistanceCalculator.travelDuration(
-        distanceInKm,
-        engine.of(vessel).getCruisingSpeedInKph()
-      )
+  public Duration apply(final Vessel vessel, final Cell cell) {
+    return DistanceCalculator.travelDuration(
+      pathLengthCalculator.lengthInKm(vessel.getCell(), cell),
+      engine.of(vessel).getCruisingSpeedInKph()
     );
   }
 }

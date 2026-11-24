@@ -22,60 +22,45 @@
 
 package uk.ac.ox.poseidon.fishing.travel;
 
-import com.google.common.collect.ImmutableList;
-import java.util.function.Function;
+import java.time.Duration;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import org.joda.money.Money;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
+import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link TravelCost}, built via
- * {@link Factories#travelCost(MappingFactory, ValueFactory...)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link TravelTimeToCell},
+ * built via {@link Factories#travelTimeToCell(VesselComponent, Factory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class TravelCostFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  TravelCost
-> {
+public class TravelTimeToCellFactory<S extends Scope>
+  extends RelativeScopeFactory<S, BiFunction<Vessel, Cell, Duration>>
+  implements MappingFactory<S, Vessel, Cell, Duration>
+{
 
-  private final MappingFactory<
+  private final VesselComponent<? extends Engine> engine;
+  private final Factory<
     ? super S,
-    ? super Vessel,
-    ? super Cell,
-    ? extends Route
-  > routeFunction;
-
-  @Singular
-  private final ImmutableList<
-    ValueFactory<
-      ? super S,
-      ? super Vessel,
-      ? extends Function<? super Route, ? extends Money>
-    >
-  > routeCosts;
+    ? extends PathLengthCalculator
+  > pathLengthCalculator;
 
   @Override
-  protected TravelCost newInstance(final S scope) {
-    return new TravelCost(
-      routeFunction.get(scope),
-      routeCosts
-        .stream()
-        .map(routeCost -> routeCost.get(scope))
-        .toList()
-    );
+  protected BiFunction<Vessel, Cell, Duration> newInstance(final S scope) {
+    return new TravelTimeToCell(engine, pathLengthCalculator.get(scope));
   }
 }

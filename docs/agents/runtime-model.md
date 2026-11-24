@@ -92,7 +92,7 @@ code and never a `Port`, so the port grid is the only route to a home port.
 does not hold (that very port, not one with the same code), then supplies the
 port's code. The `homePort()` value gives a plain `Port` and fails, naming the
 vessel, if there is none, as do `HomePortCatchValuation` and
-`RouteViaDestination`: they run inside a present vessel's behaviour.
+`TravelTimeHomeFromCell`: they run inside a present vessel's behaviour.
 
 Creation runs in a fixed order: the vessel joins the fleet with an account,
 takes its home port and attributes (which place it at its home port if it is

@@ -28,62 +28,81 @@ import static org.mockito.Mockito.mock;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 class TimeCostTest {
 
   private static final CurrencyUnit EUR = CurrencyUnit.of("EUR");
 
   private final Vessel vessel = mock(Vessel.class);
+  private final Cell ninetyMinutesAway = new Cell(90, 0);
   private final AtomicReference<Money> hourlyCost = new AtomicReference<>(
     Money.of(EUR, 10)
   );
-  private final TimeCost timeCost = new TimeCost(costOf ->
-    costOf == vessel ? hourlyCost.get() : Money.of(EUR, 100)
+  private final TimeCost<Cell> timeCost = new TimeCost<>(
+    (travellingVessel, cell) ->
+      travellingVessel == vessel
+        ? Duration.ofMinutes(cell.getX())
+        : Duration.ofMinutes(cell.getX() * 2L),
+    costedVessel ->
+      costedVessel == vessel ? hourlyCost.get() : Money.of(EUR, 100)
   );
-  private final Route route = new Route(15.0, Duration.ofMinutes(90));
 
   @Test
-  void chargesTheHourlyCostForEachHourOfTheRoute() {
-    assertThat(timeCost.apply(vessel).apply(route)).isEqualTo(
-      Money.of(EUR, 15)
-    );
+  void chargesTheHourlyCostForEachHourOfTravelTime() {
+    assertThat(
+      timeCost.forVessel(vessel).applyAsDouble(ninetyMinutesAway)
+    ).isEqualTo(15.0);
   }
 
   @Test
-  void chargesTheHourlyCostOfTheVesselGiven() {
-    assertThat(timeCost.apply(mock(Vessel.class)).apply(route)).isEqualTo(
-      Money.of(EUR, 150)
-    );
+  void chargesTheHourlyCostAndTravelTimeOfTheVesselGiven() {
+    assertThat(
+      timeCost.forVessel(mock(Vessel.class)).applyAsDouble(ninetyMinutesAway)
+    ).isEqualTo(300.0);
+  }
+
+  @Test
+  void roundsHalfEvenToTheCurrencysMinorUnit() {
+    hourlyCost.set(Money.of(EUR, 10));
+
+    assertThat(
+      timeCost.forVessel(vessel).applyAsDouble(new Cell(1, 0))
+    ).isEqualTo(0.17);
   }
 
   @Test
   void readsTheVesselsHourlyCostEachTimeTheVesselIsGiven() {
-    final Money costBefore = timeCost.apply(vessel).apply(route);
+    final double costBefore = timeCost
+      .forVessel(vessel)
+      .applyAsDouble(ninetyMinutesAway);
     hourlyCost.set(Money.of(EUR, 20));
-    final Money costAfter = timeCost.apply(vessel).apply(route);
+    final double costAfter = timeCost
+      .forVessel(vessel)
+      .applyAsDouble(ninetyMinutesAway);
 
-    assertThat(costBefore).isEqualTo(Money.of(EUR, 15));
-    assertThat(costAfter).isEqualTo(Money.of(EUR, 30));
+    assertThat(costBefore).isEqualTo(15.0);
+    assertThat(costAfter).isEqualTo(30.0);
   }
 
   @Test
-  void keepsTheHourlyCostReadForEveryRouteCostedThen() {
-    final Function<Route, Money> costOfRoute = timeCost.apply(vessel);
+  void keepsTheHourlyCostReadForEveryCellCostedThen() {
+    final ToDoubleFunction<Cell> costOfCell = timeCost.forVessel(vessel);
     hourlyCost.set(Money.of(EUR, 20));
 
-    assertThat(costOfRoute.apply(route)).isEqualTo(Money.of(EUR, 15));
+    assertThat(costOfCell.applyAsDouble(ninetyMinutesAway)).isEqualTo(15.0);
   }
 
   @Test
   void throwsWithoutAnHourlyCost() {
     hourlyCost.set(null);
 
-    assertThatThrownBy(() -> timeCost.apply(vessel)).isInstanceOf(
+    assertThatThrownBy(() -> timeCost.forVessel(vessel)).isInstanceOf(
       NullPointerException.class
     );
   }

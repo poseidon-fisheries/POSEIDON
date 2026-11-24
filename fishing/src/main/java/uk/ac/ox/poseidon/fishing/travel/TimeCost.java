@@ -24,39 +24,56 @@ package uk.ac.ox.poseidon.fishing.travel;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.time.Duration;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
+import uk.ac.ox.poseidon.fishing.choices.Cost;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * The cost of the time a vessel would spend travelling a {@link Route}: its
- * hourly cost times the route's hours. The hourly cost is read when the vessel
- * is given, and serves every route costed for it then, for one view of its
- * option values. The cost is computed in floating point and rounded
- * half-even to the currency's minor unit, which is much faster than exact
- * decimal arithmetic.
+ * The cost of the time a vessel would spend travelling to take an option: its
+ * hourly cost times the hours of the option's travel time. The hourly cost is
+ * read when the vessel is given, and serves every option costed for it then,
+ * for one view of its option values. The cost is computed in floating point
+ * and rounded half-even to the currency's minor unit, which is much faster than
+ * exact decimal arithmetic. The returned function must not be retained; model
+ * state must not change during its visit.
+ *
+ * @param <T> the type of option costed
  */
-public class TimeCost implements Function<Vessel, Function<Route, Money>> {
+public class TimeCost<T> implements Cost<T> {
 
+  private final BiFunction<
+    ? super Vessel,
+    ? super T,
+    ? extends Duration
+  > travelTime;
   private final Function<? super Vessel, ? extends Money> hourlyCost;
 
   /**
+   * @param travelTime gives how long a vessel would travel to take an option
    * @param hourlyCost gives a vessel's cost per hour at sea
    */
-  TimeCost(final Function<? super Vessel, ? extends Money> hourlyCost) {
+  TimeCost(
+    final BiFunction<? super Vessel, ? super T, ? extends Duration> travelTime,
+    final Function<? super Vessel, ? extends Money> hourlyCost
+  ) {
+    this.travelTime = checkNotNull(travelTime);
     this.hourlyCost = checkNotNull(hourlyCost);
   }
 
   /**
-   * @param vessel the vessel that would travel the routes
-   * @return the vessel's current hourly cost times the hours a route takes to
-   *         travel, rounded half-even to the currency's minor unit
+   * @param vessel the vessel that would travel
+   * @return the vessel's current hourly cost times the hours it would travel to
+   *         take an option, rounded half-even to the currency's minor unit
    * @throws NullPointerException if {@code hourlyCost} gives no cost for the
    *                              vessel
    */
   @Override
-  public Function<Route, Money> apply(final Vessel vessel) {
+  public ToDoubleFunction<T> forVessel(final Vessel vessel) {
     final Money costPerHour = checkNotNull(
       hourlyCost.apply(vessel),
       "Unable to extract hourly cost for Vessel %s.",
@@ -64,12 +81,15 @@ public class TimeCost implements Function<Vessel, Function<Route, Money>> {
     );
     final CurrencyUnit currencyUnit = costPerHour.getCurrencyUnit();
     final long minorUnitsPerHour = costPerHour.getAmountMinorLong();
-    return route -> {
-      final double hours = route.getDuration().toSeconds() / 3600.0;
+    return option -> {
+      final double hours =
+        travelTime.apply(vessel, option).toSeconds() / 3600.0;
       return Money.ofMinor(
         currencyUnit,
         (long) Math.rint(minorUnitsPerHour * hours)
-      );
+      )
+        .getAmount()
+        .doubleValue();
     };
   }
 }
