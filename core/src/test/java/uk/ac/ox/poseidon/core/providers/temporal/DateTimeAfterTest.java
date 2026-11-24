@@ -36,9 +36,10 @@ class DateTimeAfterTest {
   @Test
   void addsTheAmountToTheReference() {
     assertThat(
-      new DateTimeAfter<>(context -> NOW, context -> Duration.ofHours(3)).apply(
-        null
-      )
+      new DateTimeAfter<Object, Integer>(
+        (context, hours) -> NOW,
+        (context, hours) -> Duration.ofHours(hours)
+      ).apply(null, 3)
     ).isEqualTo(NOW.plusHours(3));
   }
 
@@ -46,12 +47,12 @@ class DateTimeAfterTest {
   void readsTheReferenceAnewOnEveryCall() {
     final AtomicReference<LocalDateTime> referenceDateTime =
       new AtomicReference<>(NOW);
-    final DateTimeAfter<Object> dateTimeAfter = new DateTimeAfter<>(
-      context -> referenceDateTime.get(),
-      context -> Duration.ofHours(3)
+    final DateTimeAfter<Object, Void> dateTimeAfter = new DateTimeAfter<>(
+      (context, unused) -> referenceDateTime.get(),
+      (context, unused) -> Duration.ofHours(3)
     );
-    dateTimeAfter.apply(null);
+    dateTimeAfter.apply(null, null);
     referenceDateTime.set(NOW.plusHours(1));
-    assertThat(dateTimeAfter.apply(null)).isEqualTo(NOW.plusHours(4));
+    assertThat(dateTimeAfter.apply(null, null)).isEqualTo(NOW.plusHours(4));
   }
 }

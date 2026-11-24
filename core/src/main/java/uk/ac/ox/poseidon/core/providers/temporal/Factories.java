@@ -31,10 +31,13 @@ import java.time.temporal.TemporalAmount;
 import uk.ac.ox.poseidon.core.CurrentDateTimeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.HasDateTimeFactory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.StartingDateTimeFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.functions.MappingAsValueFactory;
+import uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory;
 import uk.ac.ox.poseidon.core.time.DurationFactory;
 import uk.ac.ox.poseidon.core.time.PeriodFactory;
 
@@ -43,7 +46,7 @@ import uk.ac.ox.poseidon.core.time.PeriodFactory;
  * from its {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}, and for
  * the temporal arithmetic over such values.
  */
-@SuppressWarnings("varargs")
+@SuppressWarnings({ "varargs", "overloads" })
 public final class Factories {
 
   private Factories() {}
@@ -173,15 +176,24 @@ public final class Factories {
   /**
    * @param referenceDateTime the date-time to add to
    * @param amountToAdd       the amount to add
-   * @return a {@link ValueFactory} for a
-   *         {@link DateTimeAfter}
+   * @return a {@link MappingFactory} for a {@link DateTimeAfter}
    * @see DateTimeAfter
    */
-  public static <S extends Scope, C> DateTimeAfterFactory<S, C> dateTimeAfter(
-    final ValueFactory<? super S, ? super C, LocalDateTime> referenceDateTime,
-    final ValueFactory<
+  public static <S extends Scope, C, T> DateTimeAfterFactory<
+    S,
+    C,
+    T
+  > dateTimeAfter(
+    final MappingFactory<
       ? super S,
       ? super C,
+      ? super T,
+      ? extends LocalDateTime
+    > referenceDateTime,
+    final MappingFactory<
+      ? super S,
+      ? super C,
+      ? super T,
       ? extends TemporalAmount
     > amountToAdd
   ) {
@@ -189,14 +201,83 @@ public final class Factories {
   }
 
   /**
-   * @param referenceDateTime the date-time to add to
-   * @param amountToAdd       the amount to add
-   * @return a {@link ValueFactory} for a
-   *         {@link DateTimeAfter} over a constant amount
+   * @param referenceDateTime the date-time to add to, such as the current
+   *                          date-time
+   * @param amountToAdd       the amount to add, which depends on the thing
+   *                          mapped
+   * @return a {@link MappingFactory} for a {@link DateTimeAfter}
    * @see DateTimeAfter
    */
-  public static <S extends Scope, C> DateTimeAfterFactory<S, C> dateTimeAfter(
-    final ValueFactory<? super S, ? super C, LocalDateTime> referenceDateTime,
+  public static <S extends Scope, C, T> DateTimeAfterFactory<
+    S,
+    C,
+    T
+  > dateTimeAfter(
+    final ValueFactory<
+      ? super S,
+      ? super C,
+      ? extends LocalDateTime
+    > referenceDateTime,
+    final MappingFactory<
+      ? super S,
+      ? super C,
+      ? super T,
+      ? extends TemporalAmount
+    > amountToAdd
+  ) {
+    return dateTimeAfter(
+      new ValueAsMappingFactory<S, C, LocalDateTime>(referenceDateTime),
+      amountToAdd
+    );
+  }
+
+  /**
+   * @param referenceDateTime the date-time to add to
+   * @param amountToAdd       the amount to add
+   * @return a {@link ValueFactory} for a {@link DateTimeAfter}
+   * @see DateTimeAfter
+   */
+  public static <S extends Scope, C> MappingAsValueFactory<
+    S,
+    C,
+    LocalDateTime
+  > dateTimeAfter(
+    final ValueFactory<
+      ? super S,
+      ? super C,
+      ? extends LocalDateTime
+    > referenceDateTime,
+    final ValueFactory<
+      ? super S,
+      ? super C,
+      ? extends TemporalAmount
+    > amountToAdd
+  ) {
+    return new MappingAsValueFactory<S, C, LocalDateTime>(
+      new DateTimeAfterFactory<S, C, Void>(
+        new ValueAsMappingFactory<S, C, LocalDateTime>(referenceDateTime),
+        new ValueAsMappingFactory<S, C, TemporalAmount>(amountToAdd)
+      )
+    );
+  }
+
+  /**
+   * @param referenceDateTime the date-time to add to
+   * @param amountToAdd       the amount to add
+   * @return a {@link ValueFactory} for a {@link DateTimeAfter} over a constant
+   *         amount
+   * @see DateTimeAfter
+   */
+  public static <S extends Scope, C> MappingAsValueFactory<
+    S,
+    C,
+    LocalDateTime
+  > dateTimeAfter(
+    final ValueFactory<
+      ? super S,
+      ? super C,
+      ? extends LocalDateTime
+    > referenceDateTime,
     final DurationFactory amountToAdd
   ) {
     return dateTimeAfter(referenceDateTime, constant(amountToAdd));
@@ -205,12 +286,20 @@ public final class Factories {
   /**
    * @param referenceDateTime the date-time to add to
    * @param amountToAdd       the amount to add
-   * @return a {@link ValueFactory} for a
-   *         {@link DateTimeAfter} over a constant amount
+   * @return a {@link ValueFactory} for a {@link DateTimeAfter} over a constant
+   *         amount
    * @see DateTimeAfter
    */
-  public static <S extends Scope, C> DateTimeAfterFactory<S, C> dateTimeAfter(
-    final ValueFactory<? super S, ? super C, LocalDateTime> referenceDateTime,
+  public static <S extends Scope, C> MappingAsValueFactory<
+    S,
+    C,
+    LocalDateTime
+  > dateTimeAfter(
+    final ValueFactory<
+      ? super S,
+      ? super C,
+      ? extends LocalDateTime
+    > referenceDateTime,
     final PeriodFactory amountToAdd
   ) {
     return dateTimeAfter(referenceDateTime, constant(amountToAdd));

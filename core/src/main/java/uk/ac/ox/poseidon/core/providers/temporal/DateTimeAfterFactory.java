@@ -24,43 +24,45 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link DateTimeAfter}. Built via
- * {@link Factories#dateTimeAfter(ValueFactory, ValueFactory)}.
+ * {@link Factories#dateTimeAfter}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class DateTimeAfterFactory<S extends Scope, C>
-  extends RelativeScopeFactory<S, Function<C, LocalDateTime>>
-  implements ValueFactory<S, C, LocalDateTime>
+public class DateTimeAfterFactory<S extends Scope, C, T>
+  extends RelativeScopeFactory<S, BiFunction<C, T, LocalDateTime>>
+  implements MappingFactory<S, C, T, LocalDateTime>
 {
 
-  private final ValueFactory<
+  private final MappingFactory<
     ? super S,
     ? super C,
-    LocalDateTime
+    ? super T,
+    ? extends LocalDateTime
   > referenceDateTime;
-  private final ValueFactory<
+  private final MappingFactory<
     ? super S,
     ? super C,
+    ? super T,
     ? extends TemporalAmount
   > amountToAdd;
 
   @Override
-  protected Function<C, LocalDateTime> newInstance(final S scope) {
+  protected BiFunction<C, T, LocalDateTime> newInstance(final S scope) {
     return new DateTimeAfter<>(
       referenceDateTime.get(scope),
       amountToAdd.get(scope)

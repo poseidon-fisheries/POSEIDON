@@ -24,30 +24,35 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A value of a reference date-time plus an amount of time, both read anew on
- * every call. Built via
- * {@link Factories#dateTimeAfter(uk.ac.ox.poseidon.core.ValueFactory, uk.ac.ox.poseidon.core.ValueFactory)}
+ * A mapping of a reference date-time plus an amount of time, both read anew on
+ * every call and both possibly depending on the thing mapped, such as a cell.
+ * Built via
+ * {@link Factories#dateTimeAfter(uk.ac.ox.poseidon.core.MappingFactory, uk.ac.ox.poseidon.core.MappingFactory)}
  * in this package.
  */
 @RequiredArgsConstructor
-public class DateTimeAfter<C> implements Function<C, LocalDateTime> {
+public class DateTimeAfter<C, T> implements BiFunction<C, T, LocalDateTime> {
 
-  private final @NonNull Function<
+  private final @NonNull BiFunction<
     ? super C,
+    ? super T,
     ? extends LocalDateTime
   > referenceDateTime;
-  private final @NonNull Function<
+  private final @NonNull BiFunction<
     ? super C,
+    ? super T,
     ? extends TemporalAmount
   > amountToAdd;
 
   @Override
-  public LocalDateTime apply(final C context) {
-    return referenceDateTime.apply(context).plus(amountToAdd.apply(context));
+  public LocalDateTime apply(final C context, final T thing) {
+    return referenceDateTime
+      .apply(context, thing)
+      .plus(amountToAdd.apply(context, thing));
   }
 }

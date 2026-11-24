@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link ValueAsMapping}, built
- * by the value overloads of the combinators and of the blocks that take their
- * input.
+ * by the value and mixed overloads of the combinators and of the blocks that
+ * take their input.
  */
 @Getter
 @ToString
@@ -44,14 +44,14 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class ValueAsMappingFactory<S extends Scope, C, R>
-  extends RelativeScopeFactory<S, BiFunction<C, Void, R>>
-  implements MappingFactory<S, C, Void, R>
+  extends RelativeScopeFactory<S, BiFunction<C, Object, R>>
+  implements MappingFactory<S, C, Object, R>
 {
 
   private final ValueFactory<? super S, ? super C, ? extends R> value;
 
   @Override
-  protected BiFunction<C, Void, R> newInstance(final S scope) {
+  protected BiFunction<C, Object, R> newInstance(final S scope) {
     return new ValueAsMapping<>(value.get(scope));
   }
 }

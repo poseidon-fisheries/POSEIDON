@@ -43,6 +43,7 @@ import static uk.ac.ox.poseidon.core.time.Factories.time;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -179,6 +180,30 @@ class FactoriesTest {
     assertThat(
       dateTimeAfter(REFERENCE_FACTORY, period("P1M")).get(scope).apply(null)
     ).isEqualTo(REFERENCE.plusMonths(1));
+  }
+
+  @Test
+  void dateTimeAfterAddsAMappingAmountToAValueReference() {
+    final MappingFactory<Scope, Object, Integer, Duration> travelHours =
+      scope -> (_, hours) -> Duration.ofHours(hours);
+    final var arrival = dateTimeAfter(REFERENCE_FACTORY, travelHours).get(
+      scope
+    );
+    assertThat(arrival.apply(null, 2)).isEqualTo(REFERENCE.plusHours(2));
+    assertThat(arrival.apply(null, 5)).isEqualTo(REFERENCE.plusHours(5));
+  }
+
+  @Test
+  void dateTimeAfterAddsAMappingAmountToAMappingReference() {
+    final MappingFactory<Scope, Object, Integer, LocalDateTime> stop = scope ->
+      (_, hours) ->
+        REFERENCE.plusHours(hours);
+    final MappingFactory<Scope, Object, Integer, Duration> leg = scope ->
+      (_, hours) ->
+        Duration.ofMinutes(hours);
+    assertThat(dateTimeAfter(stop, leg).get(scope).apply(null, 3)).isEqualTo(
+      REFERENCE.plusHours(3).plusMinutes(3)
+    );
   }
 
   @Test
