@@ -515,10 +515,9 @@ public class TemporalSchedule extends Schedule implements Clock {
   private boolean runningStep(final SimState simState) {
     running = true;
     try {
-      final boolean stepped;
+      final double last = getTime();
+      final boolean stepped = super.step(simState);
       synchronized (lock) {
-        final double last = getTime();
-        stepped = super.step(simState);
         if (!Double.isFinite(time)) {
           // MASON has run out of events: the clock stays where it was
           boundary = last;

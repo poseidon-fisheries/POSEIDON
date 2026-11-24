@@ -70,8 +70,9 @@ class FactoriesTest {
     }
   };
 
-  private final ValueFactory<Scope, Object, LocalDateTime> currentDateTime =
-    scope -> context -> NOON;
+  private final ValueFactory<Scope, Object, LocalDateTime> dateTime = scope ->
+    context ->
+      NOON;
 
   private final MappingFactory<Scope, Object, Integer, LocalDateTime> arrival =
     scope -> (context, hours) -> NOON.plusHours(hours);
@@ -79,11 +80,11 @@ class FactoriesTest {
   @Test
   void withinTimeWindowTestsADateTimeUsedAsAPredicateOfACondition() {
     final Function<Object, Boolean> noonIsInTheDaytime = condition(
-      currentDateTime,
+      dateTime,
       withinTimeWindow(dailyTimeWindow(time(6, 0, 0), time(18, 0, 0)))
     ).get(GLOBAL_SCOPE);
     final Function<Object, Boolean> noonIsInTheNight = condition(
-      currentDateTime,
+      dateTime,
       withinTimeWindow(dailyTimeWindow(time(20, 0, 0), time(6, 0, 0)))
     ).get(GLOBAL_SCOPE);
 
@@ -96,7 +97,7 @@ class FactoriesTest {
     final var night = dailyTimeWindow(time(20, 0, 0), time(6, 0, 0));
 
     final Function<Object, Duration> fromNoon = durationUntilTimeWindowOpens(
-      currentDateTime,
+      dateTime,
       night
     ).get(GLOBAL_SCOPE);
 
@@ -119,7 +120,7 @@ class FactoriesTest {
   @Test
   void durationUntilTimeWindowOpensNamesTheWindowAndDateTimeWhenItNeverOpens() {
     final Function<Object, Duration> fromNoon = durationUntilTimeWindowOpens(
-      currentDateTime,
+      dateTime,
       scope -> ONE_OFF
     ).get(GLOBAL_SCOPE);
 

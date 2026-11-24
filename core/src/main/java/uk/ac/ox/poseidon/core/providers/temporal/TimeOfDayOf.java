@@ -29,8 +29,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A value that is the time of day of a date-time, read from it anew on every call. Built via
- * {@link Factories#timeOfDayOf(uk.ac.ox.poseidon.core.ValueFactory)} in this
+ * A value that is the time of day of a date-time, read from it anew on every call. Built
+ * via {@link Factories#timeOfDayOf(uk.ac.ox.poseidon.core.ValueFactory)} in this
  * package.
  */
 @RequiredArgsConstructor

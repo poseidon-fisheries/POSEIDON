@@ -150,6 +150,17 @@ class TemporalScheduleTest {
   }
 
   @Test
+  void keepsTheLastTimeWhenFinishedAfterRunningOutOfEventsAndResetsToTheStart() {
+    schedule.scheduleOnce(start.plusHours(3), recordFiring);
+    schedule.step(simState);
+    schedule.step(simState);
+    simState.finish();
+    assertThat(schedule.now()).isEqualTo(start.plusHours(3));
+    schedule.reset();
+    assertThat(schedule.now()).isEqualTo(start);
+  }
+
+  @Test
   void staysAtTheStartIfMasonRunsOutOfEventsWithoutAny() {
     schedule.step(simState);
     assertThat(schedule.now()).isEqualTo(start);
