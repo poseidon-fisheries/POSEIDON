@@ -5,9 +5,9 @@ working with code in this repository. Longer topic-specific sections live in
 `docs/agents/` — read the relevant one before touching code it covers:
 
 - `docs/agents/architecture.md` — before writing or changing a factory, a
-  `Factories` helper or scenario code: the Factory + Scenario pattern,
-  `*Factory` class shape, live parameters, data shared across simulations,
-  determinism.
+  `Factories` helper or scenario code, or working with model time values: the
+  Factory + Scenario pattern, whole-second time precision, `*Factory` class
+  shape, live parameters, data shared across simulations, determinism.
 - `docs/agents/runtime-model.md` — before changing `core` or `fishing`
   internals: product stores, levels and scopes, vessel components, vessel
   creation and statements, registration, services, scheduling.

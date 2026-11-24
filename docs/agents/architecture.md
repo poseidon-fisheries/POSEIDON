@@ -1,9 +1,9 @@
 # Core architectural pattern: Factory + Scenario
 
-This document holds the rules for writing factories and scenarios. How the
-framework runs them (product stores, levels and scopes, vessel components,
-vessel creation and statements, registration, services, scheduling) is in
-`runtime-model.md`.
+This document holds the rules for writing factories, scenarios and model time
+values. How the framework runs them (product stores, levels and scopes, vessel
+components, vessel creation and statements, registration, services, scheduling)
+is in `runtime-model.md`.
 
 The model is built around a declarative configuration → runtime object pattern:
 
@@ -273,6 +273,16 @@ component is built, or corrected later in the object's life
 (`Vessel.getHomePort()` is null until a later `FleetEvent` modification sets
 it), would otherwise be cached too early, and the bug surfaces far from where
 the value was captured. Failing loudly and early is no reason to resolve early.
+
+## Model time precision
+
+Model date-times, times of day and durations have whole-second precision.
+Produce whole-second temporal values at their source. Reject supplied temporal
+values with a nonzero nanosecond part rather than silently truncating or
+rounding them. Validate fixed temporal arguments at construction and live
+temporal values on every read, since a live value can become invalid after
+construction. This rule applies to model time; MASON's internal scheduler time
+remains an internal representation.
 
 ## Sharing data across simulations
 
