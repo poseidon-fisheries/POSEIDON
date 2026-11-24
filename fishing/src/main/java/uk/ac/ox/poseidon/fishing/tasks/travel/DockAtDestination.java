@@ -25,10 +25,9 @@ package uk.ac.ox.poseidon.fishing.tasks.travel;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static com.google.common.base.Preconditions.checkState;
 
-import java.time.LocalDateTime;
-import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.Destination;
@@ -43,7 +42,7 @@ public class DockAtDestination extends VesselTask {
 
   /** The clock, which dates the docking. */
   @NonNull
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final Clock clock;
 
   /**
    * Docks the vessel at its current trip's destination.
@@ -62,7 +61,7 @@ public class DockAtDestination extends VesselTask {
       vessel.getId(),
       destination
     );
-    vessel.dockAt((Port) destination, currentDateTime.apply(vessel));
+    vessel.dockAt((Port) destination, clock.now());
     return SUCCEEDED;
   }
 }

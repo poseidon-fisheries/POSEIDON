@@ -43,7 +43,9 @@ class DockAtDestinationTest {
     final Vessel vessel = vesselCruisingAtTenKph();
     final Port port = mock(Port.class);
     when(vessel.getCurrentTrip().getDestination()).thenReturn(port);
-    final DockAtDestination dockAtDestination = new DockAtDestination(_ -> NOW);
+    final DockAtDestination dockAtDestination = new DockAtDestination(
+      () -> NOW
+    );
     setTaskObject(dockAtDestination, vessel);
 
     dockAtDestination.execute();
@@ -54,7 +56,9 @@ class DockAtDestinationTest {
   @Test
   void throwsWhenTheDestinationIsNotAPort() throws Exception {
     final Vessel vessel = vesselCruisingAtTenKph();
-    final DockAtDestination dockAtDestination = new DockAtDestination(_ -> NOW);
+    final DockAtDestination dockAtDestination = new DockAtDestination(
+      () -> NOW
+    );
     setTaskObject(dockAtDestination, vessel);
 
     assertThatThrownBy(dockAtDestination::execute)

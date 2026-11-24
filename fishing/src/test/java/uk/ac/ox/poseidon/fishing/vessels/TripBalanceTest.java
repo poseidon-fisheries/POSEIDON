@@ -120,6 +120,9 @@ class TripBalanceTest {
     final var events = new SimpleEventManager();
     when(simulation.getProductStore()).thenReturn(new ProductStore());
     when(simulation.getEventManager()).thenReturn(events);
+    final TemporalSchedule schedule = mock(TemporalSchedule.class);
+    when(schedule.now()).thenAnswer(_ -> now.get());
+    when(simulation.getTemporalSchedule()).thenReturn(schedule);
     final var scope = new SimulationScope(simulation);
     final ModelGrid grid = ModelGrid.create(2, 1, new Envelope(10, 12, 40, 41));
     final var field = vesselField(_ -> grid).get(scope);
@@ -207,7 +210,7 @@ class TripBalanceTest {
     ).get(GLOBAL_SCOPE);
     final var tripBlock = new FishingTripBlock(
       _ -> Optional.of(FISHING_CELL),
-      _ -> now.get(),
+      () -> now.get(),
       List.of(_ -> Money.of(CurrencyUnit.EUR, 8)),
       List.of(
         travel(vessel, engineComponent, tankComponent, scope),
@@ -217,15 +220,15 @@ class TripBalanceTest {
           tankComponent,
           _ -> stock,
           disposition,
-          _ -> now.get()
+          () -> now.get()
         ),
         new SetDestinationToOrigin(),
         travel(vessel, engineComponent, tankComponent, scope),
-        new DockAtDestination(_ -> now.get()),
+        new DockAtDestination(() -> now.get()),
         new LandCatches(
           holdComponent,
           _ -> Duration.ofMinutes(30),
-          _ -> now.get(),
+          () -> now.get(),
           markets
         ),
         new Refuel(tankComponent, stations)
@@ -330,8 +333,7 @@ class TripBalanceTest {
       _ -> pathFinder,
       _ -> distance,
       _ -> givenVessel -> givenVessel.getCurrentTrip().getDestination(),
-      _ -> givenVessel -> givenVessel.getCurrentTrip().getEventManager(),
-      _ -> ignored -> now.get()
+      _ -> givenVessel -> givenVessel.getCurrentTrip().getEventManager()
     ).get(
       new VesselComponentScope(
         new VesselScope(scope, vessel),

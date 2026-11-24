@@ -22,7 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.regulations.actions;
 
-import java.time.LocalDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.clock;
+
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -51,16 +52,11 @@ public class DepartNowActionFunctionFactory
 {
 
   private final VesselComponent<? extends Gear> gear;
-  private final ValueFactory<
-    ? super SimulationScope,
-    ? super Vessel,
-    LocalDateTime
-  > currentDateTime;
 
   @Override
   protected Function<Vessel, DepartNow> newInstance(
     final SimulationScope scope
   ) {
-    return new DepartNowActionFunction(gear, currentDateTime.get(scope));
+    return new DepartNowActionFunction(gear, clock().get(scope));
   }
 }

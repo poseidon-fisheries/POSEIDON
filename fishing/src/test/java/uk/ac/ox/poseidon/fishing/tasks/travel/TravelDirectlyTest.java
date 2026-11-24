@@ -51,7 +51,7 @@ class TravelDirectlyTest {
       ENGINE,
       FUEL_TANK,
       distanceCalculator,
-      v -> NOW
+      () -> NOW
     );
     setTaskObject(travelDirectly, vessel);
 
@@ -72,7 +72,7 @@ class TravelDirectlyTest {
       ENGINE,
       FUEL_TANK,
       distanceCalculator,
-      v -> NOW
+      () -> NOW
     );
     setTaskObject(travelDirectly, vessel);
 
@@ -97,7 +97,7 @@ class TravelDirectlyTest {
       ENGINE,
       FUEL_TANK,
       distanceCalculator,
-      v -> clock.next()
+      clock::next
     );
     setTaskObject(travelDirectly, vessel);
 

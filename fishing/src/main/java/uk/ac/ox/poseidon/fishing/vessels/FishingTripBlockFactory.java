@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.fishing.vessels;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -33,6 +32,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
@@ -51,7 +51,6 @@ public class FishingTripBlockFactory extends TripBlockFactory {
   /**
    * @param initialDestination gives the trip's first destination for the
    *                           vessel, or none if it should not leave
-   * @param currentDateTime    the clock, which dates the trip's start and end
    * @param tripCosts          give the costs of the finished trip, charged in
    *                           order; possibly none
    * @param children           the tasks run in sequence during the trip
@@ -62,11 +61,6 @@ public class FishingTripBlockFactory extends TripBlockFactory {
       ? super Vessel,
       ? extends Optional<? extends Destination>
     > initialDestination,
-    final ValueFactory<
-      ? super VesselComponentScope,
-      ? super Vessel,
-      LocalDateTime
-    > currentDateTime,
     final ImmutableList<
       ? extends ValueFactory<
         ? super VesselComponentScope,
@@ -78,7 +72,7 @@ public class FishingTripBlockFactory extends TripBlockFactory {
       ? extends Factory<? super VesselComponentScope, ? extends Task<Vessel>>
     > children
   ) {
-    super(initialDestination, currentDateTime, tripCosts, children);
+    super(initialDestination, tripCosts, children);
   }
 
   @Override
@@ -87,15 +81,10 @@ public class FishingTripBlockFactory extends TripBlockFactory {
       ? super Vessel,
       ? extends Optional<? extends Destination>
     > initialDestination,
-    final Function<? super Vessel, LocalDateTime> currentDateTime,
+    final Clock clock,
     final List<? extends Function<? super Trip, ? extends Money>> tripCosts,
     final List<? extends Task<Vessel>> children
   ) {
-    return new FishingTripBlock(
-      initialDestination,
-      currentDateTime,
-      tripCosts,
-      children
-    );
+    return new FishingTripBlock(initialDestination, clock, tripCosts, children);
   }
 }

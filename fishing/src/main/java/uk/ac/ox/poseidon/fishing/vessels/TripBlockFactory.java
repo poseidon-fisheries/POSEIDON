@@ -23,10 +23,10 @@
 package uk.ac.ox.poseidon.fishing.vessels;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.clock;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -37,6 +37,7 @@ import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
@@ -59,12 +60,6 @@ public class TripBlockFactory extends TaskFactory<TripBlock> {
     ? extends Optional<? extends Destination>
   > initialDestination;
 
-  private final ValueFactory<
-    ? super VesselComponentScope,
-    ? super Vessel,
-    LocalDateTime
-  > currentDateTime;
-
   /** Give the costs of the finished trip, charged in order; possibly none. */
   @Singular
   private final ImmutableList<
@@ -84,7 +79,7 @@ public class TripBlockFactory extends TaskFactory<TripBlock> {
   protected TripBlock newInstance(final VesselComponentScope scope) {
     return newTripBlock(
       initialDestination.get(scope),
-      currentDateTime.get(scope),
+      clock().get(scope),
       tripCosts
         .stream()
         .<Function<? super Trip, ? extends Money>>map(tripCost ->
@@ -107,15 +102,10 @@ public class TripBlockFactory extends TaskFactory<TripBlock> {
       ? super Vessel,
       ? extends Optional<? extends Destination>
     > initialDestination,
-    final Function<? super Vessel, LocalDateTime> currentDateTime,
+    final Clock clock,
     final List<? extends Function<? super Trip, ? extends Money>> tripCosts,
     final List<? extends Task<Vessel>> children
   ) {
-    return new TripBlock(
-      initialDestination,
-      currentDateTime,
-      tripCosts,
-      children
-    );
+    return new TripBlock(initialDestination, clock, tripCosts, children);
   }
 }

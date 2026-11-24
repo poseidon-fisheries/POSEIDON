@@ -36,6 +36,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
@@ -52,12 +53,15 @@ class HasStartedFishingTripTodayFactoryTest {
   private final Vessel vessel = mock(Vessel.class);
   private final EventManager vesselEventManager = new SimpleEventManager();
   private final HasStartedFishingTripTodayFactory factory =
-    new HasStartedFishingTripTodayFactory(scope -> anyVessel -> NOW);
+    new HasStartedFishingTripTodayFactory();
   private Function<Vessel, Boolean> hasStartedFishingTripToday;
 
   @BeforeEach
   void buildForTheVessel() {
     when(simulation.getProductStore()).thenReturn(new ProductStore());
+    final TemporalSchedule schedule = mock(TemporalSchedule.class);
+    when(schedule.now()).thenAnswer(_ -> NOW);
+    when(simulation.getTemporalSchedule()).thenReturn(schedule);
     when(vessel.getProductStore()).thenReturn(new ProductStore());
     when(vessel.getEventManager()).thenReturn(vesselEventManager);
     hasStartedFishingTripToday = factory.get(componentScope());

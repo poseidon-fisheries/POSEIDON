@@ -22,9 +22,9 @@
 
 package uk.ac.ox.poseidon.fishing.regulations.actions;
 
-import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
@@ -37,14 +37,10 @@ import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 public class DepartNowActionFunction implements Function<Vessel, DepartNow> {
 
   private final VesselComponent<? extends Gear> gear;
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final Clock clock;
 
   @Override
   public DepartNow apply(final Vessel vessel) {
-    return new DepartNow(
-      vessel,
-      currentDateTime.apply(vessel),
-      gear.of(vessel)
-    );
+    return new DepartNow(vessel, clock.now(), gear.of(vessel));
   }
 }

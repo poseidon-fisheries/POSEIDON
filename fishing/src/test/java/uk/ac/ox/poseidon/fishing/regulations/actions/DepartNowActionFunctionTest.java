@@ -55,7 +55,7 @@ final class DepartNowActionFunctionTest {
 
     final DepartNow action = new DepartNowActionFunction(
       gearComponent,
-      _ -> NOW
+      () -> NOW
     ).apply(vessel);
 
     assertThat(action.getAgent()).isSameAs(vessel);

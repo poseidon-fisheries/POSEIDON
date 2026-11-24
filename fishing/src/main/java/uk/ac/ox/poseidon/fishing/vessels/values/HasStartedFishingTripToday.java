@@ -23,10 +23,10 @@
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
@@ -45,7 +45,7 @@ public class HasStartedFishingTripToday
 
   /** The clock, which gives the current date. */
   @NonNull
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final Clock clock;
 
   /**
    * The date the vessel's last fishing trip started, or {@code null} if it
@@ -67,9 +67,7 @@ public class HasStartedFishingTripToday
   public Boolean apply(final Vessel vessel) {
     return (
       lastFishingTripStartDate != null &&
-      lastFishingTripStartDate.equals(
-        currentDateTime.apply(vessel).toLocalDate()
-      )
+      lastFishingTripStartDate.equals(clock.now().toLocalDate())
     );
   }
 }

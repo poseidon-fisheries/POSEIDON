@@ -153,7 +153,7 @@ class TravelAlongPathTest {
       distanceCalculator,
       new CurrentTripDestination(),
       v -> eventManager,
-      v -> NOW
+      () -> NOW
     );
     @SuppressWarnings("unchecked")
     final BehaviorTree<Vessel> tree = new BehaviorTree<>(
@@ -205,7 +205,7 @@ class TravelAlongPathTest {
       mock(DistanceCalculator.class),
       v -> DESTINATION,
       v -> mock(EventManager.class),
-      v -> NOW
+      () -> NOW
     );
     setTaskObject(travelAlongPath, vesselCruisingAtTenKph());
 
@@ -228,7 +228,7 @@ class TravelAlongPathTest {
       mock(DistanceCalculator.class),
       v -> DESTINATION,
       v -> mock(EventManager.class),
-      v -> NOW
+      () -> NOW
     );
     setTaskObject(travelAlongPath, vesselCruisingAtTenKph());
 
@@ -254,7 +254,7 @@ class TravelAlongPathTest {
       distanceCalculator,
       v -> DESTINATION,
       v -> mock(EventManager.class),
-      v -> NOW
+      () -> NOW
     );
   }
 }

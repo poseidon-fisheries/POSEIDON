@@ -29,17 +29,19 @@ import static uk.ac.ox.poseidon.fishing.vessels.GivenComponents.componentScopeOf
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.ProductStore;
+import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 final class TripBlockFactoryTest {
 
   // Kept in fields: a scope holds its vessel weakly
+  private final Simulation simulation = mock(Simulation.class);
   private final Vessel vessel = mock(Vessel.class);
   private final VesselComponentScope scope = scope();
 
@@ -48,8 +50,12 @@ final class TripBlockFactoryTest {
 
   private VesselComponentScope scope() {
     when(vessel.getProductStore()).thenReturn(new ProductStore());
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
+    when(simulation.getTemporalSchedule()).thenReturn(
+      mock(TemporalSchedule.class)
+    );
     return componentScopeOf(
-      new VesselScope(mock(SimulationScope.class), vessel)
+      new VesselScope(new SimulationScope(simulation), vessel)
     );
   }
 
@@ -57,7 +63,6 @@ final class TripBlockFactoryTest {
   void buildsATripBlockWithItsChildren() {
     final TripBlockFactory factory = new TripBlockFactory(
       _ -> _ -> Optional.empty(),
-      _ -> _ -> LocalDateTime.of(2026, 1, 1, 0, 0),
       ImmutableList.of(_ -> _ -> Money.of(CurrencyUnit.EUR, 1.0)),
       ImmutableList.of(_ -> child)
     );
@@ -73,7 +78,6 @@ final class TripBlockFactoryTest {
   void buildsAFishingTripBlockWithItsChildren() {
     final TripBlockFactory factory = new FishingTripBlockFactory(
       _ -> _ -> Optional.empty(),
-      _ -> _ -> LocalDateTime.of(2026, 1, 1, 0, 0),
       ImmutableList.of(),
       ImmutableList.of(_ -> child)
     );

@@ -26,9 +26,9 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
@@ -46,7 +46,7 @@ public class LandCatches extends ExtendedTripTask {
 
   private final VesselComponent<? extends Hold> hold;
   private final Function<? super Vessel, Duration> duration;
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final Clock clock;
   private final MarketGrid marketGrid;
 
   /** @return how long landing takes */
@@ -73,11 +73,7 @@ public class LandCatches extends ExtendedTripTask {
     );
     marketGrid
       .getMarket(vessel.getPortDockedAt())
-      .sell(
-        vessel,
-        hold.of(vessel).extractContent(),
-        currentDateTime.apply(vessel)
-      )
+      .sell(vessel, hold.of(vessel).extractContent(), clock.now())
       .summary()
       .values()
       .forEach(getTrip().getAccount()::add);

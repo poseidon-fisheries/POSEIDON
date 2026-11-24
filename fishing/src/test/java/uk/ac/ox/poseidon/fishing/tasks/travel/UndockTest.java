@@ -41,7 +41,7 @@ class UndockTest {
   @Test
   void undocksTheVesselDuringATrip() throws Exception {
     final Vessel vessel = vesselCruisingAtTenKph();
-    final Undock undock = new Undock(_ -> NOW);
+    final Undock undock = new Undock(() -> NOW);
     setTaskObject(undock, vessel);
 
     final Status status = undock.execute();
@@ -54,7 +54,7 @@ class UndockTest {
   void throwsOutsideATrip() throws Exception {
     final Vessel vessel = vesselCruisingAtTenKph();
     when(vessel.getCurrentTrip()).thenReturn(null);
-    final Undock undock = new Undock(_ -> NOW);
+    final Undock undock = new Undock(() -> NOW);
     setTaskObject(undock, vessel);
 
     assertThatThrownBy(undock::execute)

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import org.joda.money.Money;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.geography.Destination;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
@@ -41,7 +42,7 @@ public final class FishingTripBlock extends TripBlock {
   /**
    * @param initialDestination gives the trip's first destination for the
    *                           vessel, or none if it should not leave
-   * @param currentDateTime    the clock, which dates the trip's start and end
+   * @param clock              dates the trip's start and end
    * @param tripCosts          the costs of the finished trip, charged in
    *                           order; possibly none
    * @param children           the tasks run in sequence during the trip
@@ -52,11 +53,11 @@ public final class FishingTripBlock extends TripBlock {
       ? super Vessel,
       ? extends Optional<? extends Destination>
     > initialDestination,
-    final Function<? super Vessel, LocalDateTime> currentDateTime,
+    final Clock clock,
     final List<? extends Function<? super Trip, ? extends Money>> tripCosts,
     final List<? extends Task<Vessel>> children
   ) {
-    super(initialDestination, currentDateTime, tripCosts, children);
+    super(initialDestination, clock, tripCosts, children);
   }
 
   @Override

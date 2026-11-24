@@ -25,10 +25,9 @@ package uk.ac.ox.poseidon.fishing.tasks.travel;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static com.google.common.base.Preconditions.checkState;
 
-import java.time.LocalDateTime;
-import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
@@ -42,7 +41,7 @@ public class Undock extends VesselTask {
 
   /** The clock, which dates the undocking. */
   @NonNull
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final Clock clock;
 
   /**
    * Undocks the vessel.
@@ -58,7 +57,7 @@ public class Undock extends VesselTask {
       "Vessel %s cannot undock outside a trip: a trip's start undocks it.",
       vessel.getId()
     );
-    vessel.undock(currentDateTime.apply(vessel));
+    vessel.undock(clock.now());
     return SUCCEEDED;
   }
 }

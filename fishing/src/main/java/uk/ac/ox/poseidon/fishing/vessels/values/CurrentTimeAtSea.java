@@ -25,10 +25,10 @@ package uk.ac.ox.poseidon.fishing.vessels.values;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
@@ -43,7 +43,7 @@ public class CurrentTimeAtSea implements Function<Vessel, Duration> {
 
   /** The clock, which gives the time at sea so far. */
   @NonNull
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final Clock clock;
 
   /**
    * @return the current trip's time at sea so far
@@ -57,6 +57,6 @@ public class CurrentTimeAtSea implements Function<Vessel, Duration> {
       "Vessel %s is not on a trip.",
       vessel.getId()
     );
-    return currentTrip.getTimeAtSeaUntil(currentDateTime.apply(vessel));
+    return currentTrip.getTimeAtSeaUntil(clock.now());
   }
 }

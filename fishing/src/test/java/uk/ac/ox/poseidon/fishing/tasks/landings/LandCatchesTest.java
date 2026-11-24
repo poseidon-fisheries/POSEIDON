@@ -59,7 +59,7 @@ class LandCatchesTest {
   private final LandCatches landCatches = new LandCatches(
     componentGiving(vessel, mock(Hold.class)),
     vessel -> Duration.ZERO,
-    vessel -> LocalDateTime.of(2026, 1, 1, 0, 0),
+    () -> LocalDateTime.of(2026, 1, 1, 0, 0),
     marketGrid
   );
 

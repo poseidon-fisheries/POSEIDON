@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.clock;
+
 import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
@@ -55,18 +57,12 @@ public class CurrentPortStayStartDateTimeFactory
   implements ValueFactory<VesselScope, Vessel, LocalDateTime>
 {
 
-  private final ValueFactory<
-    ? super VesselScope,
-    ? super Void,
-    LocalDateTime
-  > currentDateTime;
-
   @Override
   protected Function<Vessel, LocalDateTime> newInstance(
     final VesselScope scope
   ) {
     final CurrentPortStayStartDateTime currentPortStayStartDateTime =
-      new CurrentPortStayStartDateTime(currentDateTime.get(scope).apply(null));
+      new CurrentPortStayStartDateTime(clock().get(scope).now());
     scope.addListener(currentPortStayStartDateTime);
     return currentPortStayStartDateTime;
   }

@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import org.joda.money.Money;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.geography.Destination;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
@@ -59,7 +60,7 @@ public class TripBlock extends Sequence<Vessel> {
     ? super Vessel,
     ? extends Optional<? extends Destination>
   > initialDestination;
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final Clock clock;
   private final List<
     ? extends Function<? super Trip, ? extends Money>
   > tripCosts;
@@ -68,7 +69,7 @@ public class TripBlock extends Sequence<Vessel> {
   /**
    * @param initialDestination gives the trip's first destination for the
    *                           vessel, or none if it should not leave
-   * @param currentDateTime    the clock, which dates the trip's start and end
+   * @param clock              dates the trip's start and end
    * @param tripCosts          the costs of the finished trip, charged in
    *                           order; possibly none
    * @param children           the tasks run in sequence during the trip
@@ -79,13 +80,13 @@ public class TripBlock extends Sequence<Vessel> {
       ? super Vessel,
       ? extends Optional<? extends Destination>
     > initialDestination,
-    final Function<? super Vessel, LocalDateTime> currentDateTime,
+    final Clock clock,
     final List<? extends Function<? super Trip, ? extends Money>> tripCosts,
     final List<? extends Task<Vessel>> children
   ) {
     checkArgument(!children.isEmpty(), "A trip needs at least one task.");
     this.initialDestination = initialDestination;
-    this.currentDateTime = currentDateTime;
+    this.clock = clock;
     this.tripCosts = List.copyOf(tripCosts);
     children.forEach(this::addChild);
   }
@@ -114,7 +115,7 @@ public class TripBlock extends Sequence<Vessel> {
 
   private void openTrip(final Destination destination) {
     final Vessel vessel = getVessel();
-    final LocalDateTime startDateTime = currentDateTime.apply(vessel);
+    final LocalDateTime startDateTime = clock.now();
     vessel.startTrip(origin ->
       newTrip(vessel, origin, destination, startDateTime)
     );
@@ -136,7 +137,7 @@ public class TripBlock extends Sequence<Vessel> {
           "docked in port.",
         getStatus()
       );
-      getVessel().endTrip(currentDateTime.apply(getVessel()), tripCosts);
+      getVessel().endTrip(clock.now(), tripCosts);
       tripOpen = false;
     }
   }

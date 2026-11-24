@@ -269,7 +269,7 @@ class HomePortCatchValuationTest {
   private HomePortCatchValuation valuationOver(final Market... markets) {
     return new HomePortCatchValuation(
       catchCategoriser,
-      _ -> now,
+      () -> now,
       marketGrid(markets)
     );
   }

@@ -198,7 +198,7 @@ class FishingTest {
       final Function<? super Vessel, Fisheable> fisheable,
       final DispositionProcess dispositionProcess
     ) {
-      super(gear, hold, fuelTank, fisheable, dispositionProcess, _ ->
+      super(gear, hold, fuelTank, fisheable, dispositionProcess, () ->
         LocalDateTime.of(2026, 1, 1, 0, 0)
       );
     }

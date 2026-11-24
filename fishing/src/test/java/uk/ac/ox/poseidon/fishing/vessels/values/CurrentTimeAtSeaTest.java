@@ -37,7 +37,7 @@ class CurrentTimeAtSeaTest {
 
   private static final LocalDateTime START = LocalDateTime.of(2026, 1, 1, 6, 0);
 
-  private final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea(_ ->
+  private final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea(() ->
     START.plusHours(5)
   );
 

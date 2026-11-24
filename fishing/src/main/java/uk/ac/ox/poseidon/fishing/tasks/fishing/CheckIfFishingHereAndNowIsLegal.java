@@ -25,13 +25,11 @@ package uk.ac.ox.poseidon.fishing.tasks.fishing;
 import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
-import java.time.LocalDateTime;
-import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
-import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.regulations.Regulations;
@@ -54,7 +52,7 @@ public class CheckIfFishingHereAndNowIsLegal extends VesselTask {
 
   /** The clock, which dates the fishing action checked. */
   @NonNull
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final Clock clock;
 
   /**
    * @return {@code SUCCEEDED} if the fishing action the vessel expects to take
@@ -64,7 +62,7 @@ public class CheckIfFishingHereAndNowIsLegal extends VesselTask {
   public Status execute() {
     final ExtendedFishingAction action = ExtendedFishingAction.expected(
       getVessel(),
-      currentDateTime.apply(getVessel()),
+      clock.now(),
       getVessel().getCell(),
       gear.of(getVessel())
     );

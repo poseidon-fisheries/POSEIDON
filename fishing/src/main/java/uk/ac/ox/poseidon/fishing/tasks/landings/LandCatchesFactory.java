@@ -22,8 +22,9 @@
 
 package uk.ac.ox.poseidon.fishing.tasks.landings;
 
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.clock;
+
 import java.time.Duration;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -55,11 +56,6 @@ public class LandCatchesFactory extends TaskFactory<LandCatches> {
     ? super Vessel,
     Duration
   > duration;
-  private final ValueFactory<
-    ? super VesselComponentScope,
-    ? super Vessel,
-    LocalDateTime
-  > currentDateTime;
   private final Factory<
     ? super VesselComponentScope,
     ? extends MarketGrid
@@ -70,7 +66,7 @@ public class LandCatchesFactory extends TaskFactory<LandCatches> {
     return new LandCatches(
       hold,
       duration.get(scope),
-      currentDateTime.get(scope),
+      clock().get(scope),
       marketGrid.get(scope)
     );
   }

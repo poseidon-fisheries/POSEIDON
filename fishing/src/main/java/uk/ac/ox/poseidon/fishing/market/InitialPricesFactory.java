@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.market;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.startingDateTime;
 
 import com.google.common.collect.ImmutableList;
 import java.time.LocalDateTime;
@@ -36,7 +37,6 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link SimulationScopeFactory} that applies the resolved
@@ -62,19 +62,13 @@ public class InitialPricesFactory
     Factory<? super SimulationScope, ? extends List<MarketPrice>>
   > marketPrices;
 
-  private final ValueFactory<
-    ? super SimulationScope,
-    ? super Void,
-    LocalDateTime
-  > currentDateTime;
-
   @Override
   protected List<MarketPrice> newInstance(final SimulationScope scope) {
     final List<MarketPrice> resolved = marketPrices
       .stream()
       .flatMap(factory -> factory.get(scope).stream())
       .collect(toImmutableList());
-    final LocalDateTime dateTime = currentDateTime.get(scope).apply(null);
+    final LocalDateTime dateTime = startingDateTime().get(scope);
     resolved.forEach(marketPrice -> marketPrice.apply(dateTime));
     return resolved;
   }

@@ -36,6 +36,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.vessels.BecamePresentEvent;
 import uk.ac.ox.poseidon.fishing.vessels.DockingEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
@@ -58,12 +59,15 @@ class CurrentPortStayStartDateTimeFactoryTest {
   private final EventManager vesselEventManager = new SimpleEventManager();
   private LocalDateTime now = BUILD;
   private final CurrentPortStayStartDateTimeFactory factory =
-    new CurrentPortStayStartDateTimeFactory(scope -> _ -> now);
+    new CurrentPortStayStartDateTimeFactory();
   private Function<Vessel, LocalDateTime> currentPortStayStartDateTime;
 
   @BeforeEach
   void buildForTheVessel() {
     when(simulation.getProductStore()).thenReturn(new ProductStore());
+    final TemporalSchedule schedule = mock(TemporalSchedule.class);
+    when(schedule.now()).thenAnswer(_ -> now);
+    when(simulation.getTemporalSchedule()).thenReturn(schedule);
     when(vessel.getProductStore()).thenReturn(new ProductStore());
     when(vessel.getEventManager()).thenReturn(vesselEventManager);
     when(vessel.isDocked()).thenReturn(true);

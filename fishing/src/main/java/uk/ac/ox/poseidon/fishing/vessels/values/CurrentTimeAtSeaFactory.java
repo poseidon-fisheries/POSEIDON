@@ -22,8 +22,9 @@
 
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.clock;
+
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -49,16 +50,10 @@ public class CurrentTimeAtSeaFactory
   implements ValueFactory<SimulationScope, Vessel, Duration>
 {
 
-  private final ValueFactory<
-    ? super SimulationScope,
-    ? super Vessel,
-    LocalDateTime
-  > currentDateTime;
-
   @Override
   protected Function<Vessel, Duration> newInstance(
     final SimulationScope scope
   ) {
-    return new CurrentTimeAtSea(currentDateTime.get(scope));
+    return new CurrentTimeAtSea(clock().get(scope));
   }
 }

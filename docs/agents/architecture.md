@@ -70,10 +70,13 @@ The model is built around a declarative configuration → runtime object pattern
   trip, whether a fishing trip started today) live in vessel components, or in
   other objects built for the models that need them, never as fields or methods
   of the vessel.
-- A factory that draws random numbers, reads the date, publishes events or needs
-  the run's id takes the simulation service's factory (`rng()`, `now()`,
-  `eventManager()`, `runId()`) as an input, which its helper passes, so scenario
-  code never names it.
+- A factory that draws random numbers, publishes events or needs the run's id
+  takes the simulation service's factory (`rng()`, `eventManager()`, `runId()`)
+  as an input, which its helper passes, so scenario code never names it. A
+  service with only one meaningful value is not a parameter: a factory that
+  needs the present builds the simulation's `Clock` itself, through `clock()`,
+  and its product asks `clock.now()` whenever it acts. Scenario code composes
+  the present as a value with `now()`.
 - What runs when is said in the scenario, by wrapping a steppable in one of
   core's scheduling wrappers (`scheduledOnce`, `scheduledRepeating`,
   `scheduledByDateTime` and the rest); see "Scheduling" in `runtime-model.md`.

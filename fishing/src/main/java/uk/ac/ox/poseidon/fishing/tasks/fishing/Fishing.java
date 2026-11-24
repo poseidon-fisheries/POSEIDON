@@ -26,12 +26,12 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.fishing.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.fishing.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
@@ -72,7 +72,7 @@ public class Fishing extends ExtendedTripTask {
 
   /** The clock, which dates the start of each fishing action. */
   @NonNull
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final Clock clock;
 
   private ExtendedFishingAction action;
 
@@ -95,7 +95,7 @@ public class Fishing extends ExtendedTripTask {
     final Gear gear = this.gear.of(getVessel());
     action = new ExtendedFishingAction(
       getVessel(),
-      currentDateTime.apply(getVessel()),
+      clock.now(),
       gear.getDurationSupplier().get(),
       getVessel()
         .getVesselField()

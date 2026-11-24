@@ -42,7 +42,7 @@ class HasStartedFishingTripTodayTest {
 
   private final Vessel vessel = mock(Vessel.class);
   private final HasStartedFishingTripToday hasStartedFishingTripToday =
-    new HasStartedFishingTripToday(_ -> NOW);
+    new HasStartedFishingTripToday(() -> NOW);
   private final EventManager eventManager = new SimpleEventManager();
 
   {

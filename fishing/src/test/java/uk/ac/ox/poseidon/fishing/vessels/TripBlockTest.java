@@ -118,7 +118,7 @@ class TripBlockTest {
   ) {
     return new TripBlock(
       _ -> initialDestination,
-      _ -> NOW,
+      () -> NOW,
       List.of(),
       List.of(children)
     );
@@ -135,7 +135,7 @@ class TripBlockTest {
       Optional.of(DESTINATION),
       fishing,
       new SetDestinationToOrigin(),
-      new DockAtDestination(_ -> NOW)
+      new DockAtDestination(() -> NOW)
     );
     final BehaviorTree<Vessel> tree = treeOver(tripBlock);
 
@@ -164,7 +164,7 @@ class TripBlockTest {
         Optional.of(DESTINATION),
         task,
         new SetDestinationToOrigin(),
-        new DockAtDestination(_ -> NOW)
+        new DockAtDestination(() -> NOW)
       )
     ).step();
 
@@ -180,12 +180,12 @@ class TripBlockTest {
     treeOver(
       new FishingTripBlock(
         _ -> Optional.of(DESTINATION),
-        _ -> NOW,
+        () -> NOW,
         List.of(),
         List.of(
           task,
           new SetDestinationToOrigin(),
-          new DockAtDestination(_ -> NOW)
+          new DockAtDestination(() -> NOW)
         )
       )
     ).step();
@@ -198,7 +198,7 @@ class TripBlockTest {
     final ScriptedTask task = new ScriptedTask(SUCCEEDED);
     final TripBlock tripBlock = new TripBlock(
       _ -> Optional.of(DESTINATION),
-      _ -> NOW,
+      () -> NOW,
       List.of(
         _ -> Money.of(CurrencyUnit.EUR, 5),
         _ -> Money.of(CurrencyUnit.EUR, 2)
@@ -206,7 +206,7 @@ class TripBlockTest {
       List.of(
         task,
         new SetDestinationToOrigin(),
-        new DockAtDestination(_ -> NOW)
+        new DockAtDestination(() -> NOW)
       )
     );
 
@@ -222,7 +222,7 @@ class TripBlockTest {
     final Port otherPort = mock(Port.class);
     final TripBlock tripBlock = new TripBlock(
       new Some<>(_ -> otherPort),
-      _ -> NOW,
+      () -> NOW,
       List.of(),
       List.of(new ScriptedTask(RUNNING))
     );
@@ -258,7 +258,7 @@ class TripBlockTest {
       Optional.of(DESTINATION),
       fishing,
       new SetDestinationToOrigin(),
-      new DockAtDestination(_ -> NOW)
+      new DockAtDestination(() -> NOW)
     );
     final BehaviorTree<Vessel> tree = treeOver(tripBlock);
 
@@ -313,7 +313,7 @@ class TripBlockTest {
   void aTripBlockInsideAnotherThrows() {
     final TripBlock tripBlock = tripTo(
       Optional.of(DESTINATION),
-      tripTo(Optional.of(DESTINATION), new DockAtDestination(_ -> NOW))
+      tripTo(Optional.of(DESTINATION), new DockAtDestination(() -> NOW))
     );
 
     assertThatThrownBy(treeOver(tripBlock)::step)
@@ -329,12 +329,12 @@ class TripBlockTest {
         picks.incrementAndGet();
         return Optional.of(DESTINATION);
       },
-      receiver -> NOW,
+      () -> NOW,
       List.of(),
       List.of(
         new ScriptedTask(RUNNING, SUCCEEDED),
         new SetDestinationToOrigin(),
-        new DockAtDestination(receiver -> NOW)
+        new DockAtDestination(() -> NOW)
       )
     );
     final BehaviorTree<Vessel> tree = treeOver(block);
@@ -352,7 +352,7 @@ class TripBlockTest {
         picks.incrementAndGet();
         return Optional.empty();
       },
-      receiver -> NOW,
+      () -> NOW,
       List.of(),
       List.of(new ScriptedTask(SUCCEEDED))
     );

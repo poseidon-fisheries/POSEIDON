@@ -28,10 +28,9 @@ import static uk.ac.ox.poseidon.geography.distance.DistanceCalculator.travelDura
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.fishing.tasks.ExtendedTripTask;
-import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
@@ -50,7 +49,7 @@ public class TravelDirectly extends ExtendedTripTask {
   private final VesselComponent<? extends Engine> engine;
   private final VesselComponent<? extends FuelTank> fuelTank;
   private final DistanceCalculator distanceCalculator;
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final Clock clock;
   private LocalDateTime startDateTime;
   private Cell origin;
   private Cell destination;
@@ -63,7 +62,7 @@ public class TravelDirectly extends ExtendedTripTask {
   @Override
   public void start() {
     super.start();
-    startDateTime = currentDateTime.apply(getVessel());
+    startDateTime = clock.now();
     origin = getVessel().getCell();
     destination = getVessel()
       .getCurrentTrip()
@@ -105,7 +104,7 @@ public class TravelDirectly extends ExtendedTripTask {
         new TravelEvent(
           getVessel(),
           startDateTime,
-          currentDateTime.apply(getVessel()),
+          clock.now(),
           origin,
           destination
         )

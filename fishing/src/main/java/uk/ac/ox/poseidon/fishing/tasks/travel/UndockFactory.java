@@ -22,15 +22,14 @@
 
 package uk.ac.ox.poseidon.fishing.tasks.travel;
 
-import java.time.LocalDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.clock;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
-import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 
 /**
@@ -44,14 +43,8 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 @SuperBuilder(toBuilder = true)
 public class UndockFactory extends TaskFactory<Undock> {
 
-  private final ValueFactory<
-    ? super VesselComponentScope,
-    ? super Vessel,
-    LocalDateTime
-  > currentDateTime;
-
   @Override
   protected Undock newInstance(final VesselComponentScope scope) {
-    return new Undock(currentDateTime.get(scope));
+    return new Undock(clock().get(scope));
   }
 }

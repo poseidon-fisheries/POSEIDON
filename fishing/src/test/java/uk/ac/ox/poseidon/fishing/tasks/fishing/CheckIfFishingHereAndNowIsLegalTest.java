@@ -89,10 +89,7 @@ class CheckIfFishingHereAndNowIsLegalTest {
         checked.add(action);
         return permitted;
       },
-      givenVessel -> {
-        assertThat(givenVessel).isSameAs(vessel);
-        return NOW;
-      }
+      () -> NOW
     );
     final var tree = new BehaviorTree<>(task, vessel);
 
@@ -128,7 +125,7 @@ class CheckIfFishingHereAndNowIsLegalTest {
     final var task = new CheckIfFishingHereAndNowIsLegal(
       gearComponent,
       action -> checked.add(action),
-      _ -> now.get()
+      () -> now.get()
     );
     final var tree = new BehaviorTree<>(task, vessel);
 

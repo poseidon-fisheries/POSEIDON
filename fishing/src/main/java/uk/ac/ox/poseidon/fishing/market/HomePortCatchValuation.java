@@ -27,10 +27,10 @@ import static lombok.AccessLevel.PACKAGE;
 import java.time.LocalDateTime;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.fishing.choices.Valuation;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
@@ -58,7 +58,7 @@ public class HomePortCatchValuation implements Valuation<Bucket> {
   private static final int MAXIMUM_NUMBER_OF_VALUES = 10_000;
 
   private final CatchCategoriser catchCategoriser;
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final Clock clock;
   private final MarketGrid marketGrid;
   // By identity: cheaper than comparing catches, and a catch never changes.
   private final Map<Bucket, Double> values = new IdentityHashMap<>();
@@ -92,7 +92,7 @@ public class HomePortCatchValuation implements Valuation<Bucket> {
     if (!valuesHold) {
       values.clear();
       valuedMarket = market;
-      valuedSince = currentDateTime.apply(vessel);
+      valuedSince = clock.now();
     }
     return bucket ->
       values.computeIfAbsent(bucket, key ->

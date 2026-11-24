@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
@@ -63,7 +64,7 @@ public class TravelAlongPath extends VesselTask {
     ? extends Destination
   > destinationSource;
   private final Function<? super Vessel, EventManager> eventManager;
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final Clock clock;
   private List<Cell> currentPath;
 
   private LocalDateTime startDateTime;
@@ -93,7 +94,7 @@ public class TravelAlongPath extends VesselTask {
     destination = checkNotNull(destinationSource.apply(vessel)).getCell(
       vessel.getPortGrid()
     );
-    startDateTime = currentDateTime.apply(vessel);
+    startDateTime = clock.now();
     origin = vessel.getCell();
     currentPath = pathFinder
       .getPath(vessel.getCell(), destination)
@@ -147,7 +148,7 @@ public class TravelAlongPath extends VesselTask {
         new TravelEvent(
           getVessel(),
           startDateTime,
-          currentDateTime.apply(vessel),
+          clock.now(),
           origin,
           destination
         )

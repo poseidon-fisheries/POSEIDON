@@ -22,7 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
-import java.time.LocalDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.clock;
+
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -52,16 +53,10 @@ public class HasStartedFishingTripTodayFactory
   implements ValueFactory<VesselScope, Vessel, Boolean>
 {
 
-  private final ValueFactory<
-    ? super VesselScope,
-    ? super Vessel,
-    LocalDateTime
-  > currentDateTime;
-
   @Override
   protected Function<Vessel, Boolean> newInstance(final VesselScope scope) {
     final HasStartedFishingTripToday hasStartedFishingTripToday =
-      new HasStartedFishingTripToday(currentDateTime.get(scope));
+      new HasStartedFishingTripToday(clock().get(scope));
     scope.addListener(hasStartedFishingTripToday);
     return hasStartedFishingTripToday;
   }

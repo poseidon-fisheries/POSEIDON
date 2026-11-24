@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +36,7 @@ import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.testing.FactoryProducts;
 import uk.ac.ox.poseidon.fishing.choices.EventRecorderFactory;
 import uk.ac.ox.poseidon.fishing.fuel.FuelStationGridFactory;
@@ -49,7 +51,6 @@ import uk.ac.ox.poseidon.fishing.social.EventSharerFactory;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEventPropertyFactory;
 import uk.ac.ox.poseidon.fishing.vessels.gears.FixedBiomassProportionGearFactory;
 import uk.ac.ox.poseidon.fishing.vessels.gears.IndexedBiomassCatchabilityGearFactory;
-import uk.ac.ox.poseidon.fishing.vessels.values.CurrentPortStayStartDateTimeFactory;
 import uk.ac.ox.poseidon.fishing.vessels.values.VesselPropertyFactory;
 
 // In this package, not the module's root, because the test builds a
@@ -78,8 +79,6 @@ final class FactoryProductsTest {
     // The grid is rejected for a mocked field with no width or height.
     FuelStationGridFactory.class,
     MarketGridFactory.class,
-    // A mocked currentDateTime returns null into a non-null field.
-    CurrentPortStayStartDateTimeFactory.class,
     // The list is collected from a mocked grid's stream, which collects to
     // null.
     PriceUpdatesFromTableFactory.class,
@@ -93,6 +92,12 @@ final class FactoryProductsTest {
   void stubSimulation() {
     when(simulation.getProductStore()).thenReturn(new ProductStore());
     when(simulation.getEventManager()).thenReturn(mock(EventManager.class));
+    final TemporalSchedule schedule = mock(TemporalSchedule.class);
+    when(schedule.getStartingDateTime()).thenReturn(
+      LocalDateTime.of(2026, 1, 1, 0, 0)
+    );
+    when(schedule.now()).thenReturn(LocalDateTime.of(2026, 1, 1, 0, 0));
+    when(simulation.getTemporalSchedule()).thenReturn(schedule);
     when(vessel.getEventManager()).thenReturn(mock(EventManager.class));
     when(vessel.getProductStore()).thenReturn(new ProductStore());
   }
