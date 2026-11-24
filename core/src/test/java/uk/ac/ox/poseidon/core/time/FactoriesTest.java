@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.core.time;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.time.Factories.date;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
@@ -33,11 +32,9 @@ import static uk.ac.ox.poseidon.core.time.Factories.duration;
 import static uk.ac.ox.poseidon.core.time.Factories.exponentiallyDistributedDuration;
 import static uk.ac.ox.poseidon.core.time.Factories.hours;
 import static uk.ac.ox.poseidon.core.time.Factories.minutes;
-import static uk.ac.ox.poseidon.core.time.Factories.now;
 import static uk.ac.ox.poseidon.core.time.Factories.period;
 import static uk.ac.ox.poseidon.core.time.Factories.seconds;
 import static uk.ac.ox.poseidon.core.time.Factories.startOf;
-import static uk.ac.ox.poseidon.core.time.Factories.startOfToday;
 import static uk.ac.ox.poseidon.core.time.Factories.time;
 
 import java.time.Duration;
@@ -45,7 +42,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Period;
-import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -109,21 +105,6 @@ class FactoriesTest {
     final LocalDateTime dateTime = LocalDateTime.of(2025, 6, 1, 7, 8, 9);
 
     assertThat(dateTime(dateTime).get(GLOBAL_SCOPE)).isEqualTo(dateTime);
-  }
-
-  @Test
-  void startOfTodayIsMidnightToday() {
-    assertThat(startOfToday().get(GLOBAL_SCOPE)).isEqualTo(
-      LocalDate.now().atStartOfDay()
-    );
-  }
-
-  @Test
-  void nowIsTheCurrentDateTime() {
-    assertThat(now().get(GLOBAL_SCOPE)).isCloseTo(
-      LocalDateTime.now(),
-      within(1, ChronoUnit.MINUTES)
-    );
   }
 
   @Test

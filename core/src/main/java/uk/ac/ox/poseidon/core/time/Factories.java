@@ -115,24 +115,6 @@ public final class Factories {
   }
 
   /**
-   * @return a {@link DateTimeFactory} for the start (midnight) of today,
-   *         evaluated when this method is called
-   * @see DateTimeFactory
-   */
-  public static DateTimeFactory startOfToday() {
-    return startOf(LocalDate.now());
-  }
-
-  /**
-   * @return a {@link DateTimeFactory} for the current date-time, evaluated when
-   *         this method is called
-   * @see DateTimeFactory
-   */
-  public static DateTimeFactory now() {
-    return dateTime(LocalDateTime.now());
-  }
-
-  /**
    * @param date the date whose start (midnight) the resulting factory produces
    * @return a {@link DateTimeFactory} for the start of the given date
    * @see DateTimeFactory
