@@ -24,28 +24,24 @@ package uk.ac.ox.poseidon.fishing.regulations.predicates;
 
 import static lombok.AccessLevel.PACKAGE;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
-import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
-import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.Cell;
-import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
  * Predicate matching cells the vessel it is given could legally fish at:
  * builds the {@linkplain ExtendedFishingAction#expected expected fishing
- * action} at the candidate cell, starting on arrival there (travel time
- * included, via {@code pathLengthCalculator}), and checks it against
+ * action} at the candidate cell, starting when {@code expectedFishingStart}
+ * says the vessel would start fishing there, and checks it against
  * {@code regulations}. Used to filter fishing-cell candidates before committing
- * to a trip there.
+ * to a trip there. How the start comes about (travel, waiting for fishing
+ * hours) is the mapping's business, not this checker's.
  * <p>
  * The action lasts the vessel's gear's expected duration: fishers don't know
  * how long a given set or haul will take, so they plan with the expected one.
@@ -58,44 +54,28 @@ public class FishingCellLegalityChecker
 {
 
   private final VesselComponent<? extends Gear> gear;
-  private final VesselComponent<? extends Engine> engine;
   private final Regulations<? super ExtendedFishingAction> regulations;
-  private final PathLengthCalculator pathLengthCalculator;
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final BiFunction<
+    ? super Vessel,
+    ? super Cell,
+    ? extends LocalDateTime
+  > expectedFishingStart;
 
   /**
-   * @param vessel          the vessel that would fish
+   * @param vessel      the vessel that would fish
    * @param fishingCell the cell it would fish at
-   * @return whether fishing at {@code fishingCell} would currently be
-   *         permitted for {@code vessel}
+   * @return whether fishing at {@code fishingCell} from the date-time the
+   *         vessel is expected to start would be permitted for {@code vessel}
    */
   @Override
   public Boolean apply(final Vessel vessel, final Cell fishingCell) {
-    return regulations.isPermitted(makeAction(vessel, fishingCell));
-  }
-
-  /**
-   * Builds the {@link ExtendedFishingAction} the vessel would expect to take at
-   * {@code fishingCell}: starting whenever it would arrive there from its
-   * current cell, and lasting its gear's expected duration.
-   *
-   * @throws IllegalArgumentException if no path exists from the vessel's
-   *                                  current cell to {@code fishingCell}
-   */
-  private ExtendedFishingAction makeAction(
-    final Vessel vessel,
-    final Cell fishingCell
-  ) {
-    final Duration travelDuration = DistanceCalculator.travelDuration(
-      pathLengthCalculator.lengthInKm(vessel.getCell(), fishingCell),
-      engine.of(vessel).getCruisingSpeedInKph()
-    );
-
-    return ExtendedFishingAction.expected(
-      vessel,
-      currentDateTime.apply(vessel).plus(travelDuration),
-      fishingCell,
-      gear.of(vessel)
+    return regulations.isPermitted(
+      ExtendedFishingAction.expected(
+        vessel,
+        expectedFishingStart.apply(vessel, fishingCell),
+        fishingCell,
+        gear.of(vessel)
+      )
     );
   }
 }

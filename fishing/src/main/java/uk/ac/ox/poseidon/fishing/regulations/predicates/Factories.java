@@ -22,15 +22,15 @@
 
 package uk.ac.ox.poseidon.fishing.regulations.predicates;
 
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
-
+import java.time.LocalDateTime;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
+import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
-import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
-import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
@@ -43,34 +43,31 @@ public final class Factories {
 
   /**
    * @param gear                 the gear the vessel would fish with
-   * @param engine               the engine whose speed gives the time to get
-   *                             there
    * @param regulations          the regulations a candidate fishing action must
    *                             be permitted by
-   * @param pathLengthCalculator measures the path from the vessel's current
-   *                             cell to the candidate
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link FishingCellLegalityChecker}
+   * @param expectedFishingStart gives the date-time a vessel would start
+   *                             fishing at a candidate cell, such as its
+   *                             arrival there plus any wait for fishing hours
+   * @return a {@link MappingFactory} for a {@link FishingCellLegalityChecker}
    * @see FishingCellLegalityCheckerFactory
    */
-  public static <S extends SimulationScope> FishingCellLegalityCheckerFactory<S> fishingCellLegalityChecker(
+  public static <S extends Scope> FishingCellLegalityCheckerFactory<S> fishingCellLegalityChecker(
     final VesselComponent<? extends Gear> gear,
-    final VesselComponent<? extends Engine> engine,
     final Factory<
       ? super S,
       ? extends Regulations<? super ExtendedFishingAction>
     > regulations,
-    final Factory<
+    final MappingFactory<
       ? super S,
-      ? extends PathLengthCalculator
-    > pathLengthCalculator
+      ? super Vessel,
+      ? super Cell,
+      ? extends LocalDateTime
+    > expectedFishingStart
   ) {
     return new FishingCellLegalityCheckerFactory<>(
       gear,
-      engine,
       regulations,
-      pathLengthCalculator,
-      currentDateTime()
+      expectedFishingStart
     );
   }
 }

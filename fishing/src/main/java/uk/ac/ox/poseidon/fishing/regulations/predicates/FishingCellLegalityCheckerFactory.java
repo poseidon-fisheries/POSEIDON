@@ -33,14 +33,11 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
-import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.grids.Cell;
-import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
@@ -58,31 +55,25 @@ public class FishingCellLegalityCheckerFactory<S extends Scope>
 {
 
   private final VesselComponent<? extends Gear> gear;
-  private final VesselComponent<? extends Engine> engine;
 
   private final Factory<
     ? super S,
     ? extends Regulations<? super ExtendedFishingAction>
   > regulations;
 
-  private final Factory<
-    ? super S,
-    ? extends PathLengthCalculator
-  > pathLengthCalculator;
-  private final ValueFactory<
+  private final MappingFactory<
     ? super S,
     ? super Vessel,
-    LocalDateTime
-  > currentDateTime;
+    ? super Cell,
+    ? extends LocalDateTime
+  > expectedFishingStart;
 
   @Override
   protected BiFunction<Vessel, Cell, Boolean> newInstance(final S scope) {
     return new FishingCellLegalityChecker(
       gear,
-      engine,
       regulations.get(scope),
-      pathLengthCalculator.get(scope),
-      currentDateTime.get(scope)
+      expectedFishingStart.get(scope)
     );
   }
 }
