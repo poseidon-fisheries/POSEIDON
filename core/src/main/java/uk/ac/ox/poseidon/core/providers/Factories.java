@@ -30,9 +30,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  */
 public final class Factories {
 
-  private Factories() {
-    throw new IllegalStateException("Utility class");
-  }
+  private Factories() {}
 
   /**
    * @param delegate factory for the integer value to shift

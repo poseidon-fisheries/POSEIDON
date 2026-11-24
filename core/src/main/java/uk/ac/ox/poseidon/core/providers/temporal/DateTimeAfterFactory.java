@@ -36,7 +36,7 @@ import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link DateTimeAfter}. Built via
- * {@link Factories#dateTimeAfter}.
+ * {@link Factories Factories.dateTimeAfter(...)}.
  */
 @Getter
 @ToString

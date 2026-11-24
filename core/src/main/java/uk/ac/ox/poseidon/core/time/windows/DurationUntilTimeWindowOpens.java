@@ -29,14 +29,14 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A mapping of the thing mapped to the time from a date-time until a
+ * A mapping of its argument to the time from a date-time until a
  * {@link TimeWindow} is open: zero if it is open at that date-time. The
- * date-time is read from the context and the thing mapped, such as a cell's
+ * date-time is read from the context and the argument, such as a cell's
  * arrival time, and the duration is counted from it, not from the current
  * date-time. A window that never opens again at or after the date-time cannot
  * be waited for, so this throws an {@link IllegalStateException} naming the
  * window and the date-time. Built via
- * {@link Factories#durationUntilTimeWindowOpens}.
+ * {@link Factories Factories.durationUntilTimeWindowOpens(...)}.
  */
 @RequiredArgsConstructor
 public class DurationUntilTimeWindowOpens<
@@ -52,8 +52,8 @@ public class DurationUntilTimeWindowOpens<
   private final @NonNull TimeWindow<? super C> timeWindow;
 
   @Override
-  public Duration apply(final C context, final T thing) {
-    final LocalDateTime from = dateTime.apply(context, thing);
+  public Duration apply(final C context, final T argument) {
+    final LocalDateTime from = dateTime.apply(context, argument);
     final LocalDateTime opening = timeWindow
       .earliestOpenDateTime(context, from)
       .orElseThrow(() ->

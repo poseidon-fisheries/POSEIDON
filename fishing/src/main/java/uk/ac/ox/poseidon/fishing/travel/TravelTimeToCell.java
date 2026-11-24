@@ -22,10 +22,11 @@
 
 package uk.ac.ox.poseidon.fishing.travel;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.time.Duration;
 import java.util.function.BiFunction;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
@@ -37,22 +38,11 @@ import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
  * How long a vessel takes to travel from its current cell to a cell, at its
  * cruising speed. The vessel's cell and cruising speed are read at each call.
  */
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class TravelTimeToCell implements BiFunction<Vessel, Cell, Duration> {
 
-  private final VesselComponent<? extends Engine> engine;
-  private final PathLengthCalculator pathLengthCalculator;
-
-  /**
-   * @param engine               the engine whose speed gives the travel time
-   * @param pathLengthCalculator measures the path to the cell
-   */
-  TravelTimeToCell(
-    final VesselComponent<? extends Engine> engine,
-    final PathLengthCalculator pathLengthCalculator
-  ) {
-    this.engine = checkNotNull(engine);
-    this.pathLengthCalculator = checkNotNull(pathLengthCalculator);
-  }
+  private final @NonNull VesselComponent<? extends Engine> engine;
+  private final @NonNull PathLengthCalculator pathLengthCalculator;
 
   /**
    * @param vessel the vessel that would travel

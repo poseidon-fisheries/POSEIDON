@@ -28,6 +28,9 @@ import java.time.Duration;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.fishing.choices.Cost;
@@ -44,26 +47,15 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
  *
  * @param <T> the type of option costed
  */
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class TimeCost<T> implements Cost<T> {
 
-  private final BiFunction<
+  private final @NonNull BiFunction<
     ? super Vessel,
     ? super T,
     ? extends Duration
   > travelTime;
-  private final Function<? super Vessel, ? extends Money> hourlyCost;
-
-  /**
-   * @param travelTime gives how long a vessel would travel to take an option
-   * @param hourlyCost gives a vessel's cost per hour at sea
-   */
-  TimeCost(
-    final BiFunction<? super Vessel, ? super T, ? extends Duration> travelTime,
-    final Function<? super Vessel, ? extends Money> hourlyCost
-  ) {
-    this.travelTime = checkNotNull(travelTime);
-    this.hourlyCost = checkNotNull(hourlyCost);
-  }
+  private final @NonNull Function<? super Vessel, ? extends Money> hourlyCost;
 
   /**
    * @param vessel the vessel that would travel

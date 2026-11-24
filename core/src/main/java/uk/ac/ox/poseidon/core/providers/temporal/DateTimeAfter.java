@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * A mapping of a reference date-time plus an amount of time, both read anew on
- * every call and both possibly depending on the thing mapped, such as a cell.
+ * every call and both possibly depending on the argument, such as a cell.
  * Built via
  * {@link Factories#dateTimeAfter(uk.ac.ox.poseidon.core.MappingFactory, uk.ac.ox.poseidon.core.MappingFactory)}
  * in this package.
@@ -50,9 +50,9 @@ public class DateTimeAfter<C, T> implements BiFunction<C, T, LocalDateTime> {
   > amountToAdd;
 
   @Override
-  public LocalDateTime apply(final C context, final T thing) {
+  public LocalDateTime apply(final C context, final T argument) {
     return referenceDateTime
-      .apply(context, thing)
-      .plus(amountToAdd.apply(context, thing));
+      .apply(context, argument)
+      .plus(amountToAdd.apply(context, argument));
   }
 }

@@ -37,7 +37,8 @@ import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link DurationUntilTimeWindowOpens}.
- * Built via {@link Factories#durationUntilTimeWindowOpens}.
+ * Built via
+ * {@link Factories Factories.durationUntilTimeWindowOpens(...)}.
  */
 @Getter
 @ToString

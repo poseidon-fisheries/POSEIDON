@@ -32,9 +32,7 @@ import uk.ac.ox.poseidon.core.Scope;
  */
 public final class Factories {
 
-  private Factories() {
-    throw new IllegalStateException("Utility class");
-  }
+  private Factories() {}
 
   /**
    * @param value the value

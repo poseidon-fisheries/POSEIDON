@@ -37,8 +37,8 @@ import lombok.RequiredArgsConstructor;
  * time of day. It is open from the start, inclusive, to the end, exclusive. If
  * the start is after the end, the window crosses midnight, so it is open from
  * the start until midnight and from midnight until the end. If both are equal,
- * it is open all day: a window that is never open is not a fishing practice,
- * and a fleet with no hours has no window. It always opens again within a day.
+ * it is open all day: a window that is never open could not be waited for, and
+ * a context with no hours has no window. It always opens again within a day.
  *
  * <p>
  * Both times are live values, read on every query with the context given, even
@@ -58,8 +58,14 @@ public class DailyTimeWindow<C> implements TimeWindow<C> {
 
   @Override
   public boolean isOpenAt(final C context, final LocalDateTime dateTime) {
-    final LocalTime start = startTime.apply(context);
-    final LocalTime end = endTime.apply(context);
+    return isOpen(startTime.apply(context), endTime.apply(context), dateTime);
+  }
+
+  private static boolean isOpen(
+    final LocalTime start,
+    final LocalTime end,
+    final LocalDateTime dateTime
+  ) {
     checkArgument(
       dateTime.getNano() == 0,
       "The date-time %s has a fractional second.",
@@ -92,12 +98,12 @@ public class DailyTimeWindow<C> implements TimeWindow<C> {
     final C context,
     final LocalDateTime dateTime
   ) {
+    final LocalTime start = startTime.apply(context);
     final LocalDateTime earliest;
-    if (isOpenAt(context, dateTime)) {
+    if (isOpen(start, endTime.apply(context), dateTime)) {
       earliest = dateTime;
     } else {
       final LocalDate day = dateTime.toLocalDate();
-      final LocalTime start = startTime.apply(context);
       earliest = dateTime.toLocalTime().isBefore(start)
         ? day.atTime(start)
         : day.plusDays(1).atTime(start);

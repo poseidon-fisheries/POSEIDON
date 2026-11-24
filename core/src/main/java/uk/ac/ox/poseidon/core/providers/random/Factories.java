@@ -30,9 +30,7 @@ import uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory;
  */
 public final class Factories {
 
-  private Factories() {
-    throw new IllegalStateException("Utility class");
-  }
+  private Factories() {}
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for the

@@ -37,16 +37,14 @@ import uk.ac.ox.poseidon.core.time.TimeFactory;
 
 /**
  * Factories for time windows, and for what can be asked of them: whether one is
- * open at a date-time, and how long until it is open. A time window is asked under a context, such as the vessel
- * asking; a window or question that needs none has {@code Void} or
- * {@code Object} as its context.
+ * open at a date-time, and how long until it is open. A time window is asked
+ * under a context, such as the vessel asking; a window or question that needs
+ * none has {@code Void} or {@code Object} as its context.
  */
 @SuppressWarnings("overloads")
 public final class Factories {
 
-  private Factories() {
-    throw new IllegalStateException("Utility class");
-  }
+  private Factories() {}
 
   /**
    * @param startTime the time of day the window opens, inclusive
