@@ -39,14 +39,14 @@ class DurationBetweenTest {
   }
 
   @Test
-  void isTheTimeLeftFromTheStartToALaterEnd() {
+  void isTheTimeFromTheStartToALaterEnd() {
     assertThat(durationFromNowTo(NOW.plusHours(3))).isEqualTo(
       Duration.ofHours(3)
     );
   }
 
   @Test
-  void isZeroAtTheStart() {
+  void isZeroWhenTheEndIsTheStart() {
     assertThat(durationFromNowTo(NOW)).isEqualTo(Duration.ZERO);
   }
 

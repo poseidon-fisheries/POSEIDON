@@ -30,8 +30,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * A value of the time from a start date-time to an end date-time, both read
- * anew on every call: negative once the end is before the start, so a deadline
- * that has gone by leaves no time. Built via
+ * anew on every call: negative once the end is before the start. Built via
  * {@link Factories#durationBetween(uk.ac.ox.poseidon.core.ValueFactory, uk.ac.ox.poseidon.core.ValueFactory)}
  * in this package.
  */
