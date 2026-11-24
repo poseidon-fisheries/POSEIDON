@@ -44,7 +44,7 @@ documented in one place, and every doc comment except the component's and the
   - **Several overloads of one name each build it**: link the class with a
     label, `{@link Factories Factories.method(...)}`.
   - **Several method names build it**: combine them in one label,
-    `{@link Factories Factories.nextOccurrenceOf(...)/Factories.nextOccurrenceAfter(...)}`.
+    `{@link Factories Factories.tank(...)/Factories.fullTank(...)}`.
 
   Check what each overload actually returns. `allOf(MappingFactory...)` returns
   an `AllOfFactory` and `allOf(ValueFactory...)` a `MappingAsValueFactory`

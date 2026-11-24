@@ -35,10 +35,9 @@ import java.util.function.Function;
  * A value of the next occurrence of one of the given times of day strictly
  * after a reference date-time, read anew on every call: the same day if one of
  * the times is still to come, else the earliest of them on the following day.
- * The reference is usually the current date-time
- * ({@link Factories#nextOccurrenceOf}), but can be any other, such as when a
- * vessel departed ({@link Factories#nextOccurrenceAfter}); the occurrence can
- * then already be in the past.
+ * The reference is usually the current date-time, but can be any other, such as
+ * when a vessel departed; the occurrence can then already be in the past. Built
+ * via {@link Factories#nextOccurrenceAfter}.
  */
 public class NextOccurrenceOfTimeOfDay<C> implements
   Function<C, LocalDateTime> {

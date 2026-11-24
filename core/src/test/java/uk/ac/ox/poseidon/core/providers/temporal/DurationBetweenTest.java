@@ -28,30 +28,31 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 
-class DurationUntilTest {
+class DurationBetweenTest {
 
   private static final LocalDateTime NOW = LocalDateTime.of(2025, 6, 1, 7, 0);
 
-  private static Duration durationUntil(final LocalDateTime referenceDateTime) {
-    return new DurationUntil<>(
-      context -> NOW,
-      context -> referenceDateTime
-    ).apply(null);
+  private static Duration durationFromNowTo(final LocalDateTime endDateTime) {
+    return new DurationBetween<>(context -> NOW, context -> endDateTime).apply(
+      null
+    );
   }
 
   @Test
-  void isTheTimeLeftUntilALaterReference() {
-    assertThat(durationUntil(NOW.plusHours(3))).isEqualTo(Duration.ofHours(3));
+  void isTheTimeLeftFromTheStartToALaterEnd() {
+    assertThat(durationFromNowTo(NOW.plusHours(3))).isEqualTo(
+      Duration.ofHours(3)
+    );
   }
 
   @Test
-  void isZeroAtTheReference() {
-    assertThat(durationUntil(NOW)).isEqualTo(Duration.ZERO);
+  void isZeroAtTheStart() {
+    assertThat(durationFromNowTo(NOW)).isEqualTo(Duration.ZERO);
   }
 
   @Test
-  void isNegativeOnceTheReferenceHasPassed() {
-    assertThat(durationUntil(NOW.minusMinutes(30))).isEqualTo(
+  void isNegativeOnceTheEndIsBeforeTheStart() {
+    assertThat(durationFromNowTo(NOW.minusMinutes(30))).isEqualTo(
       Duration.ofMinutes(-30)
     );
   }

@@ -40,7 +40,7 @@ import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomInt;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.dateTimeAfter;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.durationUntil;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.durationBetween;
 import static uk.ac.ox.poseidon.core.quantities.Factories.*;
 import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_PER_HOUR;
 import static uk.ac.ox.poseidon.core.schedule.Factories.*;
@@ -409,7 +409,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             checkThat(
               condition(currentDateTime(), dateTimeIsBefore(departureDateTime))
             ),
-            waitFor(durationUntil(departureDateTime))
+            waitFor(durationBetween(currentDateTime(), departureDateTime))
           ),
           succeedOrWait(
             fishingTrip(

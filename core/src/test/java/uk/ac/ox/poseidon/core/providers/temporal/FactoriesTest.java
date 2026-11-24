@@ -31,10 +31,9 @@ import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentTime;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentYear;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.dateTimeAfter;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.dateTimeBefore;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.durationUntil;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.durationBetween;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.hasDateTime;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.nextOccurrenceAfter;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.nextOccurrenceOf;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.startingDateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.duration;
 import static uk.ac.ox.poseidon.core.time.Factories.period;
@@ -127,15 +126,6 @@ class FactoriesTest {
   }
 
   @Test
-  void theNextOccurrenceIsTheNextOfTheGivenTimesAfterTheClock() {
-    assertThat(
-      nextOccurrenceOf(time(6, 0, 0), time(22, 0, 0))
-        .get(scope)
-        .apply(null)
-    ).isEqualTo(LocalDateTime.of(2000, 1, 1, 6, 0));
-  }
-
-  @Test
   void theNextOccurrenceAfterStartsFromTheGivenReference() {
     final LocalDateTime lateEvening = LocalDateTime.of(2025, 6, 1, 23, 0);
 
@@ -151,9 +141,11 @@ class FactoriesTest {
   }
 
   @Test
-  void durationUntilIsTheTimeFromTheClockToTheReference() {
+  void durationBetweenIsTheTimeFromTheStartToTheEnd() {
     assertThat(
-      durationUntil(REFERENCE_FACTORY).get(scope).apply(null)
+      durationBetween(currentDateTime(), REFERENCE_FACTORY)
+        .get(scope)
+        .apply(null)
     ).isEqualTo(Duration.between(START, REFERENCE));
   }
 

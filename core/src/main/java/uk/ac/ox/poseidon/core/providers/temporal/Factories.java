@@ -33,7 +33,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.HasDateTimeFactory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.StartingDateTimeFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.functions.MappingAsValueFactory;
@@ -115,26 +114,6 @@ public final class Factories {
   }
 
   /**
-   * @param times the times of day
-   * @return a {@link ValueFactory} for a
-   *         {@link NextOccurrenceOfTimeOfDay} of the given times strictly after
-   *         the current date-time
-   * @see NextOccurrenceOfTimeOfDay
-   */
-  @SafeVarargs
-  public static <C> NextOccurrenceOfTimeOfDayFactory<
-    SimulationScope,
-    C
-  > nextOccurrenceOf(
-    final Factory<? super SimulationScope, ? extends LocalTime>... times
-  ) {
-    return new NextOccurrenceOfTimeOfDayFactory<>(
-      currentDateTime(),
-      ImmutableList.copyOf(times)
-    );
-  }
-
-  /**
    * @param referenceDateTime the date-time the occurrence must be
    *                          strictly after
    * @param times             the times of day
@@ -158,19 +137,21 @@ public final class Factories {
   }
 
   /**
-   * @param referenceDateTime the date-time to compute the time left
-   *                          until; the result is negative once it has passed
+   * @param startDateTime the date-time to count from
+   * @param endDateTime   the date-time to count to; the result is negative once
+   *                      it is before the start
    * @return a {@link ValueFactory} for a
-   *         {@link DurationUntil} from the current date-time
-   * @see DurationUntil
+   *         {@link DurationBetween}
+   * @see DurationBetween
    */
-  public static <S extends SimulationScope, C> DurationUntilFactory<
+  public static <S extends Scope, C> DurationBetweenFactory<
     S,
     C
-  > durationUntil(
-    final ValueFactory<? super S, ? super C, LocalDateTime> referenceDateTime
+  > durationBetween(
+    final ValueFactory<? super S, ? super C, LocalDateTime> startDateTime,
+    final ValueFactory<? super S, ? super C, LocalDateTime> endDateTime
   ) {
-    return new DurationUntilFactory<>(currentDateTime(), referenceDateTime);
+    return new DurationBetweenFactory<>(startDateTime, endDateTime);
   }
 
   /**

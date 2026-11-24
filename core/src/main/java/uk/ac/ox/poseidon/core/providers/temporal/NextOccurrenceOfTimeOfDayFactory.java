@@ -40,7 +40,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 /**
  * A {@link RelativeScopeFactory} counterpart of
  * {@link NextOccurrenceOfTimeOfDay}, built via
- * {@link Factories Factories.nextOccurrenceOf(...)/Factories.nextOccurrenceAfter(...)}.
+ * {@link Factories#nextOccurrenceAfter(ValueFactory, Factory...)}.
  */
 @Getter
 @ToString

@@ -29,29 +29,29 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A value of the time left from the current date-time until a reference
- * date-time, both read anew on every call: negative once the reference has
- * passed, so a deadline that has gone by leaves no time. Built via
- * {@link Factories#durationUntil(uk.ac.ox.poseidon.core.ValueFactory)} in this
- * package.
+ * A value of the time from a start date-time to an end date-time, both read
+ * anew on every call: negative once the end is before the start, so a deadline
+ * that has gone by leaves no time. Built via
+ * {@link Factories#durationBetween(uk.ac.ox.poseidon.core.ValueFactory, uk.ac.ox.poseidon.core.ValueFactory)}
+ * in this package.
  */
 @RequiredArgsConstructor
-public class DurationUntil<C> implements Function<C, Duration> {
+public class DurationBetween<C> implements Function<C, Duration> {
 
   private final @NonNull Function<
     ? super C,
     ? extends LocalDateTime
-  > currentDateTime;
+  > startDateTime;
   private final @NonNull Function<
     ? super C,
     ? extends LocalDateTime
-  > referenceDateTime;
+  > endDateTime;
 
   @Override
   public Duration apply(final C context) {
     return Duration.between(
-      currentDateTime.apply(context),
-      referenceDateTime.apply(context)
+      startDateTime.apply(context),
+      endDateTime.apply(context)
     );
   }
 }

@@ -35,35 +35,27 @@ import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link DurationUntil}, built
- * via {@link Factories#durationUntil(ValueFactory)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link DurationBetween}, built
+ * via {@link Factories#durationBetween(ValueFactory, ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class DurationUntilFactory<S extends Scope, C>
+public class DurationBetweenFactory<S extends Scope, C>
   extends RelativeScopeFactory<S, Function<C, Duration>>
   implements ValueFactory<S, C, Duration>
 {
 
-  private final ValueFactory<
-    ? super S,
-    ? super C,
-    LocalDateTime
-  > currentDateTime;
-  private final ValueFactory<
-    ? super S,
-    ? super C,
-    LocalDateTime
-  > referenceDateTime;
+  private final ValueFactory<? super S, ? super C, LocalDateTime> startDateTime;
+  private final ValueFactory<? super S, ? super C, LocalDateTime> endDateTime;
 
   @Override
   protected Function<C, Duration> newInstance(final S scope) {
-    return new DurationUntil<>(
-      currentDateTime.get(scope),
-      referenceDateTime.get(scope)
+    return new DurationBetween<>(
+      startDateTime.get(scope),
+      endDateTime.get(scope)
     );
   }
 }

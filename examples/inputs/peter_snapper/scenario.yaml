@@ -232,10 +232,10 @@ components:
                     value: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
                       }
             - !!uk.ac.ox.poseidon.fishing.tasks.general.WaitForFactory
-              duration: !!uk.ac.ox.poseidon.core.providers.temporal.DurationUntilFactory
-                currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+              duration: !!uk.ac.ox.poseidon.core.providers.temporal.DurationBetweenFactory
+                endDateTime: *id011
+                startDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
                   }
-                referenceDateTime: *id011
           - !!uk.ac.ox.poseidon.fishing.tasks.general.SucceedOrWaitFactory
             mainTask: !!uk.ac.ox.poseidon.fishing.vessels.FishingTripBlockFactory
               children:
