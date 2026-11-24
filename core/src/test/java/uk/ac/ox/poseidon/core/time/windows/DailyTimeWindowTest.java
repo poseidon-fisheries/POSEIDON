@@ -25,14 +25,18 @@ package uk.ac.ox.poseidon.core.time.windows;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 
 class DailyTimeWindowTest {
+
+  private static final Duration STEP = Duration.ofMinutes(30);
+  // Two days of half hours
+  private static final int STEPS = 96;
 
   private static DailyTimeWindow<Void> window(
     final LocalTime startTime,
@@ -41,7 +45,7 @@ class DailyTimeWindowTest {
     return new DailyTimeWindow<>(context -> startTime, context -> endTime);
   }
 
-  private static LocalDateTime at(final int day, final int hour) {
+  private static LocalDateTime dateTimeAt(final int day, final int hour) {
     return LocalDateTime.of(2026, 3, day, hour, 0);
   }
 
@@ -52,10 +56,10 @@ class DailyTimeWindowTest {
       LocalTime.of(18, 0)
     );
 
-    assertThat(daytime.isOpenAt(null, at(1, 6))).isTrue();
-    assertThat(daytime.isOpenAt(null, at(1, 17))).isTrue();
-    assertThat(daytime.isOpenAt(null, at(1, 18))).isFalse();
-    assertThat(daytime.isOpenAt(null, at(1, 5))).isFalse();
+    assertThat(daytime.isOpenAt(null, dateTimeAt(1, 6))).isTrue();
+    assertThat(daytime.isOpenAt(null, dateTimeAt(1, 17))).isTrue();
+    assertThat(daytime.isOpenAt(null, dateTimeAt(1, 18))).isFalse();
+    assertThat(daytime.isOpenAt(null, dateTimeAt(1, 5))).isFalse();
   }
 
   @Test
@@ -65,11 +69,11 @@ class DailyTimeWindowTest {
       LocalTime.of(6, 0)
     );
 
-    assertThat(night.isOpenAt(null, at(1, 20))).isTrue();
-    assertThat(night.isOpenAt(null, at(2, 0))).isTrue();
-    assertThat(night.isOpenAt(null, at(2, 5))).isTrue();
-    assertThat(night.isOpenAt(null, at(2, 6))).isFalse();
-    assertThat(night.isOpenAt(null, at(2, 19))).isFalse();
+    assertThat(night.isOpenAt(null, dateTimeAt(1, 20))).isTrue();
+    assertThat(night.isOpenAt(null, dateTimeAt(2, 0))).isTrue();
+    assertThat(night.isOpenAt(null, dateTimeAt(2, 5))).isTrue();
+    assertThat(night.isOpenAt(null, dateTimeAt(2, 6))).isFalse();
+    assertThat(night.isOpenAt(null, dateTimeAt(2, 19))).isFalse();
   }
 
   @Test
@@ -79,9 +83,9 @@ class DailyTimeWindowTest {
       LocalTime.of(6, 0)
     );
 
-    assertThat(allDay.isOpenAt(null, at(1, 6))).isTrue();
-    assertThat(allDay.isOpenAt(null, at(1, 12))).isTrue();
-    assertThat(allDay.isOpenAt(null, at(1, 3))).isTrue();
+    assertThat(allDay.isOpenAt(null, dateTimeAt(1, 6))).isTrue();
+    assertThat(allDay.isOpenAt(null, dateTimeAt(1, 12))).isTrue();
+    assertThat(allDay.isOpenAt(null, dateTimeAt(1, 3))).isTrue();
   }
 
   @Test
@@ -91,8 +95,12 @@ class DailyTimeWindowTest {
       LocalTime.of(6, 0)
     );
 
-    assertThat(night.earliestOpenDateTime(null, at(1, 20))).contains(at(1, 20));
-    assertThat(night.earliestOpenDateTime(null, at(2, 3))).contains(at(2, 3));
+    assertThat(night.earliestOpenDateTime(null, dateTimeAt(1, 20))).contains(
+      dateTimeAt(1, 20)
+    );
+    assertThat(night.earliestOpenDateTime(null, dateTimeAt(2, 3))).contains(
+      dateTimeAt(2, 3)
+    );
   }
 
   @Test
@@ -102,8 +110,8 @@ class DailyTimeWindowTest {
       LocalTime.of(6, 0)
     );
 
-    assertThat(night.earliestOpenDateTime(null, at(2, 7))).isEqualTo(
-      Optional.of(at(2, 20))
+    assertThat(night.earliestOpenDateTime(null, dateTimeAt(2, 7))).isEqualTo(
+      Optional.of(dateTimeAt(2, 20))
     );
   }
 
@@ -114,50 +122,56 @@ class DailyTimeWindowTest {
       LocalTime.of(18, 0)
     );
 
-    assertThat(daytime.earliestOpenDateTime(null, at(1, 18))).contains(
-      at(2, 6)
+    assertThat(daytime.earliestOpenDateTime(null, dateTimeAt(1, 18))).contains(
+      dateTimeAt(2, 6)
     );
-    assertThat(daytime.earliestOpenDateTime(null, at(1, 5))).contains(at(1, 6));
+    assertThat(daytime.earliestOpenDateTime(null, dateTimeAt(1, 5))).contains(
+      dateTimeAt(1, 6)
+    );
   }
 
   @Test
-  void itsTwoAnswersAgreeAtEveryHalfHourOfTheDay() {
-    final LocalTime[][] ends = {
+  void itsTwoAnswersAgreeAtEveryHalfHourOfTwoDays() {
+    final LocalTime[][] startAndEndTimes = {
       { LocalTime.of(6, 0), LocalTime.of(18, 0) },
       { LocalTime.of(20, 0), LocalTime.of(6, 0) },
       { LocalTime.of(6, 0), LocalTime.of(6, 0) }
     };
-    for (final LocalTime[] startAndEnd : ends) {
-      final DailyTimeWindow<Void> window = window(
+    for (final LocalTime[] startAndEnd : startAndEndTimes) {
+      final DailyTimeWindow<Void> timeWindow = window(
         startAndEnd[0],
         startAndEnd[1]
       );
-      IntStream.range(0, 96).forEach(halfHour -> {
-        final LocalDateTime dateTime = at(1, 0).plusMinutes(30L * halfHour);
-        final LocalDateTime earliest = window
+      for (int step = 0; step < STEPS; step++) {
+        final LocalDateTime dateTime = dateTimeAt(1, 0).plus(
+          STEP.multipliedBy(step)
+        );
+        final LocalDateTime earliest = timeWindow
           .earliestOpenDateTime(null, dateTime)
           .orElseThrow();
 
-        if (window.isOpenAt(null, dateTime)) {
+        if (timeWindow.isOpenAt(null, dateTime)) {
           assertThat(earliest).isEqualTo(dateTime);
         } else {
           assertThat(earliest).isAfter(dateTime);
-          assertThat(window.isOpenAt(null, earliest)).isTrue();
+          assertThat(timeWindow.isOpenAt(null, earliest)).isTrue();
         }
-      });
+      }
     }
   }
 
   @Test
   void answersEachContextFromItsOwnEnds() {
-    final DailyTimeWindow<Integer> window = new DailyTimeWindow<>(
+    final DailyTimeWindow<Integer> timeWindow = new DailyTimeWindow<>(
       startHour -> LocalTime.of(startHour, 0),
       startHour -> LocalTime.of(startHour + 2, 0)
     );
 
-    assertThat(window.isOpenAt(8, at(1, 9))).isTrue();
-    assertThat(window.isOpenAt(10, at(1, 9))).isFalse();
-    assertThat(window.earliestOpenDateTime(10, at(1, 9))).contains(at(1, 10));
+    assertThat(timeWindow.isOpenAt(8, dateTimeAt(1, 9))).isTrue();
+    assertThat(timeWindow.isOpenAt(10, dateTimeAt(1, 9))).isFalse();
+    assertThat(timeWindow.earliestOpenDateTime(10, dateTimeAt(1, 9))).contains(
+      dateTimeAt(1, 10)
+    );
   }
 
   @Test
@@ -166,7 +180,7 @@ class DailyTimeWindowTest {
       LocalTime.of(6, 0),
       LocalTime.of(18, 0)
     );
-    final LocalDateTime fractional = at(1, 7).withNano(1);
+    final LocalDateTime fractional = dateTimeAt(1, 7).withNano(1);
 
     assertThatThrownBy(() -> daytime.isOpenAt(null, fractional))
       .isInstanceOf(IllegalArgumentException.class)
@@ -181,12 +195,12 @@ class DailyTimeWindowTest {
     final LocalTime fractional = LocalTime.of(6, 0, 0, 500_000_000);
 
     assertThatThrownBy(() ->
-      window(fractional, LocalTime.of(18, 0)).isOpenAt(null, at(1, 7))
+      window(fractional, LocalTime.of(18, 0)).isOpenAt(null, dateTimeAt(1, 7))
     )
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining("start time");
     assertThatThrownBy(() ->
-      window(LocalTime.of(6, 0), fractional).isOpenAt(null, at(1, 7))
+      window(LocalTime.of(6, 0), fractional).isOpenAt(null, dateTimeAt(1, 7))
     )
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining("end time");
@@ -197,15 +211,15 @@ class DailyTimeWindowTest {
     final AtomicReference<LocalTime> endTime = new AtomicReference<>(
       LocalTime.of(18, 0)
     );
-    final DailyTimeWindow<Void> window = new DailyTimeWindow<>(
+    final DailyTimeWindow<Void> timeWindow = new DailyTimeWindow<>(
       context -> LocalTime.of(6, 0),
       context -> endTime.get()
     );
-    assertThat(window.isOpenAt(null, at(1, 7))).isTrue();
+    assertThat(timeWindow.isOpenAt(null, dateTimeAt(1, 7))).isTrue();
 
     endTime.set(LocalTime.of(18, 0, 0, 1));
 
-    assertThatThrownBy(() -> window.isOpenAt(null, at(1, 7)))
+    assertThatThrownBy(() -> timeWindow.isOpenAt(null, dateTimeAt(1, 7)))
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining("end time");
   }
@@ -217,7 +231,11 @@ class DailyTimeWindowTest {
       LocalTime.of(18, 0, 0)
     );
 
-    assertThat(daytime.isOpenAt(null, at(1, 6).minusSeconds(1))).isFalse();
-    assertThat(daytime.isOpenAt(null, at(1, 18).minusSeconds(1))).isTrue();
+    assertThat(
+      daytime.isOpenAt(null, dateTimeAt(1, 6).minusSeconds(1))
+    ).isFalse();
+    assertThat(
+      daytime.isOpenAt(null, dateTimeAt(1, 18).minusSeconds(1))
+    ).isTrue();
   }
 }

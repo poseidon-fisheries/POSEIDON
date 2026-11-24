@@ -118,14 +118,11 @@ class FishingHoursTripLimitTest {
 
   /** Travel out, wait from the arrival for the hours, set, travel home. */
   private Duration tripDurationWithFishingHours() {
-    final var arrival = dateTimeAfter(
-      currentDateTime(),
-      travelTimeToCell(engine, pathLengths)
-    );
+    final var travelTimeToCell = travelTimeToCell(engine, pathLengths);
     return combinedDuration(
-      travelTimeToCell(engine, pathLengths),
+      travelTimeToCell,
       durationUntilTimeWindowOpens(
-        arrival,
+        dateTimeAfter(currentDateTime(), travelTimeToCell),
         dailyTimeWindow(time(20, 0, 0), time(6, 0, 0))
       ),
       always(duration(0, 1, 0, 0)),

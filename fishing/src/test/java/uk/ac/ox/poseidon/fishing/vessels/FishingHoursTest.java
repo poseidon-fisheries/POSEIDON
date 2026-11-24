@@ -93,10 +93,10 @@ class FishingHoursTest {
   private final AtomicReference<LocalTime> closing = new AtomicReference<>(
     LocalTime.of(6, 0)
   );
-  private final ValueFactory<Scope, Object, LocalTime> openingValue = scope ->
+  private final ValueFactory<Scope, Object, LocalTime> openingTime = scope ->
     context ->
       opening.get();
-  private final ValueFactory<Scope, Object, LocalTime> closingValue = scope ->
+  private final ValueFactory<Scope, Object, LocalTime> closingTime = scope ->
     context ->
       closing.get();
   /** The date-times at which the vessel started a set, in order. */
@@ -130,7 +130,7 @@ class FishingHoursTest {
   }
 
   private VesselSpecification specification() {
-    final var nightHours = dailyTimeWindow(openingValue, closingValue);
+    final var nightHours = dailyTimeWindow(openingTime, closingTime);
     return new VesselSpecification(
       new SimulationScope(simulation),
       fleet,

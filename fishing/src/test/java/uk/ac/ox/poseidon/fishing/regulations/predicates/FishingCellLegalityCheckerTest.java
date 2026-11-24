@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.providers.temporal.DateTimeAfter;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.FactoryComponent;
@@ -208,6 +209,44 @@ class FishingCellLegalityCheckerTest {
         CLOSED_FROM_20_JANUARY,
         LocalDateTime.of(2013, 2, 19, 0, 0)
       ).apply(vessel, CANDIDATE)
+    ).isTrue();
+  }
+
+  private boolean allowedAfterWaiting(
+    final LocalDateTime now,
+    final Duration wait
+  ) {
+    return new FishingCellLegalityChecker(
+      gearComponent,
+      CLOSED_FROM_20_JANUARY,
+      new DateTimeAfter<Vessel, Cell>((v, cell) -> now, (v, cell) -> wait)
+    ).apply(vessel, CANDIDATE);
+  }
+
+  @Test
+  void aClosureEndingDuringTheWaitLeavesTheCellEligible() {
+    // The closure covers 18 February entirely. Starting at once would be
+    // closed, but the set starts at 01:00 on the 19th
+    final LocalDateTime now = LocalDateTime.of(2013, 2, 18, 22, 0);
+
+    assertThat(allowedAfterWaiting(now, Duration.ZERO)).isFalse();
+    assertThat(allowedAfterWaiting(now, Duration.ofHours(3))).isTrue();
+  }
+
+  @Test
+  void aClosureStartingDuringTheWaitMakesTheCellIneligible() {
+    // Starting at once would be open, but the set starts at 01:00 on the 20th,
+    // inside the closure
+    final LocalDateTime now = LocalDateTime.of(2013, 1, 19, 20, 0);
+
+    assertThat(allowedAfterWaiting(now, Duration.ZERO)).isTrue();
+    assertThat(allowedAfterWaiting(now, Duration.ofHours(5))).isFalse();
+  }
+
+  @Test
+  void anArrivalWithNoWaitIsJudgedAtTheArrival() {
+    assertThat(
+      allowedAfterWaiting(LocalDateTime.of(2013, 1, 19, 20, 30), Duration.ZERO)
     ).isTrue();
   }
 
