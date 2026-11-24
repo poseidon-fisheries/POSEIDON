@@ -219,11 +219,21 @@ each made a mapping of `Void` that ignores what it maps (`ValueAsMapping`), and
 makes the result a value by giving it `null` as the thing mapped
 (`MappingAsValue`).
 
-A block that transforms what it is given takes it as its first argument, so a
-call reads in the order data flows, with one overload per shape of that input:
-`mapLookup(key, map)`, or `condition(subject, predicate)`, which states the
-predicate of its subject. There is no generic composition: a mapping of one's
-own becomes a block that takes its input, so the YAML says what it is.
+A block with a yes/no result is a _test_: it is built without the thing it
+tests, and takes only what it tests it against (`lessThan(threshold)`,
+`withinTimeWindow(timeWindow)`, `vesselIsDockedAt(port)`). Whatever uses the
+test supplies the thing tested: `condition(subject, predicate)` gives it a value
+or a mapping, a regulation the action it judges, a filter each candidate, and a
+test of the vessel reads the vessel the call is for. Tests take this shape
+because they are combined over one subject (`allOf`, `anyOf`, `not`) and handed
+to callers that already hold it. [naming.md](naming.md) says how to name a test.
+
+Every other block takes its input as its first argument, so a call reads in the
+order data flows, with one overload per shape of that input:
+`mapLookup(key, map)`, `dateTimeAfter(referenceDateTime, amount)`,
+`durationBetween(start, end)`. There is no generic composition: a mapping of
+one's own becomes a block that takes its input, so each call names what it
+computes.
 
 The package's `Factories` class offers the live version plus an overload taking
 a plain value that it wraps in `constant(...)`:

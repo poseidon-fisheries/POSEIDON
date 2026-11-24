@@ -9,9 +9,16 @@ wrongly. Settle a name when it comes up.
 Names read like proper English: code reads as sentences. Put verbs first for
 tasks and actions (`startPurseSeinerTrip`, not `purseSeinerStartTrip`;
 `chooseNextPurseSeinerDestination`), and keep noun phrases grammatical for
-things (`purseSeinerFishingLocationAtSeaChecker`). Predicates read as statements
-(`vesselHasStartedTripToday`, `cellWasFishedThisTrip`). Check that the call site
+things (`purseSeinerFishingLocationAtSeaChecker`). Tests read as statements
+whose subject is the thing tested, never the argument: left unsaid
+(`lessThan(threshold)`, `withinTimeWindow(timeWindow)`) or named
+(`dateTimeIsBefore(referenceDateTime)`, `vesselIsDockedAt(port)`,
+`cellWasFishedThisTrip()`). Read the call with the thing tested in front: "a
+date-time is within the time window", "the vessel is docked at the port"; the
+sentence must be true exactly when the test is. Then check that the call site
 reads naturally, for example `not(cellWasFishedThisTrip())`.
+[architecture.md](architecture.md) says why tests are built without their
+subject.
 
 ## Name the thing, not an adjective
 
