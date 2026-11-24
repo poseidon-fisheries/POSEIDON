@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkWholeSeconds;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -48,7 +49,8 @@ public class NextOccurrenceOfTimeOfDay<C> implements
   /**
    * @param referenceDateTime the date-time the occurrence must be strictly
    *                          after
-   * @param times             the times of day, at least one
+   * @param times             the times of day, at least one, each with no
+   *                          fractional second
    */
   public NextOccurrenceOfTimeOfDay(
     final Function<? super C, ? extends LocalDateTime> referenceDateTime,
@@ -56,6 +58,7 @@ public class NextOccurrenceOfTimeOfDay<C> implements
   ) {
     checkArgument(times.length > 0, "At least one time of day is required.");
     this.referenceDateTime = checkNotNull(referenceDateTime);
+    Arrays.stream(times).forEach(time -> checkWholeSeconds(time));
     this.times = times.clone();
     Arrays.sort(this.times);
   }

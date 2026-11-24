@@ -24,9 +24,14 @@ package uk.ac.ox.poseidon.core.utils;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 /**
  * Argument-validation helpers, on top of Guava's {@code Preconditions}, for
- * common numeric checks.
+ * common numeric checks and for whole-second temporal values, the precision of
+ * model time.
  */
 public final class Preconditions {
 
@@ -85,5 +90,43 @@ public final class Preconditions {
   public static double checkPositive(final double value, final String name) {
     checkArgument(value > 0, "%s must be positive but was %s", name, value);
     return value;
+  }
+
+  /**
+   * @param duration the duration to check, with no fractional second
+   * @return {@code duration}, unchanged
+   * @throws IllegalArgumentException if it has a fractional second
+   */
+  public static Duration checkWholeSeconds(final Duration duration) {
+    checkArgument(
+      duration.getNano() == 0,
+      "%s has a fractional second.",
+      duration
+    );
+    return duration;
+  }
+
+  /**
+   * @param dateTime the date-time to check, with no fractional second
+   * @return {@code dateTime}, unchanged
+   * @throws IllegalArgumentException if it has a fractional second
+   */
+  public static LocalDateTime checkWholeSeconds(final LocalDateTime dateTime) {
+    checkArgument(
+      dateTime.getNano() == 0,
+      "%s has a fractional second.",
+      dateTime
+    );
+    return dateTime;
+  }
+
+  /**
+   * @param time the time of day to check, with no fractional second
+   * @return {@code time}, unchanged
+   * @throws IllegalArgumentException if it has a fractional second
+   */
+  public static LocalTime checkWholeSeconds(final LocalTime time) {
+    checkArgument(time.getNano() == 0, "%s has a fractional second.", time);
+    return time;
   }
 }

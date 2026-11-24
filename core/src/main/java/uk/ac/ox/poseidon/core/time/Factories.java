@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.core.time;
 
 import static uk.ac.ox.poseidon.core.providers.random.Factories.rng;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.startingDateTime;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkWholeSeconds;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -125,9 +126,11 @@ public final class Factories {
 
   /**
    * @return a {@link DateTimeFactory} for the given date-time
+   * @throws IllegalArgumentException if it has a fractional second
    * @see DateTimeFactory
    */
   public static DateTimeFactory dateTime(final LocalDateTime dateTime) {
+    checkWholeSeconds(dateTime);
     return new DateTimeFactory(
       dateTime.getYear(),
       dateTime.getMonthValue(),

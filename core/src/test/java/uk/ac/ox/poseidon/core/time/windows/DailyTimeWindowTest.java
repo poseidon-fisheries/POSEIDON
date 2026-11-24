@@ -198,12 +198,12 @@ class DailyTimeWindowTest {
       window(fractional, LocalTime.of(18, 0)).isOpenAt(null, dateTimeAt(1, 7))
     )
       .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("start time");
+      .hasMessageContaining("06:00:00.500 has a fractional second");
     assertThatThrownBy(() ->
       window(LocalTime.of(6, 0), fractional).isOpenAt(null, dateTimeAt(1, 7))
     )
       .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("end time");
+      .hasMessageContaining("has a fractional second");
   }
 
   @Test
@@ -221,7 +221,7 @@ class DailyTimeWindowTest {
 
     assertThatThrownBy(() -> timeWindow.isOpenAt(null, dateTimeAt(1, 7)))
       .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("end time");
+      .hasMessageContaining("has a fractional second");
   }
 
   @Test

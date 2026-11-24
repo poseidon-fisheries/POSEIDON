@@ -28,7 +28,11 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkWholeSeconds;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 
 class PreconditionsTest {
@@ -104,5 +108,30 @@ class PreconditionsTest {
     assertThatIllegalArgumentException().isThrownBy(() ->
       checkPositive(-1, "test")
     );
+  }
+
+  @Test
+  void checkWholeSecondsReturnsAWholeSecondValue() {
+    final Duration duration = Duration.ofSeconds(-3);
+    final LocalDateTime dateTime = LocalDateTime.of(2025, 1, 2, 3, 4, 5);
+    final LocalTime time = LocalTime.of(3, 4, 5);
+    assertThat(checkWholeSeconds(duration)).isSameAs(duration);
+    assertThat(checkWholeSeconds(dateTime)).isSameAs(dateTime);
+    assertThat(checkWholeSeconds(time)).isSameAs(time);
+  }
+
+  @Test
+  void checkWholeSecondsRejectsAFractionalSecondWithOneMessage() {
+    assertThatIllegalArgumentException()
+      .isThrownBy(() -> checkWholeSeconds(Duration.ofMillis(-500)))
+      .withMessage("PT-0.5S has a fractional second.");
+    assertThatIllegalArgumentException()
+      .isThrownBy(() ->
+        checkWholeSeconds(LocalDateTime.of(2025, 1, 2, 3, 4, 5, 1))
+      )
+      .withMessageContaining("has a fractional second.");
+    assertThatIllegalArgumentException()
+      .isThrownBy(() -> checkWholeSeconds(LocalTime.of(3, 4, 5, 1)))
+      .withMessageContaining("has a fractional second.");
   }
 }

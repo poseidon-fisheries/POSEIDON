@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.time;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import ec.util.MersenneTwisterFast;
 import java.time.Duration;
@@ -50,5 +51,17 @@ class ExponentiallyDistributedDurationTest {
     assertThat(supplier.get())
       .isPositive()
       .isEqualTo(Duration.ofSeconds(1 + expected.nextInt()));
+  }
+
+  @Test
+  void refusesAMeanWithAFractionalSecond() {
+    assertThatThrownBy(() ->
+      new ExponentiallyDistributedDuration(
+        Duration.ofMillis(500),
+        new MersenneTwisterFast(42)
+      )
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
   }
 }

@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.core.schedule;
 
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.stream.Collectors.*;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkWholeSeconds;
 
 import com.google.common.collect.Streams;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -39,7 +40,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import sim.engine.*;
 import uk.ac.ox.poseidon.core.Clock;
@@ -71,8 +71,11 @@ import uk.ac.ox.poseidon.core.Clock;
  * scheduled it, at the same time</b>, as in MASON. Between calls, an event
  * scheduled at the clock joins the events already queued there, ordered with
  * them by its ordering.</li>
- * <li><b>Date-times are whole seconds</b>: conversions between date-times and
- * MASON time floor fractions of a second, and a date-time in the clock's
+ * <li><b>Date-times and durations are whole seconds</b>: the starting
+ * date-time and every {@link Temporal} or {@link Duration} given to the
+ * schedule must have no fractional second, or {@link IllegalArgumentException}
+ * is thrown. MASON's own time is not so restricted: converting it to a
+ * date-time floors fractions of a second, and a date-time in the clock's
  * current second means now. (MASON places an event scheduled for the current
  * time a fraction of a second after it, so the clock can be just past the
  * second {@link #now()} shows.)</li>
@@ -100,7 +103,6 @@ import uk.ac.ox.poseidon.core.Clock;
     "methods take the same lock, which keeps the clock and the queue consistent with them."
 )
 @Getter
-@RequiredArgsConstructor
 public class TemporalSchedule extends Schedule implements Clock {
 
   /** The timestamp label used for times before the starting date-time. */
@@ -126,6 +128,14 @@ public class TemporalSchedule extends Schedule implements Clock {
   // Guarded by this.
   @Getter(AccessLevel.NONE)
   private transient boolean running;
+
+  /**
+   * @param startingDateTime the date-time of the start of the simulation
+   * @throws IllegalArgumentException if it has a fractional second
+   */
+  public TemporalSchedule(final LocalDateTime startingDateTime) {
+    this.startingDateTime = checkWholeSeconds(startingDateTime);
+  }
 
   /**
    * @return the clock, in seconds since {@link #startingDateTime}: the time of
@@ -183,21 +193,23 @@ public class TemporalSchedule extends Schedule implements Clock {
 
   /**
    * @param delta the amount of time from the clock to schedule the event at,
-   *              floored to whole seconds
+   *              with no fractional second
    * @param event the event to schedule
    * @return whether the event was successfully scheduled
+   * @throws IllegalArgumentException if {@code delta} has a fractional second
    */
   @SuppressWarnings("unused")
   public boolean scheduleOnceIn(final Duration delta, final Steppable event) {
-    return scheduleOnceIn(delta.getSeconds(), event);
+    return scheduleOnceIn(checkWholeSeconds(delta).getSeconds(), event);
   }
 
   /**
    * @param delta    the amount of time from the clock to schedule the event at,
-   *                 floored to whole seconds
+   *                 with no fractional second
    * @param event    the event to schedule
    * @param ordering the schedule ordering to use
    * @return whether the event was successfully scheduled
+   * @throws IllegalArgumentException if {@code delta} has a fractional second
    */
   @SuppressWarnings({ "unused", "UnusedReturnValue" })
   public boolean scheduleOnceIn(
@@ -205,7 +217,11 @@ public class TemporalSchedule extends Schedule implements Clock {
     final Steppable event,
     final int ordering
   ) {
-    return scheduleOnceIn(delta.getSeconds(), event, ordering);
+    return scheduleOnceIn(
+      checkWholeSeconds(delta).getSeconds(),
+      event,
+      ordering
+    );
   }
 
   /**
@@ -223,20 +239,25 @@ public class TemporalSchedule extends Schedule implements Clock {
   /**
    * Converts a Java {@link Temporal} (most likely a {@link LocalDateTime}) to
    * internal MASON schedule time by calculating the interval in seconds between
-   * that object and the starting date-time of the simulation, flooring
-   * fractions of a second.
+   * that object and the starting date-time of the simulation.
    *
-   * @param dateTime the {@link Temporal} object to convert.
+   * @param dateTime the {@link Temporal} object to convert, with no fractional
+   *                 second.
    * @return the internal MASON schedule time corresponding to {@code dateTime}.
+   * @throws IllegalArgumentException if {@code dateTime} has a fractional
+   *                                  second
    */
   @SuppressWarnings("WeakerAccess")
   public double toTime(final Temporal dateTime) {
-    return Duration.between(startingDateTime, dateTime).getSeconds();
+    return checkWholeSeconds(
+      Duration.between(startingDateTime, dateTime)
+    ).getSeconds();
   }
 
   /**
    * @return the MASON time to schedule or step to for {@code dateTime}: its
-   *         whole second, from {@link #toTime}, or the clock itself if that
+   *         whole second, from {@link #toTime}, which rejects a fractional
+   *         one, or the clock itself if that
    *         second is the clock's current second, since a date-time in the
    *         current second means now
    */
@@ -301,6 +322,8 @@ public class TemporalSchedule extends Schedule implements Clock {
    *                             {@link LocalDateTime} to {@link Steppable}.
    *                             Each entry specifies a steppable and the
    *                             date-time at which it should be scheduled.
+   * @throws IllegalArgumentException if any date-time has a fractional second,
+   *                                  even one dated before the clock
    */
   public void scheduleByDateTime(
     final Collection<
@@ -315,7 +338,7 @@ public class TemporalSchedule extends Schedule implements Clock {
       .stream()
       .collect(
         groupingBy(
-          Entry::getKey,
+          entry -> checkWholeSeconds(entry.getKey()),
           mapping(Entry::getValue, collectingAndThen(toList(), Sequence::new))
         )
       )
@@ -657,11 +680,10 @@ public class TemporalSchedule extends Schedule implements Clock {
 
   /**
    * A {@link Repeat} anchored to its first firing: its n-th firing after the
-   * first is the first plus n times {@link #interval}, floored to the second
-   * like any date-time, never the previous firing plus the interval. So neither
-   * calendar clamping nor flooring accumulates. Monthly from 31 January, it
-   * fires on 31 January, 28 February, 31 March, 30 April, and so on; every 1.5
-   * seconds from 0, it fires at 0, 1, 3, 4, 6 seconds, and so on.
+   * first is the first plus n times {@link #interval}, never the previous
+   * firing plus the interval. So calendar clamping does not accumulate. Monthly
+   * from 31 January, it fires on 31 January, 28 February, 31 March, 30 April,
+   * and so on.
    */
   public class TemporalRepeat extends Repeat {
 
@@ -674,8 +696,9 @@ public class TemporalSchedule extends Schedule implements Clock {
     /**
      * @throws IllegalArgumentException if {@code interval} is neither a
      *                                  {@link Period} nor a {@link Duration},
-     *                                  the amounts that can be multiplied, or
-     *                                  does not move time forward
+     *                                  the amounts that can be multiplied, does
+     *                                  not move time forward, or is a
+     *                                  {@link Duration} with a fractional second
      */
     TemporalRepeat(
       final Steppable event,
@@ -691,6 +714,9 @@ public class TemporalSchedule extends Schedule implements Clock {
         );
       }
       checkMovesTimeForward(interval);
+      if (interval instanceof final Duration duration) {
+        checkWholeSeconds(duration);
+      }
       this.interval = interval;
     }
 

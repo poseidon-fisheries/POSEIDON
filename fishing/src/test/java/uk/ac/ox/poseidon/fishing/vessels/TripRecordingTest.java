@@ -135,7 +135,7 @@ class TripRecordingTest {
   }
 
   @Test
-  void profitUsesTheFinalAccountAndTimeAtSeaIncludingFractionalSeconds() {
+  void profitUsesTheFinalAccountAndTimeAtSea() {
     final FishingTrip trip = trip(true);
     trip.getAccount().add(Money.of(CurrencyUnit.EUR, 120));
     final List<Double> profits = new ArrayList<>();
@@ -158,11 +158,11 @@ class TripRecordingTest {
     assertThat(profits).containsExactly(50.0);
 
     final Trip shortTrip = mock(Trip.class);
-    when(shortTrip.getTotalTimeAtSea()).thenReturn(Duration.ofMillis(500));
+    when(shortTrip.getTotalTimeAtSea()).thenReturn(Duration.ofSeconds(36));
     when(shortTrip.getAccount()).thenReturn(trip.getAccount());
     assertThat(
       profitPerHour().get(GLOBAL_SCOPE).apply(new TripEndEvent(shortTrip))
-    ).isEqualTo(720_000.0);
+    ).isEqualTo(10_000.0);
   }
 
   @Test

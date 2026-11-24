@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkWholeSeconds;
+
 import java.time.Duration;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -51,8 +53,10 @@ public class DurationFactory extends GlobalScopeFactory<Duration> {
 
   /**
    * @param duration the duration to decompose into days/hours/minutes/seconds
+   * @throws IllegalArgumentException if it has a fractional second
    */
   public DurationFactory(final Duration duration) {
+    checkWholeSeconds(duration);
     days = duration.toDaysPart();
     hours = duration.toHoursPart();
     minutes = duration.toMinutesPart();
@@ -63,6 +67,7 @@ public class DurationFactory extends GlobalScopeFactory<Duration> {
    * @param iso8601Duration an ISO-8601 duration string (e.g.
    *                        {@code "PT1H30M"}), as accepted by
    *                        {@link Duration#parse}
+   * @throws IllegalArgumentException if it has a fractional second
    */
   public DurationFactory(final String iso8601Duration) {
     this(Duration.parse(iso8601Duration));

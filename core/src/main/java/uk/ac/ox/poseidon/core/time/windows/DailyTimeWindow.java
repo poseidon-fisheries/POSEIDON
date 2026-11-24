@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.core.time.windows;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkWholeSeconds;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -66,21 +66,9 @@ public class DailyTimeWindow<C> implements TimeWindow<C> {
     final LocalTime end,
     final LocalDateTime dateTime
   ) {
-    checkArgument(
-      dateTime.getNano() == 0,
-      "The date-time %s has a fractional second.",
-      dateTime
-    );
-    checkArgument(
-      start.getNano() == 0,
-      "The start time %s has a fractional second.",
-      start
-    );
-    checkArgument(
-      end.getNano() == 0,
-      "The end time %s has a fractional second.",
-      end
-    );
+    checkWholeSeconds(dateTime);
+    checkWholeSeconds(start);
+    checkWholeSeconds(end);
     final LocalTime timeOfDay = dateTime.toLocalTime();
     final boolean open;
     if (start.equals(end)) {

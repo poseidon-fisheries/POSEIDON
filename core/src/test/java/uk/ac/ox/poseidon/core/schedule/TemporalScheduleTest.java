@@ -88,17 +88,66 @@ class TemporalScheduleTest {
   }
 
   @Test
-  void dropsFractionsOfASecond() {
+  void dropsFractionsOfASecondOfMasonTime() {
     assertThat(schedule.toDateTime(3_600.9)).isEqualTo(start.plusHours(1));
-    assertThat(
-      schedule.toTime(start.plusSeconds(1).plusNanos(500_000_000))
-    ).isEqualTo(1.0);
   }
 
   @Test
-  void floorsFractionsOfASecondBeforeTheStartInBothDirections() {
+  void rejectsADateTimeWithAFractionalSecondInToTime() {
+    assertThatThrownBy(() ->
+      schedule.toTime(start.plusSeconds(1).plusNanos(500_000_000))
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
+  }
+
+  @Test
+  void floorsFractionsOfASecondOfMasonTimeBeforeTheStart() {
     assertThat(schedule.toDateTime(-0.5)).isEqualTo(start.minusSeconds(1));
-    assertThat(schedule.toTime(start.minusNanos(500_000_000))).isEqualTo(-1.0);
+  }
+
+  @Test
+  void rejectsADateTimeWithAFractionalSecondBeforeTheStartInToTime() {
+    assertThatThrownBy(() -> schedule.toTime(start.minusNanos(500_000_000)))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
+  }
+
+  @Test
+  void rejectsAStartingDateTimeWithAFractionalSecond() {
+    assertThatThrownBy(() -> new TemporalSchedule(start.plusNanos(1)))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
+  }
+
+  @Test
+  void rejectsADateTimeWithAFractionalSecondInEveryDateTimeEntryPoint() {
+    final LocalDateTime fractional = start.plusSeconds(5).plusNanos(1);
+    assertThatThrownBy(() ->
+      schedule.scheduleOnce(fractional, recordFiring)
+    ).isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() ->
+      schedule.scheduleOnce(fractional, 0, recordFiring)
+    ).isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() ->
+      schedule.scheduleRepeating(
+        fractional,
+        recordFiring,
+        Duration.ofSeconds(1)
+      )
+    ).isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> schedule.stepUntil(simState, fractional))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
+    assertThat(schedule.now()).isEqualTo(start);
+  }
+
+  @Test
+  void rejectsSteppingForADurationWithAFractionalSecond() {
+    assertThatThrownBy(() ->
+      schedule.stepFor(simState, Duration.ofMillis(1_500))
+    ).isInstanceOf(IllegalArgumentException.class);
+    assertThat(schedule.now()).isEqualTo(start);
   }
 
   // --- The clock ---
@@ -299,6 +348,66 @@ class TemporalScheduleTest {
     );
     schedule.stepUntil(simState, start.plusDays(1));
     assertThat(firings).containsExactly(start.plusMinutes(90));
+  }
+
+  @Test
+  void rejectsADelayWithAFractionalSecondInBothOverloads() {
+    assertThatThrownBy(() ->
+      schedule.scheduleOnceIn(Duration.ofMillis(500), recordFiring)
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
+    assertThatThrownBy(() ->
+      schedule.scheduleOnceIn(Duration.ofMillis(-500), recordFiring, 1)
+    ).isInstanceOf(IllegalArgumentException.class);
+    assertThat(schedule.asMap()).isEmpty();
+  }
+
+  @Test
+  void acceptsAWholeSecondDelayIncludingZero() {
+    schedule.scheduleOnceIn(Duration.ZERO, recordFiring);
+    schedule.scheduleOnceIn(Duration.ofSeconds(2), recordFiring, 1);
+    schedule.stepUntil(simState, start.plusSeconds(3));
+    assertThat(firings).containsExactly(start, start.plusSeconds(2));
+  }
+
+  @Test
+  void stillRunsEventsScheduledForTheCurrentInstantWithinIt() {
+    schedule.scheduleOnce(start.plusSeconds(1), _ -> {
+      schedule.scheduleOnceIn(
+        Duration.ZERO,
+        (Steppable) _ -> {
+          firings.add(schedule.now());
+          schedule.scheduleOnce(schedule.now(), recordFiring);
+        }
+      );
+    });
+    schedule.stepUntil(simState, start.plusSeconds(2));
+    assertThat(firings).containsExactly(
+      start.plusSeconds(1),
+      start.plusSeconds(1)
+    );
+  }
+
+  @Test
+  void failsWhenALiveTaskDurationBecomesFractionalOnALaterStep() {
+    final Duration[] live = { Duration.ofSeconds(10) };
+    final Steppable task = new Steppable() {
+      @Override
+      public void step(final SimState state) {
+        firings.add(schedule.now());
+        schedule.scheduleOnceIn(live[0], this);
+      }
+    };
+    schedule.scheduleOnce(start, task);
+    schedule.stepUntil(simState, start.plusSeconds(11));
+    assertThat(firings).containsExactly(start, start.plusSeconds(10));
+    live[0] = Duration.ofMillis(500);
+    assertThatThrownBy(() ->
+      schedule.stepUntil(simState, start.plusSeconds(30))
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
   }
 
   @Test
@@ -605,16 +714,16 @@ class TemporalScheduleTest {
   }
 
   @Test
-  void repeatsAFractionalDurationAtItsAveragePace() {
-    schedule.scheduleRepeating(start, recordFiring, Duration.ofMillis(1_500));
-    schedule.stepUntil(simState, start.plusSeconds(7));
-    assertThat(firings).containsExactly(
-      start,
-      start.plusSeconds(1),
-      start.plusSeconds(3),
-      start.plusSeconds(4),
-      start.plusSeconds(6)
-    );
+  void refusesARepeatIntervalWithAFractionalSecond() {
+    assertThatThrownBy(() ->
+      schedule.scheduleRepeating(start, recordFiring, Duration.ofMillis(1_500))
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
+    assertThatThrownBy(() ->
+      schedule.scheduleRepeating(start, recordFiring, Duration.ofMillis(500))
+    ).isInstanceOf(IllegalArgumentException.class);
+    assertThat(schedule.asMap()).isEmpty();
   }
 
   @Test
@@ -774,6 +883,18 @@ class TemporalScheduleTest {
     );
     schedule.stepUntil(simState, start.plusDays(2));
     assertThat(runs).containsExactly("first", "second");
+  }
+
+  @Test
+  void refusesAnEntryWithAFractionalSecondEvenWhenDatedBeforeNow() {
+    schedule.stepUntil(simState, start.plusDays(10));
+    assertThatThrownBy(() ->
+      schedule.scheduleByDateTime(
+        List.of(entry(start.plusDays(2).plusNanos(1), recordFiring))
+      )
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
   }
 
   // --- Finishing, killing and resetting ---

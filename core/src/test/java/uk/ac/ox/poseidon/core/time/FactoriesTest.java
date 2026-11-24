@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.time;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.time.Factories.date;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
@@ -108,6 +109,28 @@ class FactoriesTest {
   }
 
   @Test
+  void aDateTimeWithAFractionalSecondIsRefused() {
+    assertThatThrownBy(() -> dateTime(LocalDateTime.of(2025, 6, 1, 7, 8, 9, 1)))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
+  }
+
+  @Test
+  void aDurationWithAFractionalSecondIsRefusedFromADurationOrAString() {
+    assertThatThrownBy(() -> new DurationFactory("PT0.5S"))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
+    assertThatThrownBy(() -> new DurationFactory(Duration.ofNanos(1)))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
+    assertThat(new DurationFactory("PT1M30S").get(GLOBAL_SCOPE)).isEqualTo(
+      Duration.ofSeconds(90)
+    );
+    assertThat(
+      new DurationFactory(Duration.ofSeconds(90)).get(GLOBAL_SCOPE)
+    ).isEqualTo(Duration.ofSeconds(90));
+  }
+
   void startOfIsMidnightOfTheGivenDate() {
     assertThat(startOf(LocalDate.of(2020, 2, 3)).get(GLOBAL_SCOPE)).isEqualTo(
       LocalDateTime.of(2020, 2, 3, 0, 0)

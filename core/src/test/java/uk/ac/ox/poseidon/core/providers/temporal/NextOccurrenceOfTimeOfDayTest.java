@@ -56,6 +56,18 @@ class NextOccurrenceOfTimeOfDayTest {
   }
 
   @Test
+  void refusesATimeOfDayWithAFractionalSecond() {
+    assertThatThrownBy(() ->
+      new NextOccurrenceOfTimeOfDay<>(
+        context -> null,
+        new LocalTime[] { LocalTime.of(6, 0), LocalTime.of(7, 0, 0, 1) }
+      )
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("fractional");
+  }
+
+  @Test
   void picksTheNextTimeLaterTheSameDay() {
     assertThat(
       nextOccurrenceAfter(
