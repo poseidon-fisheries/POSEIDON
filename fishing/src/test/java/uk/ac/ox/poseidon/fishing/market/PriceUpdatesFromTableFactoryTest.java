@@ -63,7 +63,7 @@ class PriceUpdatesFromTableFactoryTest {
   void setUp() {
     when(simulation.getTemporalSchedule()).thenReturn(schedule);
     when(simulation.getProductStore()).thenReturn(new ProductStore());
-    when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 0, 0));
+    when(schedule.now()).thenReturn(LocalDateTime.of(2026, 1, 1, 0, 0));
   }
 
   @Test

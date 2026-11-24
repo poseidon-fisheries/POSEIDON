@@ -149,7 +149,7 @@ components:
       portGrid: *id006
     portGrid: *id006
   initialPrices: !!uk.ac.ox.poseidon.fishing.market.InitialPricesFactory
-    currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+    currentDateTime: !!uk.ac.ox.poseidon.core.NowFactory {
       }
     marketPrices:
     - !!uk.ac.ox.poseidon.fishing.market.UniformMarketPricesFactory
@@ -226,21 +226,21 @@ components:
                             }
                         referenceDateTime: !!uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory
                           value: !!uk.ac.ox.poseidon.fishing.vessels.values.CurrentPortStayStartDateTimeFactory
-                            currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+                            currentDateTime: !!uk.ac.ox.poseidon.core.NowFactory {
                               }
                   subject: !!uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory
-                    value: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+                    value: !!uk.ac.ox.poseidon.core.NowFactory {
                       }
             - !!uk.ac.ox.poseidon.fishing.tasks.general.WaitForFactory
               duration: !!uk.ac.ox.poseidon.core.providers.temporal.DurationBetweenFactory
                 endDateTime: *id011
-                startDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+                startDateTime: !!uk.ac.ox.poseidon.core.NowFactory {
                   }
           - !!uk.ac.ox.poseidon.fishing.tasks.general.SucceedOrWaitFactory
             mainTask: !!uk.ac.ox.poseidon.fishing.vessels.FishingTripBlockFactory
               children:
               - &id019 !!uk.ac.ox.poseidon.fishing.tasks.travel.TravelAlongPathFactory
-                currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+                currentDateTime: !!uk.ac.ox.poseidon.core.NowFactory {
                   }
                 destination: !!uk.ac.ox.poseidon.fishing.vessels.values.CurrentTripDestinationFactory {
                   }
@@ -279,7 +279,7 @@ components:
                 child: !!uk.ac.ox.poseidon.fishing.tasks.branches.SequenceTaskFactory
                   children:
                   - !!uk.ac.ox.poseidon.fishing.tasks.fishing.FishingFactory
-                    currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+                    currentDateTime: !!uk.ac.ox.poseidon.core.NowFactory {
                       }
                     dispositionProcess: !!uk.ac.ox.poseidon.fishing.catches.disposition.ProportionallyLimitingBiomassToHoldFactory {
                       }
@@ -346,16 +346,16 @@ components:
                                   }
                               subject: !!uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory
                                 value: !!uk.ac.ox.poseidon.fishing.vessels.values.CurrentTimeAtSeaFactory
-                                  currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+                                  currentDateTime: !!uk.ac.ox.poseidon.core.NowFactory {
                                     }
               - !!uk.ac.ox.poseidon.fishing.tasks.travel.SetDestinationToOriginFactory {
                 }
               - *id019
               - !!uk.ac.ox.poseidon.fishing.tasks.travel.DockAtDestinationFactory
-                currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+                currentDateTime: !!uk.ac.ox.poseidon.core.NowFactory {
                   }
               - !!uk.ac.ox.poseidon.fishing.tasks.landings.LandCatchesFactory
-                currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+                currentDateTime: !!uk.ac.ox.poseidon.core.NowFactory {
                   }
                 duration: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory
                   object: !!uk.ac.ox.poseidon.core.time.DurationFactory {
@@ -380,7 +380,7 @@ components:
                     pumpRateInLitresPerMinute: 200.0
                   portGrid: *id006
                 fuelTank: *id014
-              currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+              currentDateTime: !!uk.ac.ox.poseidon.core.NowFactory {
                 }
               initialDestination: !!uk.ac.ox.poseidon.fishing.choices.EpsilonGreedyPickerFactory
                 epsilon: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory

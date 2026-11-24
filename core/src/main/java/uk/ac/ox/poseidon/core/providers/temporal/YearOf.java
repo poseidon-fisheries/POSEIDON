@@ -24,22 +24,21 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 
 import java.time.LocalDateTime;
 import java.util.function.Function;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 /**
- * A value that is the simulation's current date-time, whatever the context,
- * read live from the {@link TemporalSchedule} on every call; it throws once the
- * schedule has run out of events ({@link HasDateTime} says whether it has).
- * Built via {@link Factories#currentDateTime()} in this package.
+ * A value that is the year of a date-time, read from it anew on every call. Built via
+ * {@link Factories#yearOf(uk.ac.ox.poseidon.core.ValueFactory)} in this
+ * package.
  */
 @RequiredArgsConstructor
-public class CurrentDateTime implements Function<Object, LocalDateTime> {
+public class YearOf<C> implements Function<C, Integer> {
 
-  private final TemporalSchedule temporalSchedule;
+  private final @NonNull Function<? super C, ? extends LocalDateTime> dateTime;
 
   @Override
-  public LocalDateTime apply(final Object context) {
-    return temporalSchedule.getDateTime();
+  public Integer apply(final C context) {
+    return dateTime.apply(context).getYear();
   }
 }

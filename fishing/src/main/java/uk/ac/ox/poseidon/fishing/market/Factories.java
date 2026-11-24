@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.fishing.market;
 
 import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.now;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -94,7 +94,7 @@ public final class Factories {
   ) {
     return new HomePortCatchValuationFactory(
       catchCategoriser,
-      currentDateTime(),
+      now(),
       marketGrid
     );
   }
@@ -112,10 +112,7 @@ public final class Factories {
       ? extends List<MarketPrice>
     >... marketPrices
   ) {
-    return new InitialPricesFactory(
-      ImmutableList.copyOf(marketPrices),
-      currentDateTime()
-    );
+    return new InitialPricesFactory(ImmutableList.copyOf(marketPrices), now());
   }
 
   /**

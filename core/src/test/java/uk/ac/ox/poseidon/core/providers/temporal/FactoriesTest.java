@@ -24,17 +24,21 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDate;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDayOfWeek;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentTime;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentYear;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.clock;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.dateOf;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.dateTimeAfter;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.dateTimeBefore;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.dayOfWeek;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.dayOfWeekOf;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.durationBetween;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.hasDateTime;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.nextOccurrenceAfter;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.now;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.startingDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.thisYear;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.timeOfDay;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.timeOfDayOf;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.today;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.yearOf;
 import static uk.ac.ox.poseidon.core.time.Factories.duration;
 import static uk.ac.ox.poseidon.core.time.Factories.period;
 import static uk.ac.ox.poseidon.core.time.Factories.time;
@@ -85,32 +89,30 @@ class FactoriesTest {
   private final SimulationScope scope = new SimulationScope(simulation);
 
   @Test
-  void currentDateTimeIsTheSimulationsClock() {
-    assertThat(currentDateTime().get(scope).apply(null)).isEqualTo(START);
+  void nowIsTheSimulationsClock() {
+    assertThat(now().get(scope).apply(null)).isEqualTo(START);
   }
 
   @Test
-  void currentDateIsTheClockDate() {
-    assertThat(currentDate().get(scope).apply(null)).isEqualTo(
-      START.toLocalDate()
-    );
+  void todayIsTheClockDate() {
+    assertThat(today().get(scope).apply(null)).isEqualTo(START.toLocalDate());
   }
 
   @Test
-  void currentTimeIsTheClockTimeOfDay() {
-    assertThat(currentTime().get(scope).apply(null)).isEqualTo(
+  void timeOfDayIsTheClockTimeOfDay() {
+    assertThat(timeOfDay().get(scope).apply(null)).isEqualTo(
       START.toLocalTime()
     );
   }
 
   @Test
-  void currentYearIsTheClockYear() {
-    assertThat(currentYear().get(scope).apply(null)).isEqualTo(START.getYear());
+  void thisYearIsTheClockYear() {
+    assertThat(thisYear().get(scope).apply(null)).isEqualTo(START.getYear());
   }
 
   @Test
-  void currentDayOfWeekIsTheClockDayOfWeek() {
-    assertThat(currentDayOfWeek().get(scope).apply(null)).isEqualTo(
+  void dayOfWeekIsTheClockDayOfWeek() {
+    assertThat(dayOfWeek().get(scope).apply(null)).isEqualTo(
       START.getDayOfWeek()
     );
   }
@@ -121,8 +123,24 @@ class FactoriesTest {
   }
 
   @Test
-  void hasDateTimeIsTrueWhileTheClockHasOne() {
-    assertThat(hasDateTime().get(scope).apply(null)).isTrue();
+  void theClockIsTheSimulationsSchedule() {
+    assertThat(clock().get(scope)).isSameAs(simulation.getTemporalSchedule());
+  }
+
+  @Test
+  void theExtractorsTakeAnyDateTime() {
+    assertThat(dateOf(REFERENCE_FACTORY).get(scope).apply(null)).isEqualTo(
+      REFERENCE.toLocalDate()
+    );
+    assertThat(yearOf(REFERENCE_FACTORY).get(scope).apply(null)).isEqualTo(
+      2025
+    );
+    assertThat(timeOfDayOf(REFERENCE_FACTORY).get(scope).apply(null)).isEqualTo(
+      REFERENCE.toLocalTime()
+    );
+    assertThat(dayOfWeekOf(REFERENCE_FACTORY).get(scope).apply(null)).isEqualTo(
+      REFERENCE.getDayOfWeek()
+    );
   }
 
   @Test
@@ -143,9 +161,7 @@ class FactoriesTest {
   @Test
   void durationBetweenIsTheTimeFromTheStartToTheEnd() {
     assertThat(
-      durationBetween(currentDateTime(), REFERENCE_FACTORY)
-        .get(scope)
-        .apply(null)
+      durationBetween(now(), REFERENCE_FACTORY).get(scope).apply(null)
     ).isEqualTo(Duration.between(START, REFERENCE));
   }
 

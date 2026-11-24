@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.tasks.travel;
 
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.now;
 
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
@@ -105,7 +105,7 @@ public final class Factories {
       distance,
       destination,
       eventManager,
-      currentDateTime()
+      now()
     );
   }
 
@@ -125,12 +125,7 @@ public final class Factories {
       ? extends DistanceCalculator
     > distance
   ) {
-    return new TravelDirectlyFactory(
-      engine,
-      fuelTank,
-      distance,
-      currentDateTime()
-    );
+    return new TravelDirectlyFactory(engine, fuelTank, distance, now());
   }
 
   /**
@@ -148,7 +143,7 @@ public final class Factories {
    * @see DockAtDestination
    */
   public static DockAtDestinationFactory dockAtDestination() {
-    return new DockAtDestinationFactory(currentDateTime());
+    return new DockAtDestinationFactory(now());
   }
 
   /**
@@ -157,6 +152,6 @@ public final class Factories {
    * @see Undock
    */
   public static UndockFactory undock() {
-    return new UndockFactory(currentDateTime());
+    return new UndockFactory(now());
   }
 }

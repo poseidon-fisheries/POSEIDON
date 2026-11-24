@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,28 +20,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.temporal;
+package uk.ac.ox.poseidon.core;
+
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.clock;
 
 import java.time.LocalDateTime;
 import java.util.function.Function;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.providers.temporal.Now;
 
 /**
- * A value that is the simulation's current calendar year, read from the current
- * date-time on every call. Built via {@link Factories#currentYear()} in this
- * package.
+ * A {@link ValueFactory} for a {@link Now}: the present date-time, read from
+ * the simulation's clock. Built via
+ * {@link uk.ac.ox.poseidon.core.providers.temporal.Factories#now()}.
  */
-@RequiredArgsConstructor
-public class CurrentYear<C> implements Function<C, Integer> {
-
-  private final @NonNull Function<
-    ? super C,
-    ? extends LocalDateTime
-  > currentDateTime;
+@ToString
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
+public class NowFactory
+  extends SimulationScopeFactory<Function<Object, LocalDateTime>>
+  implements ValueFactory<SimulationScope, Object, LocalDateTime>
+{
 
   @Override
-  public Integer apply(final C context) {
-    return currentDateTime.apply(context).getYear();
+  protected Function<Object, LocalDateTime> newInstance(
+    final SimulationScope scope
+  ) {
+    return new Now(clock().get(scope));
   }
 }

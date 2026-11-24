@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.tasks.fishing;
 
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.now;
 
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
@@ -60,11 +60,7 @@ public final class Factories {
       ? extends Regulations<? super ExtendedFishingAction>
     > regulations
   ) {
-    return new CheckIfFishingHereAndNowIsLegalFactory(
-      gear,
-      regulations,
-      currentDateTime()
-    );
+    return new CheckIfFishingHereAndNowIsLegalFactory(gear, regulations, now());
   }
 
   /**
@@ -120,7 +116,7 @@ public final class Factories {
       fuelTank,
       fisheable,
       dispositionProcess,
-      currentDateTime()
+      now()
     );
   }
 }

@@ -105,7 +105,7 @@ class SimulationTest {
   void stepForAdvancesTheScheduleByTheAmountGiven() {
     simulation.stepFor(Period.ofDays(3));
 
-    assertThat(simulation.getTemporalSchedule().getDateTime()).isEqualTo(
+    assertThat(simulation.getTemporalSchedule().now()).isEqualTo(
       LocalDateTime.of(2000, 1, 4, 0, 0)
     );
   }

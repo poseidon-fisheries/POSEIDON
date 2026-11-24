@@ -138,14 +138,14 @@ class VoyageHomeTest {
 
     private Status setOff() {
       destination = getVessel().getHomePort().orElseThrow();
-      getVessel().undock(schedule.getDateTime());
+      getVessel().undock(schedule.now());
       log.add("travel home to " + destination.getCode());
       return runFor(ofHours(3));
     }
 
     private Status arrive() {
       getVessel().setCurrentCell(portGrid.getCell(destination));
-      getVessel().dockAt(destination, schedule.getDateTime());
+      getVessel().dockAt(destination, schedule.now());
       log.add("arrive at " + destination.getCode());
       return Status.SUCCEEDED;
     }

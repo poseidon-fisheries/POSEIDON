@@ -28,11 +28,13 @@ import com.google.common.collect.ImmutableList;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAmount;
-import uk.ac.ox.poseidon.core.CurrentDateTimeFactory;
+import uk.ac.ox.poseidon.core.Clock;
+import uk.ac.ox.poseidon.core.ClockFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.HasDateTimeFactory;
 import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.NowFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.StartingDateTimeFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.functions.MappingAsValueFactory;
@@ -41,9 +43,8 @@ import uk.ac.ox.poseidon.core.time.DurationFactory;
 import uk.ac.ox.poseidon.core.time.PeriodFactory;
 
 /**
- * Factories for values that read the simulation's current or upcoming date/time
- * from its {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}, and for
- * the temporal arithmetic over such values.
+ * Factories for values that read the simulation's clock, and for the temporal
+ * arithmetic over date-time values.
  */
 @SuppressWarnings({ "varargs", "overloads" })
 public final class Factories {
@@ -51,39 +52,84 @@ public final class Factories {
   private Factories() {}
 
   /**
-   * @return a {@link ValueFactory} for a
-   *         {@link CurrentDate}
-   * @see CurrentDate
+   * @return a {@link ClockFactory} for the simulation's {@link Clock}, which
+   *         components hold to read the present
+   * @see ClockFactory
    */
-  public static <C> CurrentDateFactory<C> currentDate() {
-    return new CurrentDateFactory<>(currentDateTime());
+  public static ClockFactory clock() {
+    return new ClockFactory();
   }
 
   /**
-   * @return a {@link ValueFactory} for a
-   *         {@link CurrentYear}
-   * @see CurrentYear
+   * @return a {@link ValueFactory} for a {@link Now}: the present date-time
+   * @see Now
    */
-  public static <C> CurrentYearFactory<C> currentYear() {
-    return new CurrentYearFactory<>(currentDateTime());
+  public static NowFactory now() {
+    return new NowFactory();
   }
 
   /**
-   * @return a {@link ValueFactory} for a
-   *         {@link CurrentDateTime}
-   * @see CurrentDateTime
+   * @param dateTime the date-time to take the date of
+   * @return a {@link ValueFactory} for a {@link DateOf}
+   * @see DateOf
    */
-  public static CurrentDateTimeFactory currentDateTime() {
-    return new CurrentDateTimeFactory();
+  public static <S extends Scope, C> DateOfFactory<S, C> dateOf(
+    final ValueFactory<? super S, ? super C, LocalDateTime> dateTime
+  ) {
+    return new DateOfFactory<>(dateTime);
   }
 
   /**
-   * @return a {@link ValueFactory} for a {@link HasDateTime}: whether the
-   *         simulation's clock has a date-time
-   * @see HasDateTime
+   * @param dateTime the date-time to take the year of
+   * @return a {@link ValueFactory} for a {@link YearOf}
+   * @see YearOf
    */
-  public static HasDateTimeFactory hasDateTime() {
-    return new HasDateTimeFactory();
+  public static <S extends Scope, C> YearOfFactory<S, C> yearOf(
+    final ValueFactory<? super S, ? super C, LocalDateTime> dateTime
+  ) {
+    return new YearOfFactory<>(dateTime);
+  }
+
+  /**
+   * @param dateTime the date-time to take the time of day of
+   * @return a {@link ValueFactory} for a {@link TimeOfDayOf}
+   * @see TimeOfDayOf
+   */
+  public static <S extends Scope, C> TimeOfDayOfFactory<S, C> timeOfDayOf(
+    final ValueFactory<? super S, ? super C, LocalDateTime> dateTime
+  ) {
+    return new TimeOfDayOfFactory<>(dateTime);
+  }
+
+  /**
+   * @param dateTime the date-time to take the day of the week of
+   * @return a {@link ValueFactory} for a {@link DayOfWeekOf}
+   * @see DayOfWeekOf
+   */
+  public static <S extends Scope, C> DayOfWeekOfFactory<S, C> dayOfWeekOf(
+    final ValueFactory<? super S, ? super C, LocalDateTime> dateTime
+  ) {
+    return new DayOfWeekOfFactory<>(dateTime);
+  }
+
+  /** @return the date of {@link #now()} */
+  public static <C> DateOfFactory<SimulationScope, C> today() {
+    return dateOf(now());
+  }
+
+  /** @return the year of {@link #now()} */
+  public static <C> YearOfFactory<SimulationScope, C> thisYear() {
+    return yearOf(now());
+  }
+
+  /** @return the time of day of {@link #now()} */
+  public static <C> TimeOfDayOfFactory<SimulationScope, C> timeOfDay() {
+    return timeOfDayOf(now());
+  }
+
+  /** @return the day of the week of {@link #now()} */
+  public static <C> DayOfWeekOfFactory<SimulationScope, C> dayOfWeek() {
+    return dayOfWeekOf(now());
   }
 
   /**
@@ -93,24 +139,6 @@ public final class Factories {
    */
   public static StartingDateTimeFactory startingDateTime() {
     return new StartingDateTimeFactory();
-  }
-
-  /**
-   * @return a {@link ValueFactory} for a
-   *         {@link CurrentDayOfWeek}
-   * @see CurrentDayOfWeek
-   */
-  public static <C> CurrentDayOfWeekFactory<C> currentDayOfWeek() {
-    return new CurrentDayOfWeekFactory<>(currentDateTime());
-  }
-
-  /**
-   * @return a {@link ValueFactory} for a
-   *         {@link CurrentTime}
-   * @see CurrentTime
-   */
-  public static <C> CurrentTimeFactory<C> currentTime() {
-    return new CurrentTimeFactory<>(currentDateTime());
   }
 
   /**

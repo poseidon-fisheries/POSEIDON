@@ -42,8 +42,6 @@ public class PriceUpdate implements Steppable {
   @Override
   @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
   public void step(final SimState simState) {
-    marketPrice.apply(
-      ((Simulation) simState).getTemporalSchedule().getDateTime()
-    );
+    marketPrice.apply(((Simulation) simState).getTemporalSchedule().now());
   }
 }

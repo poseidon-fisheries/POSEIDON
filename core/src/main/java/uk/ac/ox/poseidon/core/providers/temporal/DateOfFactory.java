@@ -22,27 +22,36 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.function.Function;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A value that is the simulation's current time of day, read from the current
- * date-time on every call. Built via {@link Factories#currentTime()} in this
- * package.
+ * A {@link RelativeScopeFactory} counterpart of {@link DateOf}, built via
+ * {@link Factories#dateOf(ValueFactory)}.
  */
-@RequiredArgsConstructor
-public class CurrentTime<C> implements Function<C, LocalTime> {
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
+public class DateOfFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, LocalDate>>
+  implements ValueFactory<S, C, LocalDate>
+{
 
-  private final @NonNull Function<
-    ? super C,
-    ? extends LocalDateTime
-  > currentDateTime;
+  private final ValueFactory<? super S, ? super C, LocalDateTime> dateTime;
 
   @Override
-  public LocalTime apply(final C context) {
-    return currentDateTime.apply(context).toLocalTime();
+  protected Function<C, LocalDate> newInstance(final S scope) {
+    return new DateOf<>(dateTime.get(scope));
   }
 }

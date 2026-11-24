@@ -25,37 +25,21 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.function.Function;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.SimulationScope;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.ValueFactory;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link CurrentDate}, built
- * via {@link Factories#currentDate()}.
+ * A value that is the date of a date-time, read from it anew on every call. Built via
+ * {@link Factories#dateOf(uk.ac.ox.poseidon.core.ValueFactory)} in this
+ * package.
  */
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder(toBuilder = true)
-public class CurrentDateFactory<C>
-  extends SimulationScopeFactory<Function<C, LocalDate>>
-  implements ValueFactory<SimulationScope, C, LocalDate>
-{
+@RequiredArgsConstructor
+public class DateOf<C> implements Function<C, LocalDate> {
 
-  private final ValueFactory<
-    ? super SimulationScope,
-    ? super C,
-    LocalDateTime
-  > currentDateTime;
+  private final @NonNull Function<? super C, ? extends LocalDateTime> dateTime;
 
   @Override
-  protected Function<C, LocalDate> newInstance(final SimulationScope scope) {
-    return new CurrentDate<>(currentDateTime.get(scope));
+  public LocalDate apply(final C context) {
+    return dateTime.apply(context).toLocalDate();
   }
 }

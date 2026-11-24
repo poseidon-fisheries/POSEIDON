@@ -30,32 +30,28 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.SimulationScope;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link CurrentTime}, built
- * via {@link Factories#currentTime()}.
+ * A {@link RelativeScopeFactory} counterpart of {@link TimeOfDayOf}, built via
+ * {@link Factories#timeOfDayOf(ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class CurrentTimeFactory<C>
-  extends SimulationScopeFactory<Function<C, LocalTime>>
-  implements ValueFactory<SimulationScope, C, LocalTime>
+public class TimeOfDayOfFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, LocalTime>>
+  implements ValueFactory<S, C, LocalTime>
 {
 
-  private final ValueFactory<
-    ? super SimulationScope,
-    ? super C,
-    LocalDateTime
-  > currentDateTime;
+  private final ValueFactory<? super S, ? super C, LocalDateTime> dateTime;
 
   @Override
-  protected Function<C, LocalTime> newInstance(final SimulationScope scope) {
-    return new CurrentTime<>(currentDateTime.get(scope));
+  protected Function<C, LocalTime> newInstance(final S scope) {
+    return new TimeOfDayOf<>(dateTime.get(scope));
   }
 }

@@ -101,17 +101,11 @@ public class QuickRunner implements Runnable {
   ) {
     final Simulation simulation = scenario.startNewSimulation();
     final TemporalSchedule schedule = simulation.getTemporalSchedule();
-    logger.log(
-      INFO,
-      () -> "Simulation started (" + schedule.getDateTime() + ")"
-    );
+    logger.log(INFO, () -> "Simulation started (" + schedule.now() + ")");
     final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
     temporalSchedule.stepFor(simulation, temporalAmount);
     simulation.finish();
-    logger.log(
-      INFO,
-      () -> "Simulation completed (" + schedule.getDateTime() + ")"
-    );
+    logger.log(INFO, () -> "Simulation completed (" + schedule.now() + ")");
   }
 
   /**

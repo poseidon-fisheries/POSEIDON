@@ -30,7 +30,7 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * A {@link SimulationScopeFactory} for the date-time the simulation's clock
- * starts at. With {@link CurrentDateTimeFactory}, it is the clock that
+ * starts at. With {@link NowFactory}, it is the clock that
  * factories take as an input rather than reading the simulation's schedule.
  * Built via
  * {@link uk.ac.ox.poseidon.core.providers.temporal.Factories#startingDateTime()}.

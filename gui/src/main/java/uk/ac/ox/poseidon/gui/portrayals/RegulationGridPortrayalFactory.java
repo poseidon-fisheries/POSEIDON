@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.gui.portrayals;
 
 import static java.time.temporal.ChronoField.*;
 import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
-import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toSupplier;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.clock;
 import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_DAY;
 
 import java.awt.*;
@@ -35,7 +35,6 @@ import java.time.temporal.TemporalField;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import javax.imageio.ImageIO;
 import lombok.*;
 import lombok.Getter;
@@ -45,6 +44,7 @@ import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
+import uk.ac.ox.poseidon.core.Clock;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -93,16 +93,6 @@ public class RegulationGridPortrayalFactory
     ? super SimulationScope,
     ? extends BathymetricGrid
   > bathymetric;
-  private final ValueFactory<
-    ? super SimulationScope,
-    ? super Void,
-    LocalDateTime
-  > currentDateTime;
-  private final ValueFactory<
-    ? super SimulationScope,
-    ? super Void,
-    Boolean
-  > hasDateTime;
   private final int displayWidth;
   private final int displayHeight;
 
@@ -114,8 +104,7 @@ public class RegulationGridPortrayalFactory
   protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
     return new Portrayal(
       gear,
-      toSupplier(currentDateTime.get(scope)),
-      toSupplier(hasDateTime.get(scope)),
+      clock().get(scope),
       regulations.get(scope),
       vesselField.get(scope),
       fleet.get(scope),
@@ -155,8 +144,7 @@ public class RegulationGridPortrayalFactory
     }
 
     private final VesselComponent<? extends Gear> gear;
-    private final Supplier<LocalDateTime> currentDateTime;
-    private final Supplier<Boolean> hasDateTime;
+    private final Clock clock;
     private final Regulations<? super ExtendedFishingAction> regulations;
     private final VesselField vesselField;
     private final Function<? super Vessel, Boolean> fleet;
@@ -167,8 +155,7 @@ public class RegulationGridPortrayalFactory
 
     Portrayal(
       final VesselComponent<? extends Gear> gear,
-      final Supplier<LocalDateTime> currentDateTime,
-      final Supplier<Boolean> hasDateTime,
+      final Clock clock,
       final Regulations<? super ExtendedFishingAction> regulations,
       final VesselField vesselField,
       final Function<? super Vessel, Boolean> fleet,
@@ -186,8 +173,7 @@ public class RegulationGridPortrayalFactory
       final int gridWidth = bathymetricGrid.getModelGrid().getGridWidth();
       final int gridHeight = bathymetricGrid.getModelGrid().getGridHeight();
       this.grid = new ObjectGrid2D(gridWidth, gridHeight);
-      this.currentDateTime = currentDateTime;
-      this.hasDateTime = hasDateTime;
+      this.clock = clock;
       this.updateFrequency = updateFrequency;
       setField(grid);
 
@@ -206,21 +192,19 @@ public class RegulationGridPortrayalFactory
       final Graphics2D graphics,
       final DrawInfo2D info
     ) {
-      if (hasDateTime.get()) {
-        final long currentFieldValue = currentDateTime
-          .get()
-          .toLocalDate()
-          .getLong(updateFrequency.field);
-        if (currentFieldValue != lastUpdated) {
-          updateGrid();
-          lastUpdated = currentFieldValue;
-        }
+      final long currentFieldValue = clock
+        .now()
+        .toLocalDate()
+        .getLong(updateFrequency.field);
+      if (currentFieldValue != lastUpdated) {
+        updateGrid();
+        lastUpdated = currentFieldValue;
       }
       super.draw(object, graphics, info);
     }
 
     void updateGrid() {
-      final LocalDateTime dateTime = currentDateTime.get();
+      final LocalDateTime dateTime = clock.now();
       final List<Vessel> fleetVessels = bagToStream(
         vesselField.getField().allObjects,
         Vessel.class

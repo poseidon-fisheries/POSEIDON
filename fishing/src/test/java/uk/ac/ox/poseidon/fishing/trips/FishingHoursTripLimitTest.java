@@ -27,8 +27,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.core.functions.Factories.combinedDuration;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.dateTimeAfter;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.now;
 import static uk.ac.ox.poseidon.core.time.Factories.duration;
 import static uk.ac.ox.poseidon.core.time.Factories.time;
 import static uk.ac.ox.poseidon.core.time.windows.Factories.dailyTimeWindow;
@@ -122,7 +122,7 @@ class FishingHoursTripLimitTest {
     return combinedDuration(
       travelTimeToCell,
       durationUntilTimeWindowOpens(
-        dateTimeAfter(currentDateTime(), travelTimeToCell),
+        dateTimeAfter(now(), travelTimeToCell),
         dailyTimeWindow(time(20, 0, 0), time(6, 0, 0))
       ),
       always(duration(0, 1, 0, 0)),

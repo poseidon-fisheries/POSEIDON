@@ -84,7 +84,7 @@ class VesselTest {
 
     @Override
     public Status execute() {
-      stepDateTimes.add(schedule.getDateTime());
+      stepDateTimes.add(schedule.now());
       vesselsRead.add(getVessel());
       return getStatus() == Status.RUNNING
         ? Status.SUCCEEDED

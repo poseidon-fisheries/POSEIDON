@@ -52,8 +52,7 @@ class TemporalScheduleTest {
   private final TemporalSchedule schedule = new TemporalSchedule(start);
   private final SimState simState = new SimState(0, schedule) {};
   private final List<LocalDateTime> firings = new ArrayList<>();
-  private final Steppable recordFiring = _ ->
-    firings.add(schedule.getDateTime());
+  private final Steppable recordFiring = _ -> firings.add(schedule.now());
   private final List<String> runs = new ArrayList<>();
 
   private static LocalDateTime dateTime(
@@ -106,8 +105,7 @@ class TemporalScheduleTest {
 
   @Test
   void givesTheStartingDateTimeBeforeTheFirstStep() {
-    assertThat(schedule.hasDateTime()).isTrue();
-    assertThat(schedule.getDateTime()).isEqualTo(start);
+    assertThat(schedule.now()).isEqualTo(start);
     assertThat(schedule.getTime()).isEqualTo(0.0);
   }
 
@@ -117,7 +115,6 @@ class TemporalScheduleTest {
     schedule.scheduleOnce(dateTime, recordFiring);
     schedule.step(simState);
     assertThat(firings).containsExactly(dateTime);
-    assertThat(schedule.getDate()).isEqualTo(dateTime.toLocalDate());
   }
 
   @Test
@@ -143,16 +140,19 @@ class TemporalScheduleTest {
   }
 
   @Test
-  void hasNoDateTimeOnceMasonHasRunOutOfEvents() {
+  void staysAtTheLastEventOnceMasonHasRunOutOfEvents() {
+    schedule.scheduleOnce(start.plusHours(3), recordFiring);
     schedule.step(simState);
-    assertThat(schedule.getTime()).isEqualTo(Schedule.AFTER_SIMULATION);
-    assertThat(schedule.hasDateTime()).isFalse();
-    assertThat(schedule.getTimestamp()).isEqualTo(
-      TemporalSchedule.AFTER_SIMULATION_STRING
-    );
-    assertThatThrownBy(schedule::getDateTime).isInstanceOf(
-      IllegalStateException.class
-    );
+    schedule.step(simState);
+    assertThat(schedule.now()).isEqualTo(start.plusHours(3));
+    assertThat(schedule.getTime()).isEqualTo(10_800.0);
+    assertThat(schedule.getTimestamp()).isEqualTo("2013-01-01 03:00");
+  }
+
+  @Test
+  void staysAtTheStartIfMasonRunsOutOfEventsWithoutAny() {
+    schedule.step(simState);
+    assertThat(schedule.now()).isEqualTo(start);
   }
 
   // --- Stepping ---
@@ -164,7 +164,7 @@ class TemporalScheduleTest {
     schedule.scheduleOnce(until, recordFiring);
     schedule.stepUntil(simState, until);
     assertThat(firings).containsExactly(until.minusSeconds(1));
-    assertThat(schedule.getDateTime()).isEqualTo(until);
+    assertThat(schedule.now()).isEqualTo(until);
     schedule.stepUntil(simState, until.plusDays(1));
     assertThat(firings).containsExactly(until.minusSeconds(1), until);
   }
@@ -173,15 +173,13 @@ class TemporalScheduleTest {
   void stepsForAnAmountOfTimeFromTheCurrentDateTime() {
     schedule.stepUntil(simState, start.plusDays(10));
     schedule.stepFor(simState, Period.ofMonths(1));
-    assertThat(schedule.getDateTime()).isEqualTo(
-      start.plusDays(10).plusMonths(1)
-    );
+    assertThat(schedule.now()).isEqualTo(start.plusDays(10).plusMonths(1));
   }
 
   @Test
   void stepsForAnAmountOfTimeFromTheStartBeforeTheFirstStep() {
     schedule.stepFor(simState, Period.ofMonths(1));
-    assertThat(schedule.getDateTime()).isEqualTo(start.plusMonths(1));
+    assertThat(schedule.now()).isEqualTo(start.plusMonths(1));
   }
 
   @Test
@@ -190,7 +188,7 @@ class TemporalScheduleTest {
     final List<LocalDateTime> expected = new ArrayList<>();
     for (int month = 1; month <= 14; month++) {
       schedule.stepFor(simState, Period.ofMonths(1));
-      ends.add(schedule.getDateTime());
+      ends.add(schedule.now());
       expected.add(start.plusMonths(month));
     }
     assertThat(ends).isEqualTo(expected);
@@ -201,7 +199,7 @@ class TemporalScheduleTest {
     final List<LocalDateTime> accumulated = new ArrayList<>();
     schedule.scheduleRepeating(
       start.plusHours(12),
-      (Steppable) _ -> accumulated.add(schedule.getDateTime()),
+      (Steppable) _ -> accumulated.add(schedule.now()),
       Duration.ofDays(1)
     );
     schedule.scheduleRepeating(
@@ -227,16 +225,16 @@ class TemporalScheduleTest {
     schedule.stepUntil(simState, start.plusSeconds(1));
     schedule.stepUntil(simState, start.plusSeconds(1));
     assertThat(firings).containsExactly(start);
-    assertThat(schedule.getDateTime()).isEqualTo(start.plusSeconds(1));
+    assertThat(schedule.now()).isEqualTo(start.plusSeconds(1));
   }
 
   @Test
   void reachesTheTargetOfAnIntervalWithNoEventsWithoutStepping() {
     schedule.stepUntil(simState, start.plusDays(3));
-    assertThat(schedule.getDateTime()).isEqualTo(start.plusDays(3));
+    assertThat(schedule.now()).isEqualTo(start.plusDays(3));
     schedule.scheduleOnce(start.plusDays(10), recordFiring);
     schedule.stepUntil(simState, start.plusDays(5));
-    assertThat(schedule.getDateTime()).isEqualTo(start.plusDays(5));
+    assertThat(schedule.now()).isEqualTo(start.plusDays(5));
     assertThat(schedule.getSteps()).isZero();
   }
 
@@ -259,9 +257,9 @@ class TemporalScheduleTest {
     schedule.step(simState);
     schedule.step(simState);
     assertThat(schedule.getTime()).isGreaterThan(1.0);
-    assertThat(schedule.getDateTime()).isEqualTo(start.plusSeconds(1));
+    assertThat(schedule.now()).isEqualTo(start.plusSeconds(1));
     assertThatCode(() ->
-      schedule.stepUntil(simState, schedule.getDateTime())
+      schedule.stepUntil(simState, schedule.now())
     ).doesNotThrowAnyException();
     assertThat(firings).isEmpty();
     schedule.stepUntil(simState, start.plusSeconds(2));
@@ -275,7 +273,7 @@ class TemporalScheduleTest {
     schedule.stepUntil(simState, until);
     schedule.step(simState);
     assertThat(firings).containsExactly(until.plusHours(1));
-    assertThat(schedule.getDateTime()).isEqualTo(until.plusHours(1));
+    assertThat(schedule.now()).isEqualTo(until.plusHours(1));
     assertThatThrownBy(() ->
       schedule.stepUntil(simState, until.plusMinutes(30))
     ).isInstanceOf(IllegalArgumentException.class);
@@ -485,7 +483,7 @@ class TemporalScheduleTest {
             0.0,
             (Steppable) _ -> {
               runs.add("third");
-              firings.add(schedule.getDateTime());
+              firings.add(schedule.now());
             }
           );
         }
@@ -504,9 +502,9 @@ class TemporalScheduleTest {
         0.0,
         (Steppable) _ -> {
           runs.add("second");
-          schedule.scheduleOnce(schedule.getDateTime(), _ -> {
+          schedule.scheduleOnce(schedule.now(), _ -> {
             runs.add("third");
-            firings.add(schedule.getDateTime());
+            firings.add(schedule.now());
           });
         }
       );
@@ -523,7 +521,7 @@ class TemporalScheduleTest {
         0.0,
         (Steppable) _ ->
           schedule.scheduleByDateTime(
-            List.of(entry(schedule.getDateTime(), recordFiring))
+            List.of(entry(schedule.now(), recordFiring))
           )
       )
     );
@@ -691,13 +689,13 @@ class TemporalScheduleTest {
     final List<LocalDateTime> mason = new ArrayList<>();
     schedule.scheduleRepeating(
       start.plusHours(12),
-      (Steppable) _ -> temporal.add(schedule.getDateTime()),
+      (Steppable) _ -> temporal.add(schedule.now()),
       Duration.ofDays(1)
     );
     schedule.scheduleRepeating(
       3_600.0,
       0,
-      (Steppable) _ -> mason.add(schedule.getDateTime()),
+      (Steppable) _ -> mason.add(schedule.now()),
       7 * 3_600.0
     );
     final Duration pause = Duration.ofMinutes(10 * 60 + 17);
@@ -782,7 +780,7 @@ class TemporalScheduleTest {
     assertThatThrownBy(() ->
       schedule.stepFor(simState, Duration.ZERO)
     ).isInstanceOf(IllegalStateException.class);
-    assertThat(schedule.getDateTime()).isEqualTo(start.plusDays(1));
+    assertThat(schedule.now()).isEqualTo(start.plusDays(1));
   }
 
   @Test
@@ -791,7 +789,7 @@ class TemporalScheduleTest {
     assertThatThrownBy(() ->
       schedule.stepUntil(simState, start.plusDays(1))
     ).isInstanceOf(IllegalStateException.class);
-    assertThat(schedule.getDateTime()).isEqualTo(start.plusHours(1));
+    assertThat(schedule.now()).isEqualTo(start.plusHours(1));
   }
 
   @Test
@@ -808,7 +806,7 @@ class TemporalScheduleTest {
     final LocalDateTime eventDateTime = start.plusSeconds(5);
     schedule.scheduleOnce(eventDateTime, _ -> {});
     schedule.addAfter(sim -> {
-      if (schedule.getDateTime().equals(eventDateTime)) {
+      if (schedule.now().equals(eventDateTime)) {
         sim.kill();
       }
     });
@@ -822,7 +820,7 @@ class TemporalScheduleTest {
     schedule.stepUntil(simState, start.plusDays(1));
     simState.finish();
     assertThat(schedule.step(simState)).isFalse();
-    assertThat(schedule.getDateTime()).isEqualTo(start.plusDays(1));
+    assertThat(schedule.now()).isEqualTo(start.plusDays(1));
   }
 
   @Test
@@ -830,14 +828,14 @@ class TemporalScheduleTest {
     schedule.scheduleOnce(start.plusHours(1), _ -> simState.kill());
     assertThatCode(() -> schedule.step(simState)).doesNotThrowAnyException();
     assertThat(schedule.step(simState)).isFalse();
-    assertThat(schedule.getDateTime()).isEqualTo(start.plusHours(1));
+    assertThat(schedule.now()).isEqualTo(start.plusHours(1));
   }
 
   @Test
   void bringsTheClockBackToTheStartOnReset() {
     schedule.stepUntil(simState, start.plusDays(1));
     schedule.reset();
-    assertThat(schedule.getDateTime()).isEqualTo(start);
+    assertThat(schedule.now()).isEqualTo(start);
     schedule.scheduleOnce(start, recordFiring);
     schedule.stepUntil(simState, start.plusSeconds(1));
     assertThat(firings).containsExactly(start);
@@ -876,7 +874,7 @@ class TemporalScheduleTest {
       assertThat(e).hasMessageContaining("from inside an event")
     );
     assertThat(firings).containsExactly(start.plusSeconds(1));
-    assertThat(schedule.getDateTime()).isEqualTo(start.plusSeconds(2));
+    assertThat(schedule.now()).isEqualTo(start.plusSeconds(2));
     schedule.stepUntil(simState, start.plusSeconds(10));
     assertThat(firings).containsExactly(
       start.plusSeconds(1),
@@ -931,7 +929,7 @@ class TemporalScheduleTest {
       new Thread(() -> pausing.stepFor(state, Duration.ofSeconds(10)), "first"),
       new Thread(() -> pausing.stepFor(state, Duration.ofSeconds(10)), "second")
     );
-    assertThat(pausing.getDateTime()).isEqualTo(start.plusSeconds(20));
+    assertThat(pausing.now()).isEqualTo(start.plusSeconds(20));
   }
 
   /**

@@ -20,29 +20,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.temporal;
+package uk.ac.ox.poseidon.core;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.function.Function;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 /**
- * A value that is the simulation's current date, read from the current
- * date-time on every call. Built via {@link Factories#currentDate()} in this
- * package.
+ * A read-only view of the simulation's clock: components that need the present
+ * hold one and ask it again whenever they act. Implemented by
+ * {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}, which a component
+ * holding a {@code Clock} cannot use to schedule.
  */
-@RequiredArgsConstructor
-public class CurrentDate<C> implements Function<C, LocalDate> {
-
-  private final @NonNull Function<
-    ? super C,
-    ? extends LocalDateTime
-  > currentDateTime;
-
-  @Override
-  public LocalDate apply(final C context) {
-    return currentDateTime.apply(context).toLocalDate();
-  }
+public interface Clock {
+  /**
+   * @return the present date-time. It never throws: however the run ends, the
+   *         clock stops at its last time.
+   */
+  LocalDateTime now();
 }

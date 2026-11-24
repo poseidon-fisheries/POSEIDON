@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,28 +22,24 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import java.time.LocalDateTime;
+import java.util.function.Function;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.Clock;
 
 /**
- * Whether the clock has a date-time follows the schedule, which has none once
- * it has run out of events.
+ * A value that is the present date-time, whatever the context, read live from
+ * the simulation's {@link Clock} on every call. Built via
+ * {@link Factories#now()} in this package.
  */
-class HasDateTimeTest {
+@RequiredArgsConstructor
+public class Now implements Function<Object, LocalDateTime> {
 
-  @Test
-  void saysWhetherTheClockHasADateTime() {
-    final TemporalSchedule schedule = mock(TemporalSchedule.class);
-    final HasDateTime hasDateTime = new HasDateTime(schedule);
+  private final @NonNull Clock clock;
 
-    when(schedule.hasDateTime()).thenReturn(true);
-    assertThat(hasDateTime.apply(null)).isTrue();
-
-    when(schedule.hasDateTime()).thenReturn(false);
-    assertThat(hasDateTime.apply(null)).isFalse();
+  @Override
+  public LocalDateTime apply(final Object context) {
+    return clock.now();
   }
 }

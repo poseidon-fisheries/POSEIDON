@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.now;
 import static uk.ac.ox.poseidon.core.time.windows.Factories.dailyTimeWindow;
 import static uk.ac.ox.poseidon.core.time.windows.Factories.durationUntilTimeWindowOpens;
 import static uk.ac.ox.poseidon.core.time.windows.Factories.withinTimeWindow;
@@ -124,7 +124,7 @@ class FishingHoursTest {
     }
 
     private Status startSet() {
-      setStarts.add(schedule.getDateTime());
+      setStarts.add(schedule.now());
       return runFor(ofHours(1));
     }
   }
@@ -139,10 +139,8 @@ class FishingHoursTest {
           sequenceTask(
             untilSuccess(
               succeedOrWait(
-                checkThat(currentDateTime(), withinTimeWindow(nightHours)),
-                waitFor(
-                  durationUntilTimeWindowOpens(currentDateTime(), nightHours)
-                )
+                checkThat(now(), withinTimeWindow(nightHours)),
+                waitFor(durationUntilTimeWindowOpens(now(), nightHours))
               )
             ),
             scope -> new FishingSet()

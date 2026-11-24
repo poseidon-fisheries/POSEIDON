@@ -20,29 +20,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.temporal;
+package uk.ac.ox.poseidon.core;
 
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.util.function.Function;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * A value that is the simulation's current day of the week, read from the
- * current date-time on every call. Built via
- * {@link Factories#currentDayOfWeek()} in this package.
+ * A {@link SimulationScopeFactory} for the simulation's {@link Clock}: its
+ * {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}, seen as a read-only
+ * clock. Built via
+ * {@link uk.ac.ox.poseidon.core.providers.temporal.Factories#clock()}.
  */
-@RequiredArgsConstructor
-public class CurrentDayOfWeek<C> implements Function<C, DayOfWeek> {
-
-  private final @NonNull Function<
-    ? super C,
-    ? extends LocalDateTime
-  > currentDateTime;
+@ToString
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
+public class ClockFactory extends SimulationScopeFactory<Clock> {
 
   @Override
-  public DayOfWeek apply(final C context) {
-    return currentDateTime.apply(context).getDayOfWeek();
+  protected Clock newInstance(final SimulationScope scope) {
+    return scope.getSimulation().getTemporalSchedule();
   }
 }

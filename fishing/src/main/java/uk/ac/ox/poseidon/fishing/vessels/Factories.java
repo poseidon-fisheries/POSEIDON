@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.fishing.vessels;
 
 import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.now;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.startingDateTime;
 
 import com.badlogic.gdx.ai.btree.Task;
@@ -287,7 +287,7 @@ public final class Factories {
   ) {
     return new TripBlockFactory(
       initialDestination,
-      currentDateTime(),
+      now(),
       ImmutableList.of(),
       ImmutableList.copyOf(children)
     );
@@ -327,7 +327,7 @@ public final class Factories {
   ) {
     return new TripBlockFactory(
       initialDestination,
-      currentDateTime(),
+      now(),
       ImmutableList.of(tripCost),
       ImmutableList.copyOf(children)
     );
@@ -360,7 +360,7 @@ public final class Factories {
   ) {
     return new FishingTripBlockFactory(
       initialDestination,
-      currentDateTime(),
+      now(),
       ImmutableList.of(),
       ImmutableList.copyOf(children)
     );
@@ -400,7 +400,7 @@ public final class Factories {
   ) {
     return new FishingTripBlockFactory(
       initialDestination,
-      currentDateTime(),
+      now(),
       ImmutableList.of(tripCost),
       ImmutableList.copyOf(children)
     );

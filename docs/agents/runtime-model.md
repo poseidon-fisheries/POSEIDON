@@ -211,13 +211,13 @@ scope offers no way to register.
 ## Simulation services
 
 The simulation's services are inputs: its random number generator (`rng()`), its
-clock (`currentDateTime()`, `hasDateTime()`, `startingDateTime()`), its event
-manager (`eventManager()`) and the run's id (`runId()`). A scope does not offer
-the simulation to a build: `SimulationScope`'s accessor is package-private, and
-the only readers, all in `core`, are the services' own factories, the store
-routing (`SimulationScopeFactory`, `PerSimulationFactory`), the scope's
-registration methods and the `SchedulingScope`. A service is simulation-level,
-so a relative factory that takes one is at least simulation-level.
+clock (`clock()`, `now()`, `startingDateTime()`), its event manager
+(`eventManager()`) and the run's id (`runId()`). A scope does not offer the
+simulation to a build: `SimulationScope`'s accessor is package-private, and the
+only readers, all in `core`, are the services' own factories, the store routing
+(`SimulationScopeFactory`, `PerSimulationFactory`), the scope's registration
+methods and the `SchedulingScope`. A service is simulation-level, so a relative
+factory that takes one is at least simulation-level.
 
 ## Scheduling
 

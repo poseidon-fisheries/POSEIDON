@@ -38,9 +38,9 @@ import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
 import static uk.ac.ox.poseidon.core.predicates.temporal.Factories.dateTimeIsBefore;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomInt;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.dateTimeAfter;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.durationBetween;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.now;
 import static uk.ac.ox.poseidon.core.quantities.Factories.*;
 import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_PER_HOUR;
 import static uk.ac.ox.poseidon.core.schedule.Factories.*;
@@ -168,7 +168,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                   columnDefinition("date_time", "LOCAL_DATE_TIME"),
                   columnDefinition("total_biomass", "DOUBLE")
                 ),
-                currentDateTime(),
+                now(),
                 gridSum(scenario.component("biomassGrid"))
               )
             ),
@@ -406,10 +406,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         checkThat(vesselIsDockedAt(homePort())),
         fallbackTask(
           sequenceTask(
-            checkThat(
-              condition(currentDateTime(), dateTimeIsBefore(departureDateTime))
-            ),
-            waitFor(durationBetween(currentDateTime(), departureDateTime))
+            checkThat(condition(now(), dateTimeIsBefore(departureDateTime))),
+            waitFor(durationBetween(now(), departureDateTime))
           ),
           succeedOrWait(
             fishingTrip(

@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.fishing.tasks.landings;
 
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.now;
 
 import java.time.Duration;
 import uk.ac.ox.poseidon.core.Factory;
@@ -59,12 +59,7 @@ public final class Factories {
     > duration,
     final Factory<? super VesselComponentScope, ? extends MarketGrid> marketGrid
   ) {
-    return new LandCatchesFactory(
-      hold,
-      duration,
-      currentDateTime(),
-      marketGrid
-    );
+    return new LandCatchesFactory(hold, duration, now(), marketGrid);
   }
 
   /**

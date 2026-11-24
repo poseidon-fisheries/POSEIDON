@@ -71,9 +71,9 @@ The model is built around a declarative configuration → runtime object pattern
   other objects built for the models that need them, never as fields or methods
   of the vessel.
 - A factory that draws random numbers, reads the date, publishes events or needs
-  the run's id takes the simulation service's factory (`rng()`,
-  `currentDateTime()`, `eventManager()`, `runId()`) as an input, which its
-  helper passes, so scenario code never names it.
+  the run's id takes the simulation service's factory (`rng()`, `now()`,
+  `eventManager()`, `runId()`) as an input, which its helper passes, so scenario
+  code never names it.
 - What runs when is said in the scenario, by wrapping a steppable in one of
   core's scheduling wrappers (`scheduledOnce`, `scheduledRepeating`,
   `scheduledByDateTime` and the rest); see "Scheduling" in `runtime-model.md`.

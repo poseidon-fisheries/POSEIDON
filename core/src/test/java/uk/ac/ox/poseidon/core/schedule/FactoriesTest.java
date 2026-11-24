@@ -54,8 +54,7 @@ class FactoriesTest {
   private final SimulationScope scope = new SimulationScope(simulation);
   private final TemporalSchedule schedule = simulation.getTemporalSchedule();
   private final List<LocalDateTime> firings = new ArrayList<>();
-  private final Steppable recordFiring = _ ->
-    firings.add(schedule.getDateTime());
+  private final Steppable recordFiring = _ -> firings.add(schedule.now());
 
   @Test
   void scheduledOnceSchedulesTheSteppableAndReturnsIt() {

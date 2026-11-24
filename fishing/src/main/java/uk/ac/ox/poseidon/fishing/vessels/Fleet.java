@@ -193,7 +193,7 @@ public class Fleet implements VesselsGetter {
    */
   private void remove(final Vessel vessel) {
     vesselsById.remove(vessel.getId());
-    exitDatesById.put(vessel.getId(), schedule.getDateTime());
+    exitDatesById.put(vessel.getId(), schedule.now());
     exitListeners.forEach(listener -> listener.accept(vessel));
   }
 
@@ -236,7 +236,7 @@ public class Fleet implements VesselsGetter {
       this.schedule = schedule;
       this.step = _ -> {
         stepPending = false;
-        vesselStep.accept(schedule.getDateTime());
+        vesselStep.accept(schedule.now());
       };
     }
 

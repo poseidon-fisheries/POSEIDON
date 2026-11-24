@@ -28,7 +28,6 @@ import static java.util.stream.Collectors.*;
 import com.google.common.collect.Streams;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.Temporal;
@@ -43,6 +42,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import sim.engine.*;
+import uk.ac.ox.poseidon.core.Clock;
 
 /**
  * MASON's {@link Schedule}, extended to let callers schedule {@link Steppable}s
@@ -56,7 +56,7 @@ import sim.engine.*;
  * The schedule follows seven rules:
  * <ol>
  * <li><b>The clock reads how far the schedule has run</b> ({@link #getTime()},
- * {@link #getDateTime()}): during an event, that event's time; between calls,
+ * {@link #now()}): during an event, that event's time; between calls,
  * where the last {@link #stepUntil} stopped; before the first step, the
  * start.</li>
  * <li><b>{@link #stepUntil stepUntil(t)} runs every event dated before
@@ -75,7 +75,7 @@ import sim.engine.*;
  * MASON time floor fractions of a second, and a date-time in the clock's
  * current second means now. (MASON places an event scheduled for the current
  * time a fraction of a second after it, so the clock can be just past the
- * second {@link #getDateTime()} shows.)</li>
+ * second {@link #now()} shows.)</li>
  * <li><b>One advance at a time</b>: {@link #stepUntil}, {@link #stepFor} and
  * {@link #step} are synchronised on the schedule, and advancing from inside an
  * event throws {@link IllegalStateException}.</li>
@@ -101,7 +101,7 @@ import sim.engine.*;
 )
 @Getter
 @RequiredArgsConstructor
-public class TemporalSchedule extends Schedule {
+public class TemporalSchedule extends Schedule implements Clock {
 
   /** The timestamp label used for times before the starting date-time. */
   public static final String BEFORE_SIMULATION_STRING = "At Start";
@@ -130,51 +130,34 @@ public class TemporalSchedule extends Schedule {
   /**
    * @return the clock, in seconds since {@link #startingDateTime}: the time of
    *         the event being run; otherwise where the last {@link #stepUntil}
-   *         stopped, or 0 before the first step; or {@link #AFTER_SIMULATION}
-   *         once MASON has run out of events
+   *         stopped, or 0 before the first step; once MASON has run out of
+   *         events, the time of the last event that ran
    */
   @Override
   public double getTime() {
     synchronized (lock) {
-      return Math.max(time, boundary);
+      return Double.isFinite(time) ? Math.max(time, boundary) : boundary;
     }
   }
 
   /**
-   * @return the clock as a {@link LocalDateTime}
-   * @throws IllegalStateException once MASON has run out of events, as the
-   *                               clock then has no date-time
+   * @return the clock as a {@link LocalDateTime}; it never throws, as the clock
+   *         stops at its last time however the run ends
    */
-  @SuppressWarnings("WeakerAccess")
-  public LocalDateTime getDateTime() {
-    final double clock = getTime();
-    if (!Double.isFinite(clock)) {
-      throw new IllegalStateException(
-        "The schedule has run out of events: no date-time."
-      );
-    }
-    return toDateTime(clock);
+  @Override
+  public LocalDateTime now() {
+    return toDateTime(getTime());
   }
 
   /**
-   * @return whether the clock has a date-time: it has none once MASON has run
-   *         out of events
-   */
-  public boolean hasDateTime() {
-    return Double.isFinite(getTime());
-  }
-
-  /** @return the clock as a {@link LocalDate} */
-  public LocalDate getDate() {
-    return getDateTime().toLocalDate();
-  }
-
-  /**
-   * @return the clock as a human-readable timestamp, or
-   *         {@link #AFTER_SIMULATION_STRING} once MASON has run out of events
+   * @return the clock as a human-readable timestamp
    */
   public String getTimestamp() {
-    return getTimestamp(BEFORE_SIMULATION_STRING, AFTER_SIMULATION_STRING);
+    return getTimestamp(
+      getTime(),
+      BEFORE_SIMULATION_STRING,
+      AFTER_SIMULATION_STRING
+    );
   }
 
   @Override
@@ -324,7 +307,7 @@ public class TemporalSchedule extends Schedule {
       ? extends Entry<LocalDateTime, ? extends Steppable>
     > steppablesByDateTime
   ) {
-    final LocalDateTime clock = getDateTime();
+    final LocalDateTime clock = now();
     final Map<
       Boolean,
       List<Entry<LocalDateTime, Sequence>>
@@ -372,12 +355,7 @@ public class TemporalSchedule extends Schedule {
     final Steppable event,
     final TemporalAmount interval
   ) {
-    return this.scheduleRepeating(
-      getDateTime().plus(interval),
-      0,
-      event,
-      interval
-    );
+    return this.scheduleRepeating(now().plus(interval), 0, event, interval);
   }
 
   /**
@@ -394,12 +372,7 @@ public class TemporalSchedule extends Schedule {
     final int ordering,
     final TemporalAmount interval
   ) {
-    return scheduleRepeating(
-      getDateTime().plus(interval),
-      ordering,
-      event,
-      interval
-    );
+    return scheduleRepeating(now().plus(interval), ordering, event, interval);
   }
 
   /**
@@ -454,7 +427,7 @@ public class TemporalSchedule extends Schedule {
     final SimState simState,
     final TemporalAmount temporalAmount
   ) {
-    this.stepUntil(simState, getDateTime().plus(temporalAmount));
+    this.stepUntil(simState, now().plus(temporalAmount));
   }
 
   /**
@@ -542,7 +515,16 @@ public class TemporalSchedule extends Schedule {
   private boolean runningStep(final SimState simState) {
     running = true;
     try {
-      return super.step(simState);
+      final boolean stepped;
+      synchronized (lock) {
+        final double last = getTime();
+        stepped = super.step(simState);
+        if (!Double.isFinite(time)) {
+          // MASON has run out of events: the clock stays where it was
+          boundary = last;
+        }
+      }
+      return stepped;
     } finally {
       running = false;
     }

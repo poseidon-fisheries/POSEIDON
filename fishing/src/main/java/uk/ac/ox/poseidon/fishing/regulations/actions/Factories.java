@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.regulations.actions;
 
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.now;
 
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
@@ -43,6 +43,6 @@ public final class Factories {
   public static DepartNowActionFunctionFactory departNow(
     final VesselComponent<? extends Gear> gear
   ) {
-    return new DepartNowActionFunctionFactory(gear, currentDateTime());
+    return new DepartNowActionFunctionFactory(gear, now());
   }
 }

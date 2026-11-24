@@ -119,7 +119,6 @@ class RegulationGridPortrayalFactoryTest {
     return new RegulationGridPortrayalFactory.Portrayal(
       gear(),
       () -> LocalDateTime.of(2013, 1, 2, 0, 0),
-      () -> true,
       regulations,
       vesselField,
       fleet,

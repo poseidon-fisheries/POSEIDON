@@ -30,32 +30,28 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.SimulationScope;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link CurrentDayOfWeek},
- * built via {@link Factories#currentDayOfWeek()}.
+ * A {@link RelativeScopeFactory} counterpart of {@link DayOfWeekOf}, built via
+ * {@link Factories#dayOfWeekOf(ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class CurrentDayOfWeekFactory<C>
-  extends SimulationScopeFactory<Function<C, DayOfWeek>>
-  implements ValueFactory<SimulationScope, C, DayOfWeek>
+public class DayOfWeekOfFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, DayOfWeek>>
+  implements ValueFactory<S, C, DayOfWeek>
 {
 
-  private final ValueFactory<
-    ? super SimulationScope,
-    ? super C,
-    LocalDateTime
-  > currentDateTime;
+  private final ValueFactory<? super S, ? super C, LocalDateTime> dateTime;
 
   @Override
-  protected Function<C, DayOfWeek> newInstance(final SimulationScope scope) {
-    return new CurrentDayOfWeek<>(currentDateTime.get(scope));
+  protected Function<C, DayOfWeek> newInstance(final S scope) {
+    return new DayOfWeekOf<>(dateTime.get(scope));
   }
 }

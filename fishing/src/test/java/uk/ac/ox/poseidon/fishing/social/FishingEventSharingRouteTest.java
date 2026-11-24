@@ -275,7 +275,7 @@ class FishingEventSharingRouteTest {
   }
 
   private LocalDateTime now() {
-    return simulation.getTemporalSchedule().getDateTime();
+    return simulation.getTemporalSchedule().now();
   }
 
   /**

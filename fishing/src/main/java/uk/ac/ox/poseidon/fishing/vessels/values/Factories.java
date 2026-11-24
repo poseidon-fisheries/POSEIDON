@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
-import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.now;
 
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.Factory;
@@ -92,7 +92,7 @@ public final class Factories {
    * @see CurrentTimeAtSea
    */
   public static CurrentTimeAtSeaFactory currentTimeAtSea() {
-    return new CurrentTimeAtSeaFactory(currentDateTime());
+    return new CurrentTimeAtSeaFactory(now());
   }
 
   /**
@@ -140,7 +140,7 @@ public final class Factories {
    * @see HasStartedFishingTripToday
    */
   public static HasStartedFishingTripTodayFactory hasStartedFishingTripToday() {
-    return new HasStartedFishingTripTodayFactory(currentDateTime());
+    return new HasStartedFishingTripTodayFactory(now());
   }
 
   /**
@@ -156,7 +156,7 @@ public final class Factories {
    * @see CurrentPortStayStartDateTime
    */
   public static CurrentPortStayStartDateTimeFactory currentPortStayStartDateTime() {
-    return new CurrentPortStayStartDateTimeFactory(currentDateTime());
+    return new CurrentPortStayStartDateTimeFactory(now());
   }
 
   /**
