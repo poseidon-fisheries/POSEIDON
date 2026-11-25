@@ -28,3 +28,12 @@ dependencies {
     api(project(":core"))
     api(libs.jenetics)
 }
+
+pitest {
+    // Measured 2026-11-25 at approximately 90.7% (88 killed or timed out of 97
+    // mutants); the floor sits two points below. Six mutants have no coverage.
+    // The three survivors are in CalibrationProblem: a long subtraction
+    // replaced by addition, and removed calls to TemporalSchedule::stepFor and
+    // Simulation::finish. Bump this floor up, never down.
+    mutationThreshold.set(88)
+}

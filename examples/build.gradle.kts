@@ -43,3 +43,13 @@ val writePeterSnapperScenario = tasks.register("writePeterSnapperScenario", Java
         "-s", "inputs/peter_snapper/scenario.yaml"
     )
 }
+
+pitest {
+    // Measured 2026-11-25 at approximately 12.8% (6 killed or timed out of 47
+    // mutants); the floor sits two points below. Forty-one mutants have no
+    // coverage: the calibration and run entry points (PeterSnapperCatchability
+    // Calibration, QuickRunner, PeterSnapperScenario) have no tests. The floor
+    // measures this module's coverage, not the strength of its tests. Bump
+    // this floor up, never down.
+    mutationThreshold.set(10)
+}

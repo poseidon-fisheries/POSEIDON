@@ -30,3 +30,12 @@ dependencies {
     api(project(":geography"))
     api(libs.threeten.extra)
 }
+
+pitest {
+    // Measured 2026-11-25 at approximately 67.6% (50 killed or timed out of 74
+    // mutants); the floor sits two points below. Twenty-one mutants have no
+    // coverage. The three survivors are a removed Preconditions check in
+    // BetweenYearlyDates and two boundary changes in InYear, both at the
+    // year-range edges. Bump this floor up, never down.
+    mutationThreshold.set(65)
+}

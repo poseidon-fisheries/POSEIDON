@@ -39,3 +39,14 @@ dependencies {
 
     implementation(libs.bundles.batik) // Apache batik for SVG handling
 }
+
+pitest {
+    // Measured 2026-11-25 at approximately 16.9% (23 killed or timed out of 136
+    // mutants); the floor sits two points below. Eighty-eight mutants have no
+    // coverage, mostly in SimulationWithUI, DisplayWrapper2D, PaletteColorMap
+    // and the portrayal factories. The 25 survivors are in PaletteColorMap,
+    // NumberGridPortrayalFactory and SpeciesBiomassFieldsPortrayalFactory. The
+    // floor measures this module's coverage, not the strength of its tests.
+    // Bump this floor up, never down.
+    mutationThreshold.set(14)
+}

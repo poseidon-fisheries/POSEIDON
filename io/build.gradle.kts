@@ -38,3 +38,14 @@ dependencies {
     }
     runtimeOnly(libs.slf4j.jdk14) // tablesaw uses slf4j, which we reroute to j.u.Logging
 }
+
+pitest {
+    // Measured 2026-11-25 at approximately 78.9% (101 killed or timed out of
+    // 128 mutants); the floor sits two points below. Twenty mutants have no
+    // coverage, and the seven survivors are YAML loader and dumper settings
+    // (ScenarioLoader's alias limit and class-name checks, DumperOptions'
+    // pretty flow, the read-only property setting in BuilderConstructor), a
+    // logger call in CsvTableWriter, and a type-description registration.
+    // Bump this floor up, never down.
+    mutationThreshold.set(76)
+}
