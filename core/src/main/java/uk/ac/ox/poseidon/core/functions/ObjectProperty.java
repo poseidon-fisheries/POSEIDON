@@ -163,8 +163,8 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
    *                              {@code null}
    */
   @Override
-  public R apply(final Object context, final T object) {
-    return read(object);
+  public R apply(final Object context, final T argument) {
+    return read(argument);
   }
 
   /**

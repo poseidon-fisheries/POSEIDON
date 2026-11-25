@@ -51,8 +51,8 @@ public class MapLookup<C, T, K, V> implements BiFunction<C, T, V> {
   private final V defaultValue;
 
   @Override
-  public V apply(final C context, final T t) {
-    final K k = key.apply(context, t);
+  public V apply(final C context, final T argument) {
+    final K k = key.apply(context, argument);
     final V value = map.get(k);
     final boolean missing = value == null && !map.containsKey(k);
     if (missing && defaultValue == null) {

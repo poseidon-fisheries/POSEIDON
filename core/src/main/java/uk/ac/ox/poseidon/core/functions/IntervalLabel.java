@@ -85,8 +85,8 @@ public class IntervalLabel<C, T, R> implements BiFunction<C, T, R> {
    * @throws NullPointerException if the number is {@code null}
    */
   @Override
-  public R apply(final C context, final T t) {
-    final double value = number.apply(context, t);
+  public R apply(final C context, final T argument) {
+    final double value = number.apply(context, argument);
     // Adding 0.0 turns -0.0 into 0.0, which the search would place below it
     final int found = Arrays.binarySearch(lowerBounds, value + 0.0);
     final int index = found >= 0 ? found : -found - 2;

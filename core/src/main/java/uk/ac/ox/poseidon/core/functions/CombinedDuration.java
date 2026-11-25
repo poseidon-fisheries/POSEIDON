@@ -53,10 +53,10 @@ public class CombinedDuration<C, T> implements BiFunction<C, T, Duration> {
   }
 
   @Override
-  public Duration apply(final C context, final T t) {
+  public Duration apply(final C context, final T argument) {
     Duration total = Duration.ZERO;
     for (int i = 0; i < durations.length; i++) {
-      total = total.plus(durations[i].apply(context, t));
+      total = total.plus(durations[i].apply(context, argument));
     }
     return total;
   }

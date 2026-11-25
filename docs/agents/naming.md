@@ -10,7 +10,7 @@ Names read like proper English: code reads as sentences. Put verbs first for
 tasks and actions (`startPurseSeinerTrip`, not `purseSeinerStartTrip`;
 `chooseNextPurseSeinerDestination`), and keep noun phrases grammatical for
 things (`purseSeinerFishingLocationAtSeaChecker`). Tests read as statements
-whose subject is the thing tested, never the argument: left unsaid
+whose subject is the thing tested, never what it is tested against: left unsaid
 (`lessThan(threshold)`, `withinTimeWindow(timeWindow)`) or named
 (`dateTimeIsBefore(referenceDateTime)`, `vesselIsDockedAt(port)`,
 `cellWasFishedThisTrip()`). Read the call with the thing tested in front: "a
@@ -30,6 +30,13 @@ example, `previous` and `current` in an interval comparison. Judge related names
 together and preserve their balance when renaming one. Checkstyle catches known
 cases in `config/checkstyle/checkstyle.xml`; the prose rule applies to every
 name, including those outside that list.
+
+## Mapping arguments
+
+The second `apply` parameter of a mapping names its input. When its declared
+type is a concrete domain type, name it after that type (`dateTime`, `date`,
+`cell`, `vessel`). When the type is a type variable or `Object`, name it
+`argument`.
 
 ## Naming audit and Checkstyle upkeep
 

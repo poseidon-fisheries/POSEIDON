@@ -45,7 +45,7 @@ public class AfterDateTime<C> implements BiFunction<C, LocalDateTime, Boolean> {
   > referenceDateTime;
 
   @Override
-  public Boolean apply(final C context, final LocalDateTime mapped) {
-    return mapped.isAfter(referenceDateTime.apply(context));
+  public Boolean apply(final C context, final LocalDateTime dateTime) {
+    return dateTime.isAfter(referenceDateTime.apply(context));
   }
 }

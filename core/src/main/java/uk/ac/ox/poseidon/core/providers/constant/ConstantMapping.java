@@ -26,9 +26,9 @@ import java.util.function.BiFunction;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A mapping whose result is the same whatever the context and whatever it maps,
- * such as a filter that lets every option through, or one part of a key that
- * is the same for every species. Built via
+ * A mapping whose result is the same whatever the context and whatever its
+ * argument, which is ignored, such as a filter that lets every option through,
+ * or one part of a key that is the same for every species. Built via
  * {@link Factories Factories.always(...)}; {@link Constant} is its counterpart
  * where a value is expected.
  *
@@ -40,7 +40,7 @@ public class ConstantMapping<R> implements BiFunction<Object, Object, R> {
   private final R result;
 
   @Override
-  public R apply(final Object context, final Object mapped) {
+  public R apply(final Object context, final Object argument) {
     return result;
   }
 }

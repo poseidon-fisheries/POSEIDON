@@ -50,8 +50,8 @@ public class FloorMapLookup<C, T, K, V> implements BiFunction<C, T, V> {
   private final @NonNull NavigableMap<? super K, ? extends V> map;
 
   @Override
-  public V apply(final C context, final T t) {
-    final K k = key.apply(context, t);
+  public V apply(final C context, final T argument) {
+    final K k = key.apply(context, argument);
     final Map.Entry<? super K, ? extends V> entry = map.floorEntry(k);
     if (entry == null) {
       throw new NoSuchElementException(

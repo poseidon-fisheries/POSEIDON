@@ -46,7 +46,7 @@ public class DateTimeIsBefore<C> implements
   > referenceDateTime;
 
   @Override
-  public Boolean apply(final C context, final LocalDateTime mapped) {
-    return mapped.isBefore(referenceDateTime.apply(context));
+  public Boolean apply(final C context, final LocalDateTime dateTime) {
+    return dateTime.isBefore(referenceDateTime.apply(context));
   }
 }

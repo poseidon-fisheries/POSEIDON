@@ -28,12 +28,13 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A value made a mapping that ignores what it maps: on each call, it reads the
- * value under the same context. Typed by {@code Object} as the thing mapped, it
- * fits over any thing mapped, as a mapping over cells or, inside a combinator
- * that {@link MappingAsValue} makes a value again, where nothing is mapped.
- * Built by the value and mixed overloads of the combinators, and of the blocks
- * that take their input, never by scenario code.
+ * A value made a mapping that ignores its argument: on each call, it reads
+ * the value under the same context. Typed by {@code Object} as the thing
+ * mapped, it fits over any thing mapped, as a mapping over cells or, inside
+ * a combinator that {@link MappingAsValue} makes a value again, where
+ * nothing is mapped. Built by the value and mixed overloads of the
+ * combinators, and of the blocks that take their input, never by scenario
+ * code.
  *
  * @param <C> the type of the context
  * @param <R> the type of the value
@@ -44,7 +45,7 @@ public class ValueAsMapping<C, R> implements BiFunction<C, Object, R> {
   private final @NonNull Function<? super C, ? extends R> value;
 
   @Override
-  public R apply(final C context, final Object ignored) {
+  public R apply(final C context, final Object argument) {
     return value.apply(context);
   }
 }

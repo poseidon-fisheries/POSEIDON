@@ -41,7 +41,7 @@ public class Equal<C, T> implements BiFunction<C, T, Boolean> {
   private final @NonNull Function<? super C, ? extends T> value;
 
   @Override
-  public Boolean apply(final C context, final T mapped) {
-    return value.apply(context).equals(mapped);
+  public Boolean apply(final C context, final T argument) {
+    return value.apply(context).equals(argument);
   }
 }

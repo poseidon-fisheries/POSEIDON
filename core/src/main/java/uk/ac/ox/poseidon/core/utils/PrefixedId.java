@@ -28,10 +28,10 @@ import lombok.Getter;
 
 /**
  * A mapping that gives a new id each time it is called: the given prefix
- * followed by a counter starting at 0, whatever the context and whatever it
- * maps. An id is always the id of something, and what the mapping maps is
- * what the caller names: the cell a port is placed on, the port vessels are
- * created at. It is the counterpart of
+ * followed by a counter starting at 0, whatever the context and whatever its
+ * argument, which is ignored. An id is always the id of something, so the
+ * caller passes in what it names, such as the cell a port is placed on or
+ * the port vessels are created at. It is the counterpart of
  * {@link uk.ac.ox.poseidon.core.providers.constant.ConstantMapping} for ids
  * that must differ.
  *
@@ -56,7 +56,7 @@ public class PrefixedId implements BiFunction<Object, Object, String> {
   }
 
   @Override
-  public String apply(final Object context, final Object subject) {
+  public String apply(final Object context, final Object argument) {
     return prefix + counter.getAndIncrement();
   }
 }

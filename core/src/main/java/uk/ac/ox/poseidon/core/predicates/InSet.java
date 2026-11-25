@@ -45,7 +45,7 @@ public class InSet<C, T> implements BiFunction<C, T, Boolean> {
   > values;
 
   @Override
-  public Boolean apply(final C context, final T mapped) {
-    return values.apply(context).contains(mapped);
+  public Boolean apply(final C context, final T argument) {
+    return values.apply(context).contains(argument);
   }
 }

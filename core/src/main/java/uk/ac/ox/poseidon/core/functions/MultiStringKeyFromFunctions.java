@@ -52,10 +52,10 @@ public class MultiStringKeyFromFunctions<
   }
 
   @Override
-  public String apply(final C context, final T t) {
+  public String apply(final C context, final T argument) {
     final Object[] keys = new Object[functions.length];
     for (int i = 0; i < functions.length; i++) {
-      keys[i] = functions[i].apply(context, t);
+      keys[i] = functions[i].apply(context, argument);
     }
     return multiStringKey(keys);
   }

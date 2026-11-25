@@ -44,7 +44,7 @@ public class GreaterThan<
   private final @NonNull Function<? super C, ? extends T> value;
 
   @Override
-  public Boolean apply(final C context, final Comparable<T> mapped) {
-    return mapped.compareTo(value.apply(context)) > 0;
+  public Boolean apply(final C context, final Comparable<T> argument) {
+    return argument.compareTo(value.apply(context)) > 0;
   }
 }

@@ -42,7 +42,7 @@ public class Condition<C, T, U> implements BiFunction<C, T, Boolean> {
   private final BiFunction<? super C, ? super U, Boolean> predicate;
 
   @Override
-  public Boolean apply(final C context, final T t) {
-    return predicate.apply(context, subject.apply(context, t));
+  public Boolean apply(final C context, final T argument) {
+    return predicate.apply(context, subject.apply(context, argument));
   }
 }

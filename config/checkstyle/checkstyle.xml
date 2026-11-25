@@ -48,6 +48,12 @@
       <property name="format"
                 value="^(?!(held|named|created|changed|built)$).+$"/>
     </module>
+    <!-- A mapping's argument is named for what it is, not as mapped. A bare t is
+         left to the manual audit: it also names lambda parameters that are fine. -->
+    <module name="IllegalIdentifierName">
+      <property name="tokens" value="PARAMETER_DEF"/>
+      <property name="format" value="^(?!mapped$).+$"/>
+    </module>
 
     <!-- An empty catch block is allowed when its variable says it is ignored -->
     <module name="EmptyCatchBlock">

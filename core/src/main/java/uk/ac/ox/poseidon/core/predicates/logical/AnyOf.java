@@ -54,13 +54,13 @@ public class AnyOf<C, T> implements BiFunction<C, T, Boolean> {
   // tests, and the stream's overhead showed in profiles.
   @Override
   @SuppressWarnings("checkstyle:ReturnCount")
-  public Boolean apply(final C context, final T t) {
+  public Boolean apply(final C context, final T argument) {
     for (final BiFunction<
       ? super C,
       ? super T,
       Boolean
     > predicate : predicates) {
-      if (predicate.apply(context, t)) {
+      if (predicate.apply(context, argument)) {
         return true;
       }
     }

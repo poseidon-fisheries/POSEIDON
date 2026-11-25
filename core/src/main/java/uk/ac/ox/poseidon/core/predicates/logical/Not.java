@@ -39,7 +39,7 @@ public class Not<C, T> implements BiFunction<C, T, Boolean> {
   private final @NonNull BiFunction<? super C, ? super T, Boolean> predicate;
 
   @Override
-  public Boolean apply(final C context, final T t) {
-    return !predicate.apply(context, t);
+  public Boolean apply(final C context, final T argument) {
+    return !predicate.apply(context, argument);
   }
 }

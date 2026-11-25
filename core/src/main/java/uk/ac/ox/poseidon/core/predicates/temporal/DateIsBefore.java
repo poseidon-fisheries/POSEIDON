@@ -42,7 +42,7 @@ public class DateIsBefore<C> implements BiFunction<C, LocalDate, Boolean> {
   private final @NonNull Function<? super C, ? extends LocalDate> referenceDate;
 
   @Override
-  public Boolean apply(final C context, final LocalDate mapped) {
-    return mapped.isBefore(referenceDate.apply(context));
+  public Boolean apply(final C context, final LocalDate date) {
+    return date.isBefore(referenceDate.apply(context));
   }
 }

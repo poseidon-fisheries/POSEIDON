@@ -45,9 +45,9 @@ public class Between<C, T> implements BiFunction<C, Comparable<T>, Boolean> {
   private final boolean includeMaximum;
 
   @Override
-  public Boolean apply(final C context, final Comparable<T> mapped) {
-    final int comparedToMinimum = mapped.compareTo(minimum.apply(context));
-    final int comparedToMaximum = mapped.compareTo(maximum.apply(context));
+  public Boolean apply(final C context, final Comparable<T> argument) {
+    final int comparedToMinimum = argument.compareTo(minimum.apply(context));
+    final int comparedToMaximum = argument.compareTo(maximum.apply(context));
     return (
       (includeMinimum ? comparedToMinimum >= 0 : comparedToMinimum > 0) &&
       (includeMaximum ? comparedToMaximum <= 0 : comparedToMaximum < 0)
