@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.core.time;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
 
 import ec.util.MersenneTwisterFast;
 import java.time.Duration;
@@ -32,7 +33,7 @@ import sim.util.distribution.Exponential;
 
 /**
  * An exponentially distributed duration draws its rate from the mean and its
- * seconds from the distribution, adding a second so a draw is never zero.
+ * seconds from the distribution, rounded up so a draw is never zero.
  */
 class ExponentiallyDistributedDurationTest {
 
@@ -50,7 +51,32 @@ class ExponentiallyDistributedDurationTest {
 
     assertThat(supplier.get())
       .isPositive()
-      .isEqualTo(Duration.ofSeconds(1 + expected.nextInt()));
+      .isEqualTo(
+        Duration.ofSeconds(Math.max(1, (long) Math.ceil(expected.nextDouble())))
+      );
+  }
+
+  @Test
+  void drawsArePositiveWithASampleMeanNearTheRequestedMean() {
+    final int draws = 100_000;
+    final ExponentiallyDistributedDuration supplier =
+      new ExponentiallyDistributedDuration(
+        Duration.ofSeconds(10),
+        new MersenneTwisterFast(42)
+      );
+
+    long totalSeconds = 0;
+    for (int i = 0; i < draws; i++) {
+      final Duration draw = supplier.get();
+      assertThat(draw).isPositive();
+      totalSeconds += draw.getSeconds();
+    }
+
+    // Rounding up adds half a second on average, so the expected mean is the
+    // requested one plus 0.5 s. The standard error of the mean is about
+    // 10 / sqrt(draws) = 0.03 s, so a tolerance of 0.2 s is generous, yet it
+    // still rejects the old bias of a full second.
+    assertThat((double) totalSeconds / draws).isCloseTo(10.5, within(0.2));
   }
 
   @Test

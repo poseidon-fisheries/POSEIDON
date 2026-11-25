@@ -138,7 +138,7 @@ public interface DistanceCalculator {
    * @param totalDistanceInKm  the total distance to travel, in kilometres
    * @param cruisingSpeedInKph the constant travel speed, in km/h
    * @return the time to travel {@code totalDistanceInKm} at
-   *         {@code cruisingSpeedInKph}
+   *         {@code cruisingSpeedInKph}, rounded up to a whole second
    */
   static Duration travelDuration(
     final double totalDistanceInKm,
@@ -146,7 +146,9 @@ public interface DistanceCalculator {
   ) {
     final long SECONDS_PER_HOUR = 3600;
     return Duration.ofSeconds(
-      (long) ((totalDistanceInKm / cruisingSpeedInKph) * SECONDS_PER_HOUR)
+      (long) Math.ceil(
+        (totalDistanceInKm / cruisingSpeedInKph) * SECONDS_PER_HOUR
+      )
     );
   }
 

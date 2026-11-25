@@ -48,6 +48,23 @@ class DistanceCalculatorTest {
   }
 
   @Test
+  void travelDurationRoundsUpToTheNextWholeSecond() {
+    assertThat(DistanceCalculator.travelDuration(0.001, 10.0)).isEqualTo(
+      Duration.ofSeconds(1)
+    );
+    assertThat(DistanceCalculator.travelDuration(0.0030001, 10.0)).isEqualTo(
+      Duration.ofSeconds(2)
+    );
+  }
+
+  @Test
+  void travelDurationOfAWholeNumberOfSecondsIsUnchanged() {
+    assertThat(DistanceCalculator.travelDuration(10.0, 10.0)).isEqualTo(
+      Duration.ofHours(1)
+    );
+  }
+
+  @Test
   void travelDurationAlongAPathIsItsLengthOverSpeed() {
     final DistanceCalculator calculator = new CartesianDistanceCalculator(
       null,

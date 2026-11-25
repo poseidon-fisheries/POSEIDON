@@ -32,7 +32,8 @@ import sim.util.distribution.Exponential;
 
 /**
  * A {@link Supplier} of exponentially distributed random {@link Duration}s,
- * drawn from the simulation's shared RNG on every call. Built via
+ * drawn from the simulation's shared RNG on every call and rounded up to a
+ * whole second, so no draw is zero. Built via
  * {@link Factories#exponentiallyDistributedDuration(uk.ac.ox.poseidon.core.Factory)}
  * in this package.
  */
@@ -57,6 +58,8 @@ public class ExponentiallyDistributedDuration implements Supplier<Duration> {
 
   @Override
   public Duration get() {
-    return Duration.ofSeconds(1 + exponential.nextInt());
+    return Duration.ofSeconds(
+      Math.max(1, (long) Math.ceil(exponential.nextDouble()))
+    );
   }
 }

@@ -153,11 +153,12 @@ class PeterSnapperScenarioTest {
   // these values and says why. These values changed when vessels began to
   // learn from their own and their friends' trip outcomes through one memory
   // of the last received profit per hour, which draws differently from the
-  // earlier tables, evaluator and imitation.
+  // earlier tables, evaluator and imitation. They changed again when travel
+  // and exponential durations began to round up to whole seconds.
   @Test
   void landingsMatchTheBaseline() {
     assertThat(landingsForAYear(new PeterSnapperScenario().get())).isEqualTo(
-      Map.of(1, 2.208188231290395E7)
+      Map.of(1, 2.3084128253837388E7)
     );
   }
 

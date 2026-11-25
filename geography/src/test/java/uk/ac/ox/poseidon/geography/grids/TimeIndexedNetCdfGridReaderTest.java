@@ -177,6 +177,56 @@ class TimeIndexedNetCdfGridReaderTest {
   }
 
   @Test
+  void dateTimesRoundToTheNearestSecond() throws IOException {
+    final Path subSecondFixture = tempDir.resolve("subsecond.nc");
+    final NetcdfFormatWriter.Builder writerBuilder =
+      NetcdfFormatWriter.createNewNetcdf3(subSecondFixture.toString());
+    final Dimension timeDim = writerBuilder.addDimension("time", 2);
+    final Dimension latDim = writerBuilder.addDimension("latitude", 1);
+    final Dimension lonDim = writerBuilder.addDimension("longitude", 1);
+    writerBuilder
+      .addVariable("time", DataType.DOUBLE, List.of(timeDim))
+      .addAttribute(new Attribute("units", "days since 1970-01-01"));
+    writerBuilder.addVariable("latitude", DataType.DOUBLE, List.of(latDim));
+    writerBuilder.addVariable("longitude", DataType.DOUBLE, List.of(lonDim));
+    writerBuilder
+      .addVariable("TEMP", DataType.FLOAT, List.of(timeDim, latDim, lonDim))
+      .addAttribute(new Attribute("_FillValue", FILL_VALUE));
+    try (NetcdfFormatWriter writer = writerBuilder.build()) {
+      // 0.4 s and 0.6 s after midnight on 2020-01-01, as fractions of a day.
+      writer.write(
+        "time",
+        Array.makeFromJavaArray(new double[] {
+          18262 + 0.4 / 86400,
+          18262 + 0.6 / 86400
+        })
+      );
+      writer.write("latitude", Array.makeFromJavaArray(new double[] { 1.0 }));
+      writer.write("longitude", Array.makeFromJavaArray(new double[] { 2.0 }));
+      writer.write(
+        "TEMP",
+        Array.makeFromJavaArray(new float[][][] { { { 1f } }, { { 2f } } })
+      );
+    } catch (final ucar.ma2.InvalidRangeException e) {
+      throw new RuntimeException(e);
+    }
+
+    try (
+      TimeIndexedNetCdfGridReader reader = new TimeIndexedNetCdfGridReader(
+        subSecondFixture,
+        "time",
+        "latitude",
+        "longitude"
+      )
+    ) {
+      assertThat(reader.getDateTimes()).containsExactly(
+        LocalDateTime.of(2020, 1, 1, 0, 0, 0),
+        LocalDateTime.of(2020, 1, 1, 0, 0, 1)
+      );
+    }
+  }
+
+  @Test
   void readSliceIsReorientedToLonByLatWithFillConvertedToNaN() {
     try (TimeIndexedNetCdfGridReader reader = openReader()) {
       final double[][] slice = reader.readSlice("TEMP", 0);
