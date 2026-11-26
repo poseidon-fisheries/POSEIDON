@@ -41,12 +41,12 @@
       <property name="format"
                 value="^(?!(given|keyed|shared|filtered)$).+$"/>
     </module>
-    <!-- These words can be verbs in method names, but need nouns for values -->
+    <!-- These words can name methods, but values need nouns -->
     <module name="IllegalIdentifierName">
       <property name="tokens"
                 value="VARIABLE_DEF, PARAMETER_DEF, PATTERN_VARIABLE_DEF, RECORD_COMPONENT_DEF, LAMBDA"/>
       <property name="format"
-                value="^(?!(held|named|created|changed|built)$).+$"/>
+                value="^(?!(held|named|created|changed|built|current|previous|kept|remaining)$).+$"/>
     </module>
     <!-- A mapping's argument is named for what it is, not as mapped. A bare t is
          left to the manual audit: it also names lambda parameters that are fine. -->

@@ -47,13 +47,13 @@ class TableMappingsTest {
     final Map<String, Double> entries = new LinkedHashMap<>();
     entries.put("B", 2.5);
     entries.put("A", 1.25);
-    final var current = new AtomicReference<>(entries);
+    final var currentEntries = new AtomicReference<>(entries);
     final var supplier = tableFromMap(
       tableDefinition(
         columnDefinition("key", "STRING"),
         columnDefinition("value", "DOUBLE")
       ),
-      _ -> current::get
+      _ -> currentEntries::get
     ).get(GLOBAL_SCOPE);
 
     final Table first = supplier.get();
@@ -64,7 +64,7 @@ class TableMappingsTest {
       2.5,
       1.25
     );
-    current.set(Map.of("C", 7.5));
+    currentEntries.set(Map.of("C", 7.5));
 
     final Table second = supplier.get();
 
@@ -74,7 +74,7 @@ class TableMappingsTest {
       7.5
     );
     assertThat(first.rowCount()).isEqualTo(2);
-    current.set(Map.of());
+    currentEntries.set(Map.of());
     assertThat(supplier.get().rowCount()).isZero();
   }
 

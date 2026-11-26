@@ -82,21 +82,23 @@ class EventManagerTest {
 
   @Test
   void removingOneOfTwoListenersLeavesTheOther() {
-    final List<String> removed = new ArrayList<>();
-    final List<String> kept = new ArrayList<>();
+    final List<String> removedListenerEvents = new ArrayList<>();
+    final List<String> keptListenerEvents = new ArrayList<>();
 
     final Listener<String> removedListener = new SimpleListener<>(
       String.class,
-      removed::add
+      removedListenerEvents::add
     );
     eventManager.addListener(removedListener);
-    eventManager.addListener(new SimpleListener<>(String.class, kept::add));
+    eventManager.addListener(
+      new SimpleListener<>(String.class, keptListenerEvents::add)
+    );
 
     eventManager.removeListener(removedListener);
     eventManager.broadcast("event");
 
-    assertThat(removed).isEmpty();
-    assertThat(kept).containsExactly("event");
+    assertThat(removedListenerEvents).isEmpty();
+    assertThat(keptListenerEvents).containsExactly("event");
   }
 
   @Test

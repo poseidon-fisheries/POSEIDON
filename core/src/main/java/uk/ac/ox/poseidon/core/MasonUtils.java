@@ -313,19 +313,19 @@ public final class MasonUtils {
       candidates.size(),
       Spliterator.SIZED | Spliterator.SUBSIZED
     ) {
-      private int remaining = candidates.size();
+      private int unshuffledCount = candidates.size();
 
       @Override
       public boolean tryAdvance(final Consumer<? super T> action) {
-        final boolean advances = remaining > 0;
+        final boolean advances = unshuffledCount > 0;
         if (advances) {
-          final int i = candidates.size() - remaining;
-          final int j = i + rng.nextInt(remaining);
+          final int i = candidates.size() - unshuffledCount;
+          final int j = i + rng.nextInt(unshuffledCount);
           final int tmp = indices[i];
           indices[i] = indices[j];
           indices[j] = tmp;
           action.accept(candidates.get(indices[i]));
-          remaining--;
+          unshuffledCount--;
         }
         return advances;
       }

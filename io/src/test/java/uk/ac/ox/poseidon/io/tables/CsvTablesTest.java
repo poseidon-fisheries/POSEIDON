@@ -111,9 +111,9 @@ class CsvTablesTest {
     final Path file = directory.resolve("output.csv");
     final Table first = Table.create(StringColumn.create("name", "first"));
     final Table second = Table.create(StringColumn.create("name", "second"));
-    final var current = new AtomicReference<>(first);
+    final var currentTable = new AtomicReference<>(first);
     final var writer = csvTableWriter(
-      _ -> current::get,
+      _ -> currentTable::get,
       _ -> file,
       append,
       clearAfterWriting
@@ -123,7 +123,7 @@ class CsvTablesTest {
 
     assertThat(Files.readAllLines(file)).containsExactly("name", "first");
     assertThat(first.rowCount()).isEqualTo(clearAfterWriting ? 0 : 1);
-    current.set(second);
+    currentTable.set(second);
 
     writer.step(null);
 

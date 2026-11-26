@@ -22,14 +22,19 @@ subject.
 
 ## Name the thing, not an adjective
 
-Name the thing itself (`keyedMemory`, `memory`, `sharedEvent`) rather than
-leaving an adjective or participle dangling (`keyed`, `shared`, `filtered`),
-even for a short-lived local variable or a lambda parameter. An adjective can
-stand alone when the immediate context supplies an unmistakable noun: for
-example, `previous` and `current` in an interval comparison. Judge related names
-together and preserve their balance when renaming one. Checkstyle catches known
-cases in `config/checkstyle/checkstyle.xml`; the prose rule applies to every
-name, including those outside that list.
+Name the thing itself, as a noun or a noun with its qualifier (`keyedMemory`,
+`memory`, `sharedEvent`, `keptCatch`), even for a short-lived local variable or
+a lambda parameter. An adjective or participle on its own (`keyed`, `shared`,
+`filtered`, `current`, `kept`, `remaining`) is a dangling name in any context.
+Judge related names together and preserve their balance when renaming one.
+Checkstyle catches known cases in `config/checkstyle/checkstyle.xml`; the prose
+rule applies to every name, including those outside that list.
+
+## Units
+
+A quantity held as a bare number names its unit (`freeCapacityInKg`,
+`getTotalBiomassInKg`). A quantity whose type carries the unit
+(`Quantity<Mass>`, `Biomass`, `Duration`) takes a plain name (`capacity`).
 
 ## Mapping arguments
 
