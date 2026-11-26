@@ -50,6 +50,7 @@ import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPer
 import static uk.ac.ox.poseidon.fishing.catches.Factories.uncategorisedCatchCategory;
 import static uk.ac.ox.poseidon.fishing.catches.Factories.uniformCatchCategoriser;
 import static uk.ac.ox.poseidon.fishing.catches.disposition.Factories.proportionallyLimitingBiomassToHold;
+import static uk.ac.ox.poseidon.fishing.catches.disposition.Factories.uniformDiscardMortality;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.*;
 import static uk.ac.ox.poseidon.fishing.fields.Factories.vesselField;
 import static uk.ac.ox.poseidon.fishing.fisheables.Factories.currentCellFisheable;
@@ -320,7 +321,6 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     final var hold = vesselComponent(
       standardBiomassHold(
         massOf(15_000, KILOGRAM),
-        massOf(1, KILOGRAM),
         uniformCatchCategoriser(catchCategory)
       )
     );
@@ -420,7 +420,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     hold,
                     fuelTank,
                     currentCellFisheable(biomassGrid),
-                    proportionallyLimitingBiomassToHold()
+                    proportionallyLimitingBiomassToHold(),
+                    uniformDiscardMortality(1)
                   ),
                   checkThat(
                     allOf(

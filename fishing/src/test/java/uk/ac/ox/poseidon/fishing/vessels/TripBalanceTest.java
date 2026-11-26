@@ -142,8 +142,7 @@ class TripBalanceTest {
     ).get(GLOBAL_SCOPE);
     final var hold = new StandardBiomassHold(
       bucket -> new CategorisedCatch(Map.of(CATEGORY, bucket)),
-      40,
-      0
+      40
     );
     final var tank = new SimpleFuelTank(100, 100);
     final var engineComponent = new FactoryComponent<>(_ -> engine);
@@ -203,10 +202,9 @@ class TripBalanceTest {
       .addListener(
         new SimpleListener<>(FishingTripEndEvent.class, completed::add)
       );
-    final var disposition = compositeDispositionProcess(
+    final var disposition = compositeCatchSorting(
       selectedSpeciesRetention(_ -> List.of(TARGET)),
-      proportionallyLimitingBiomassToHold(),
-      discardMortality(0.5)
+      proportionallyLimitingBiomassToHold()
     ).get(GLOBAL_SCOPE);
     final var tripBlock = new FishingTripBlock(
       _ -> Optional.of(FISHING_CELL),
@@ -220,6 +218,7 @@ class TripBalanceTest {
           tankComponent,
           _ -> stock,
           disposition,
+          uniformDiscardMortality(0.5).get(GLOBAL_SCOPE),
           () -> now.get()
         ),
         new SetDestinationToOrigin(),

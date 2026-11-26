@@ -22,41 +22,39 @@
 
 package uk.ac.ox.poseidon.fishing.catches.disposition;
 
-import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toFunction;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.MappingFactory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link DiscardMortality}, built
- * via {@link Factories#discardMortality}.
+ * A {@link GlobalScopeFactory} counterpart of {@link UniformDiscardMortality},
+ * built via {@link Factories#uniformDiscardMortality}.
  */
 @Getter
 @ToString
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class DiscardMortalityFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  DiscardMortality
-> {
+public final class UniformDiscardMortalityFactory
+  extends GlobalScopeFactory<UniformDiscardMortality>
+{
 
-  private final MappingFactory<
-    ? super S,
-    ? super Void,
-    ? super Species,
-    Double
-  > mortalityRate;
+  private final double mortalityRate;
+
+  /** @param builder the factory properties */
+  protected UniformDiscardMortalityFactory(
+    final UniformDiscardMortalityFactoryBuilder<?, ?> builder
+  ) {
+    super(builder);
+    mortalityRate = checkUnitRange(builder.mortalityRate, "mortality rate");
+  }
 
   @Override
-  protected DiscardMortality newInstance(final S scope) {
-    return new DiscardMortality(toFunction(mortalityRate.get(scope)));
+  protected UniformDiscardMortality newInstance(final Scope scope) {
+    return new UniformDiscardMortality(mortalityRate);
   }
 }

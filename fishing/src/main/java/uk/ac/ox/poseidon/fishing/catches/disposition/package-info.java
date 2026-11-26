@@ -21,14 +21,8 @@
  */
 
 /**
- * What happens to a {@link uk.ac.ox.poseidon.fishing.catches.CategorisedCatch}
- * once it's caught: one or more
- * {@link uk.ac.ox.poseidon.fishing.catches.disposition.DispositionProcess} steps
- * sort it into retained/discarded-alive/discarded-dead
- * ({@link uk.ac.ox.poseidon.fishing.catches.disposition.Disposition}), chained
- * via
- * {@link uk.ac.ox.poseidon.fishing.catches.disposition.CompositeDispositionProcess}.
- * See {@link uk.ac.ox.poseidon.fishing.catches.disposition.Factories} for the
- * entry points.
+ * Catch sorting, discard mortality and the resulting disposition of a catch.
+ * See {@link uk.ac.ox.poseidon.fishing.catches.disposition.Factories} for
+ * components composed in a {@link uk.ac.ox.poseidon.core.Scenario}.
  */
 package uk.ac.ox.poseidon.fishing.catches.disposition;

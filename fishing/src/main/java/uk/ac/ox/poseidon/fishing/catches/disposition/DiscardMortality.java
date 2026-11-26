@@ -22,42 +22,16 @@
 
 package uk.ac.ox.poseidon.fishing.catches.disposition;
 
-import static lombok.AccessLevel.PACKAGE;
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
-
-import java.util.function.Function;
-import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
-import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 
-/**
- * A {@link DispositionProcess} that moves a per-species proportion of the
- * currently discarded-alive catch into discarded-dead.
- */
-@RequiredArgsConstructor(access = PACKAGE)
-public class DiscardMortality implements DispositionProcess {
-
-  private final Function<? super Species, Double> mortalityRate;
-
+/** Mortality of discarded catch, with the fishing action it came from. */
+@FunctionalInterface
+public interface DiscardMortality {
   /**
-   * @return {@code currentDisposition} with {@link #mortalityRate}'s
-   *         per-species fraction of its discarded-alive catch moved into
-   *         discarded-dead
+   * @param discards the catch thrown back after sorting
+   * @param action   the fishing action that caught it
+   * @return the part of the discards that dies
    */
-  @Override
-  public Disposition partition(
-    final Disposition currentDisposition,
-    final double availableCapacityInKg
-  ) {
-    final Bucket discardedAlive = currentDisposition.getDiscardedAlive();
-    final Bucket newlyDead = discardedAlive.mapBiomassValue(
-      (species, biomass) ->
-        biomass * checkUnitRange(mortalityRate.apply(species), "Mortality")
-    );
-    return new Disposition(
-      currentDisposition.getRetained(),
-      discardedAlive.subtract(newlyDead),
-      currentDisposition.getDiscardedDead().add(newlyDead)
-    );
-  }
+  Bucket deaths(Bucket discards, ExtendedFishingAction action);
 }

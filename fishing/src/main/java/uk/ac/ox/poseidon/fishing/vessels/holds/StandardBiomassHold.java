@@ -24,54 +24,22 @@ package uk.ac.ox.poseidon.fishing.vessels.holds;
 
 import lombok.Getter;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategoriser;
-import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
 
-/**
- * A {@link BiomassHold} with a fixed capacity, plus a small tolerance overage
- * allowed before {@link #addContent(CategorisedCatch)} rejects content
- * outright.
- */
+/** A {@link BiomassHold} with a fixed capacity. */
 @Getter
 public class StandardBiomassHold extends BiomassHold {
 
   private final double totalCapacityInKg;
-  private final double toleranceInKg;
 
   /**
    * @param catchCategoriser  sorts uncategorised content added to the hold
    * @param totalCapacityInKg the hold's total capacity, in kilograms
-   * @param toleranceInKg     how far over {@code totalCapacityInKg} the hold
-   *                          may go before
-   *                          {@link #addContent(CategorisedCatch)} rejects
-   *                          further content
    */
   public StandardBiomassHold(
     final CatchCategoriser catchCategoriser,
-    final double totalCapacityInKg,
-    final double toleranceInKg
+    final double totalCapacityInKg
   ) {
     super(catchCategoriser);
     this.totalCapacityInKg = totalCapacityInKg;
-    this.toleranceInKg = toleranceInKg;
-  }
-
-  /**
-   * @throws IllegalStateException if adding {@code categorisedCatch} would
-   *                               exceed {@link #totalCapacityInKg} plus
-   *                               {@link #toleranceInKg}
-   */
-  @Override
-  public void addContent(final CategorisedCatch categorisedCatch) {
-    final CategorisedCatch newContent = content.add(categorisedCatch);
-    if (newContent.getTotalBiomassInKg() <= totalCapacityInKg + toleranceInKg) {
-      content = newContent;
-    } else {
-      throw new IllegalStateException(
-        "Trying to store %f kg in the hold, but only %f kg of capacity available.".formatted(
-          categorisedCatch.getTotalBiomassInKg(),
-          getAvailableCapacityInKg()
-        )
-      );
-    }
   }
 }

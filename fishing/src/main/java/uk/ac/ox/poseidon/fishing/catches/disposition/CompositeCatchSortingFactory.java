@@ -37,44 +37,39 @@ import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of
- * {@link CompositeDispositionProcess}, built via
- * {@link Factories#compositeDispositionProcess}.
+ * {@link CompositeCatchSorting}, built via
+ * {@link Factories#compositeCatchSorting}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class CompositeDispositionProcessFactory<S extends Scope> extends RelativeScopeFactory<
+public class CompositeCatchSortingFactory<S extends Scope> extends RelativeScopeFactory<
   S,
-  CompositeDispositionProcess
+  CompositeCatchSorting
 > {
 
   @Singular
-  private final ImmutableList<
-    Factory<? super S, ? extends DispositionProcess>
-  > dispositionStrategies;
+  private final ImmutableList<Factory<? super S, ? extends CatchSorting>> steps;
 
-  /** @param dispositionStrategies the steps to chain, in order */
+  /** @param steps the steps to chain, in order */
   @SafeVarargs
   @SuppressWarnings("varargs")
-  public CompositeDispositionProcessFactory(
-    final Factory<
-      ? super S,
-      ? extends DispositionProcess
-    >... dispositionStrategies
+  public CompositeCatchSortingFactory(
+    final Factory<? super S, ? extends CatchSorting>... steps
   ) {
-    this(ImmutableList.copyOf(dispositionStrategies));
+    this(ImmutableList.copyOf(steps));
   }
 
   /**
-   * @return a {@link CompositeDispositionProcess} chaining every resolved step,
+   * @return a {@link CompositeCatchSorting} chaining every resolved step,
    *         in order
    */
   @Override
-  protected CompositeDispositionProcess newInstance(final S scope) {
-    return new CompositeDispositionProcess(
-      dispositionStrategies
+  protected CompositeCatchSorting newInstance(final S scope) {
+    return new CompositeCatchSorting(
+      steps
         .stream()
         .map(f -> f.get(scope))
         .collect(toImmutableList())

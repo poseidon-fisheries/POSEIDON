@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -25,88 +25,45 @@ package uk.ac.ox.poseidon.fishing.catches.disposition;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.DummySpecies;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 
 class ProportionallyLimitingBiomassToHoldTest {
 
-  private final Disposition disposition = new Disposition(
-    Bucket.of(
-      Map.of(
-        DummySpecies.A,
-        Biomass.ofKg(60.0),
-        DummySpecies.B,
-        Biomass.ofKg(40.0)
-      )
-    ),
-    Bucket.of(DummySpecies.A, Biomass.ofKg(5.0)),
-    Bucket.of(DummySpecies.B, Biomass.ofKg(7.0))
+  private final Bucket catches = Bucket.of(
+    new double[] { 60, 40 },
+    SpeciesIndex.of(DummySpecies.A, DummySpecies.B)
   );
-
-  private final ProportionallyLimitingBiomassToHold process =
+  private final CatchSorting catchSorting =
     new ProportionallyLimitingBiomassToHold();
 
   @Test
-  void partition_returnsDispositionUnchangedWhenRetainedFits() {
-    assertThat(process.partition(disposition, 100.0)).isSameAs(disposition);
+  void returnsTheInputWhenItFits() {
+    assertThat(catchSorting.keep(catches, 100)).isSameAs(catches);
   }
 
   @Test
-  void partition_scalesEverySpeciesBySameFactorWhenRetainedDoesNotFit() {
-    final Disposition result = process.partition(disposition, 50.0);
+  void scalesEverySpeciesByTheSameFactor() {
+    final Bucket keptCatch = catchSorting.keep(catches, 50);
 
-    assertThat(result.getRetained().getTotalBiomassInKg()).isEqualTo(50.0);
-    assertThat(result.getRetained().getKg(DummySpecies.A)).isEqualTo(30.0);
-    assertThat(result.getRetained().getKg(DummySpecies.B)).isEqualTo(20.0);
+    assertThat(keptCatch.getKg(DummySpecies.A)).isEqualTo(30);
+    assertThat(keptCatch.getKg(DummySpecies.B)).isEqualTo(20);
   }
 
   @Test
-  void partition_movesExcessToDiscardedAliveAndConservesBiomass() {
-    final Disposition result = process.partition(disposition, 50.0);
-
-    assertThat(result.getDiscardedAlive().getKg(DummySpecies.A)).isEqualTo(
-      35.0
-    );
-    assertThat(result.getDiscardedAlive().getKg(DummySpecies.B)).isEqualTo(
-      20.0
-    );
-    assertThat(result.getDiscardedDead()).isEqualTo(
-      disposition.getDiscardedDead()
-    );
-    assertThat(totalKg(result)).isEqualTo(totalKg(disposition));
-  }
-
-  @Test
-  void partition_discardsAllRetainedAliveWhenCapacityIsZero() {
-    final Disposition result = process.partition(disposition, 0.0);
-
-    assertThat(result.getRetained().getTotalBiomassInKg()).isZero();
-    assertThat(result.getDiscardedAlive().getKg(DummySpecies.A)).isEqualTo(
-      65.0
-    );
-    assertThat(result.getDiscardedAlive().getKg(DummySpecies.B)).isEqualTo(
-      40.0
-    );
+  void zeroCapacityKeepsNothing() {
+    assertThat(catchSorting.keep(catches, 0).isEmpty()).isTrue();
   }
 
   @ParameterizedTest
-  @ValueSource(doubles = { -1.0, Double.NaN })
-  void partition_throwsOnNegativeOrNaNCapacity(final double capacity) {
-    assertThatThrownBy(() -> process.partition(disposition, capacity))
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("must be a non-negative value");
-  }
-
-  private static double totalKg(final Disposition disposition) {
-    return (
-      disposition.getRetained().getTotalBiomassInKg() +
-      disposition.getDiscardedAlive().getTotalBiomassInKg() +
-      disposition.getDiscardedDead().getTotalBiomassInKg()
-    );
+  @ValueSource(doubles = { -1, Double.NaN })
+  void rejectsInvalidCapacity(final double freeCapacityInKg) {
+    assertThatThrownBy(() ->
+      catchSorting.keep(catches, freeCapacityInKg)
+    ).isInstanceOf(IllegalArgumentException.class);
   }
 }

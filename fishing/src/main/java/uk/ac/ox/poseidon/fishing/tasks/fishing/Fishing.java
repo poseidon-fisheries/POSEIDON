@@ -32,8 +32,9 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.Clock;
+import uk.ac.ox.poseidon.fishing.catches.disposition.CatchSorting;
+import uk.ac.ox.poseidon.fishing.catches.disposition.DiscardMortality;
 import uk.ac.ox.poseidon.fishing.catches.disposition.Disposition;
-import uk.ac.ox.poseidon.fishing.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
@@ -47,7 +48,7 @@ import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
  * An {@link ExtendedTripTask} that fishes a single {@link Fisheable} using the
  * vessel's gear: runs for a duration drawn from the gear's duration supplier
  * (the actual duration, which may differ from the gear's expected one), then
- * sorts the catch via {@code dispositionProcess}, adds the retained portion to
+ * sorts the catch via {@code catchSorting}, adds the retained portion to
  * the hold, releases what's discarded alive back to the fisheable, broadcasts a
  * {@link FishingActionEvent}, and takes the fuel the gear burns per hour of
  * fishing from the tank.
@@ -68,7 +69,10 @@ public class Fishing extends ExtendedTripTask {
   private final Function<? super Vessel, Fisheable> fisheable;
 
   @NonNull
-  private final DispositionProcess dispositionProcess;
+  private final CatchSorting catchSorting;
+
+  @NonNull
+  private final DiscardMortality discardMortality;
 
   /** The clock, which dates the start of each fishing action. */
   @NonNull
@@ -116,9 +120,9 @@ public class Fishing extends ExtendedTripTask {
 
   /**
    * Fishes the fisheable {@link #fisheable} supplies, sorts the catch
-   * via {@link #dispositionProcess}, retains what fits in the hold, releases
-   * the rest alive back to the fisheable, broadcasts a {@link FishingActionEvent},
-   * and consumes fuel for the elapsed duration.
+   * via {@link #catchSorting}, stores the kept catch and applies discard
+   * mortality. It releases survivors back to the fisheable, broadcasts a
+   * {@link FishingActionEvent}, and consumes fuel for the elapsed duration.
    *
    * @return always {@code SUCCEEDED}
    */
@@ -128,12 +132,20 @@ public class Fishing extends ExtendedTripTask {
     final Gear gear = this.gear.of(getVessel());
     final Bucket grossCatch = gear.fish(fisheable);
     final Hold hold = this.hold.of(getVessel());
-    final Disposition disposition = dispositionProcess.partition(
+    final Bucket keptCatch = catchSorting.keep(
       grossCatch,
       hold.getAvailableCapacityInKg()
     );
-    hold.addContent(disposition.getRetained());
-    fisheable.release(disposition.getDiscardedAlive());
+    final Bucket discards = grossCatch.subtract(keptCatch);
+    hold.addContent(keptCatch);
+    final Bucket deadDiscards = discardMortality.deaths(discards, action);
+    final Bucket survivingDiscards = discards.subtract(deadDiscards);
+    final Disposition disposition = new Disposition(
+      keptCatch,
+      survivingDiscards,
+      deadDiscards
+    );
+    fisheable.release(survivingDiscards);
     getTrip()
       .getEventManager()
       .broadcast(

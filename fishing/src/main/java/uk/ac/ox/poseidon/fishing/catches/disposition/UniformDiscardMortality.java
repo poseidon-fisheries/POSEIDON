@@ -22,40 +22,28 @@
 
 package uk.ac.ox.poseidon.fishing.catches.disposition;
 
-import java.util.Collection;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
-/**
- * A {@link DispositionProcess} that chains several steps, each refining the
- * previous one's result.
- */
-public class CompositeDispositionProcess implements DispositionProcess {
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 
-  private final DispositionProcess[] dispositionStrategies;
+/** Applies one discard mortality rate to every species, independently of haul. */
+public final class UniformDiscardMortality implements DiscardMortality {
 
-  CompositeDispositionProcess(
-    final Collection<DispositionProcess> dispositionStrategies
-  ) {
-    this.dispositionStrategies = dispositionStrategies.toArray(
-      DispositionProcess[]::new
-    );
+  private final double mortalityRate;
+
+  /** @param mortalityRate the fraction of discards that dies, in [0, 1] */
+  public UniformDiscardMortality(final double mortalityRate) {
+    this.mortalityRate = checkUnitRange(mortalityRate, "mortality rate");
   }
 
-  /**
-   * @return the disposition after running every step in
-   *         {@link #dispositionStrategies}, in order
-   */
   @Override
-  public Disposition partition(
-    final Disposition currentDisposition,
-    final double availableCapacityInKg
+  public Bucket deaths(
+    final Bucket discards,
+    final ExtendedFishingAction action
   ) {
-    Disposition disposition = currentDisposition;
-    for (final DispositionProcess dispositionProcess : dispositionStrategies) {
-      disposition = dispositionProcess.partition(
-        disposition,
-        availableCapacityInKg
-      );
-    }
-    return disposition;
+    return discards.mapContent((species, content) ->
+      content.multiply(mortalityRate)
+    );
   }
 }

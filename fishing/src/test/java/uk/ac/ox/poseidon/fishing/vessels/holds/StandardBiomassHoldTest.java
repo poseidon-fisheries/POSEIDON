@@ -39,8 +39,7 @@ final class StandardBiomassHoldTest {
 
   private final StandardBiomassHold hold = new StandardBiomassHold(
     bucket -> new CategorisedCatch(Map.of(CATEGORY, bucket)),
-    10.0,
-    1.0
+    10.0
   );
 
   private static CategorisedCatch kg(final double kg) {
@@ -48,20 +47,60 @@ final class StandardBiomassHoldTest {
   }
 
   @Test
-  void accumulatesWhatIsAddedUpToItsCapacityPlusTolerance() {
+  void acceptsRoundingWithinTheRelativeMargin() {
     hold.addContent(kg(6.0));
-    hold.addContent(kg(5.0));
+    hold.addContent(kg(4.000000005));
 
-    assertThat(hold.getContent().getTotalBiomassInKg()).isEqualTo(11.0);
+    assertThat(hold.getContent().getTotalBiomassInKg()).isEqualTo(10.000000005);
   }
 
   @Test
-  void rejectsContentBeyondItsCapacityPlusTolerance() {
+  void rejectsContentBeyondItsCapacityAndReportsTheCause() {
     hold.addContent(kg(6.0));
 
     assertThatThrownBy(() -> hold.addContent(kg(5.5)))
       .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("only");
+      .hasMessageContaining("5.5 kg")
+      .hasMessageContaining("6.0 kg")
+      .hasMessageContaining("10.0 kg")
+      .hasMessageContaining("sorting");
     assertThat(hold.getContent().getTotalBiomassInKg()).isEqualTo(6.0);
+  }
+
+  @Test
+  void rejectsContentBeyondRelativeMarginWithoutChangingContent() {
+    hold.addContent(kg(6.0));
+
+    assertThatThrownBy(() -> hold.addContent(kg(4.000001))).isInstanceOf(
+      IllegalStateException.class
+    );
+    assertThat(hold.getContent().getTotalBiomassInKg()).isEqualTo(6.0);
+  }
+
+  @Test
+  void aZeroCapacityHoldRejectsAnyPositiveCatch() {
+    final Hold emptyHold = new StandardBiomassHold(
+      bucket -> new CategorisedCatch(Map.of(CATEGORY, bucket)),
+      0
+    );
+
+    assertThatThrownBy(() -> emptyHold.addContent(kg(0.000001))).isInstanceOf(
+      IllegalStateException.class
+    );
+    assertThat(emptyHold.isEmpty()).isTrue();
+  }
+
+  @Test
+  void anInfiniteHoldAcceptsCatchWithoutAFiniteLimit() {
+    final Hold infiniteHold = new InfiniteBiomassHold(bucket ->
+      new CategorisedCatch(Map.of(CATEGORY, bucket))
+    );
+
+    infiniteHold.addContent(kg(1e100));
+    infiniteHold.addContent(Bucket.of(SPECIES, 1e100));
+
+    assertThat(infiniteHold.getContent().getTotalBiomassInKg()).isEqualTo(
+      2e100
+    );
   }
 }

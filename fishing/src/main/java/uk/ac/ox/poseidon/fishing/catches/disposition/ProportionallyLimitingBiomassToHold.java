@@ -29,61 +29,29 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /**
- * A {@link DispositionProcess} that discards (alive) whatever retained catch
- * doesn't fit in the remaining hold capacity, scaling every species down
- * proportionally rather than discarding whole species.
+ * Keeps the catch that fits the free capacity, scaling every species' content
+ * by the same factor when the catch is too large.
  */
 @NoArgsConstructor(access = PACKAGE)
-public class ProportionallyLimitingBiomassToHold implements DispositionProcess {
+public class ProportionallyLimitingBiomassToHold implements CatchSorting {
 
   /**
-   * @return {@code currentDisposition} unchanged if its retained catch already
-   *         fits in {@code availableCapacityInKg}; otherwise every species'
-   *         retained biomass scaled down by the same factor to fit, with the
-   *         rest moved to discarded-alive
-   * @throws IllegalArgumentException if {@code availableCapacityInKg} is
-   *                                  negative or NaN
+   * @throws IllegalArgumentException if the free capacity is negative or NaN
    */
   @Override
-  public Disposition partition(
-    final Disposition currentDisposition,
-    final double availableCapacityInKg
-  ) {
+  public Bucket keep(final Bucket catches, final double freeCapacityInKg) {
     checkArgument(
-      !Double.isNaN(availableCapacityInKg) && availableCapacityInKg >= 0,
-      "availableCapacityInKg must be a non-negative value, got %s",
-      availableCapacityInKg
+      !Double.isNaN(freeCapacityInKg) && freeCapacityInKg >= 0,
+      "freeCapacityInKg must be a non-negative value, got %s",
+      freeCapacityInKg
     );
-    final double currentlyRetainedInKg = currentDisposition
-      .getRetained()
-      .getTotalBiomass()
-      .asKg();
-    return currentlyRetainedInKg <= availableCapacityInKg
-      ? currentDisposition
-      : scaledDown(
-          currentDisposition,
-          availableCapacityInKg / currentlyRetainedInKg
+    final double catchInKg = catches.getTotalBiomassInKg();
+    final double proportionToKeep =
+      catchInKg <= freeCapacityInKg ? 1 : freeCapacityInKg / catchInKg;
+    return catchInKg <= freeCapacityInKg
+      ? catches
+      : catches.mapContent((species, content) ->
+          content.multiply(proportionToKeep)
         );
-  }
-
-  /**
-   * @return {@code currentDisposition} with its retained biomass scaled by
-   *         {@code proportionToKeep}, the rest moved to discarded-alive
-   */
-  private static Disposition scaledDown(
-    final Disposition currentDisposition,
-    final double proportionToKeep
-  ) {
-    final Bucket updatedRetained = currentDisposition
-      .getRetained()
-      .mapContent((species, biomass) -> biomass.multiply(proportionToKeep));
-    final Bucket newlyDiscarded = currentDisposition
-      .getRetained()
-      .subtract(updatedRetained);
-    return new Disposition(
-      updatedRetained,
-      currentDisposition.getDiscardedAlive().add(newlyDiscarded),
-      currentDisposition.getDiscardedDead()
-    );
   }
 }

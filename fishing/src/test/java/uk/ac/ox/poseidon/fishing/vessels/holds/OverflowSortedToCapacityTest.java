@@ -33,28 +33,26 @@ import uk.ac.ox.poseidon.biology.species.DummySpecies;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategory;
 import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
-import uk.ac.ox.poseidon.fishing.catches.disposition.Disposition;
-import uk.ac.ox.poseidon.fishing.catches.disposition.DispositionProcess;
+import uk.ac.ox.poseidon.fishing.catches.disposition.CatchSorting;
 
 /**
  * A set bigger than the hold's free capacity, as {@code Fishing} handles it:
  * the limiter fits it to the free capacity, and the hold then counts as full.
  */
-class OverflowReturnedAliveTest {
+class OverflowSortedToCapacityTest {
 
   private static final CatchCategory CATEGORY = new CatchCategory("C");
 
-  private final DispositionProcess limiter =
+  private final CatchSorting limiter =
     proportionallyLimitingBiomassToHold().get(Scope.GLOBAL_SCOPE);
 
   private final StandardBiomassHold hold = new StandardBiomassHold(
     bucket -> new CategorisedCatch(Map.of(CATEGORY, bucket)),
-    60_000.0,
-    1.0
+    60_000.0
   );
 
   @Test
-  void aSetBeyondTheFreeCapacityFillsTheHoldAndReturnsTheRestAlive() {
+  void aSetBeyondTheFreeCapacityFillsTheHoldAndDiscardsTheRest() {
     final Bucket set = Bucket.of(
       Map.of(
         DummySpecies.A,
@@ -65,35 +63,28 @@ class OverflowReturnedAliveTest {
     );
     hold.addContent(Bucket.of(DummySpecies.A, Biomass.ofKg(45_000.0)));
 
-    final Disposition disposition = limiter.partition(
-      set,
-      hold.getAvailableCapacityInKg()
-    );
-    hold.addContent(disposition.getRetained());
+    final Bucket keptCatch = limiter.keep(set, hold.getAvailableCapacityInKg());
+    hold.addContent(keptCatch);
 
     assertThat(hold.isFilledTo(1)).isTrue();
     assertThat(hold.getContent().getTotalBiomassInKg()).isCloseTo(
       60_000.0,
       org.assertj.core.data.Offset.offset(1e-6)
     );
-    assertThat(disposition.getDiscardedAlive().getTotalBiomassInKg()).isCloseTo(
+    assertThat(set.subtract(keptCatch).getTotalBiomassInKg()).isCloseTo(
       set.getTotalBiomassInKg() - 15_000.0,
       org.assertj.core.data.Offset.offset(1e-6)
     );
-    assertThat(disposition.getDiscardedDead().isEmpty()).isTrue();
   }
 
   @Test
   void aSetThatFitsLeavesTheHoldBelowTheThresholdAndReturnsNothing() {
     final Bucket set = Bucket.of(DummySpecies.A, Biomass.ofKg(10_000.0));
 
-    final Disposition disposition = limiter.partition(
-      set,
-      hold.getAvailableCapacityInKg()
-    );
-    hold.addContent(disposition.getRetained());
+    final Bucket keptCatch = limiter.keep(set, hold.getAvailableCapacityInKg());
+    hold.addContent(keptCatch);
 
     assertThat(hold.isFilledTo(0.5)).isFalse();
-    assertThat(disposition.getDiscardedAlive().isEmpty()).isTrue();
+    assertThat(set.subtract(keptCatch).isEmpty()).isTrue();
   }
 }

@@ -154,11 +154,12 @@ class PeterSnapperScenarioTest {
   // learn from their own and their friends' trip outcomes through one memory
   // of the last received profit per hour, which draws differently from the
   // earlier tables, evaluator and imitation. They changed again when travel
-  // and exponential durations began to round up to whole seconds.
+  // and exponential durations began to round up to whole seconds, and when
+  // overflow from the hold began to die rather than returning to the sea.
   @Test
   void landingsMatchTheBaseline() {
     assertThat(landingsForAYear(new PeterSnapperScenario().get())).isEqualTo(
-      Map.of(1, 2.3084128253837388E7)
+      Map.of(1, 2.3249272048290823E7)
     );
   }
 

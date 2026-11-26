@@ -35,7 +35,8 @@ public final class Factories {
 
   /**
    * @param catchCategoriser sorts uncategorised content added to the hold
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory}
+   * @return a
+   *         {@link uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory}
    *         for an {@link InfiniteBiomassHold}
    * @see InfiniteBiomassHold
    */
@@ -50,10 +51,9 @@ public final class Factories {
 
   /**
    * @param capacity         the hold's total capacity
-   * @param tolerance        how far over capacity the hold may go before
-   *                         rejecting content
    * @param catchCategoriser sorts uncategorised content added to the hold
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory}
+   * @return a
+   *         {@link uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory}
    *         for a {@link StandardBiomassHold}
    * @see StandardBiomassHold
    */
@@ -64,17 +64,9 @@ public final class Factories {
     > capacity,
     final Factory<
       ? super VesselComponentScope,
-      ? extends Quantity<Mass>
-    > tolerance,
-    final Factory<
-      ? super VesselComponentScope,
       ? extends CatchCategoriser
     > catchCategoriser
   ) {
-    return new StandardBiomassHoldFactory(
-      capacity,
-      tolerance,
-      catchCategoriser
-    );
+    return new StandardBiomassHoldFactory(capacity, catchCategoriser);
   }
 }

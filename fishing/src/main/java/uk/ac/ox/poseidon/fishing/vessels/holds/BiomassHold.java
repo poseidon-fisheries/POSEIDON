@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 /**
  * A {@link Hold} base that sorts uncategorised content via
  * {@link #catchCategoriser} and keeps the running content in {@link #content}.
- * Subclasses supply {@link #getTotalCapacityInKg()} and may override
- * {@link #addContent(CategorisedCatch)} to enforce it (this base does not).
+ * Subclasses supply {@link #getTotalCapacityInKg()}; additions exceeding it
+ * beyond {@link #FULLNESS_TOLERANCE} are rejected without changing the content.
  */
 @Getter
 @RequiredArgsConstructor
@@ -55,10 +55,29 @@ public abstract class BiomassHold implements Hold {
     addContent(catchCategoriser.apply(uncategorisedCatch));
   }
 
-  /** Adds {@code categorisedCatch} to {@link #content} unconditionally. */
+  /**
+   * Adds catch only if the resulting content fits within the relative margin.
+   *
+   * @throws IllegalStateException if the resulting content exceeds capacity
+   */
   @Override
   public void addContent(final CategorisedCatch categorisedCatch) {
-    content = content.add(categorisedCatch);
+    final CategorisedCatch newContent = content.add(categorisedCatch);
+    if (
+      !(
+        newContent.getTotalBiomassInKg() <=
+        getTotalCapacityInKg() * (1 + FULLNESS_TOLERANCE)
+      )
+    ) {
+      throw new IllegalStateException(
+        "Cannot add %s kg to a hold containing %s kg with capacity %s kg; no sorting step fitted the catch to the free capacity.".formatted(
+          categorisedCatch.getTotalBiomassInKg(),
+          content.getTotalBiomassInKg(),
+          getTotalCapacityInKg()
+        )
+      );
+    }
+    content = newContent;
   }
 
   /**

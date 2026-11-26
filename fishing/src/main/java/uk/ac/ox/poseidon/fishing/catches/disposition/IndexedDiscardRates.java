@@ -30,9 +30,11 @@ import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 
 /**
  * Applies per-species discard rates to retained catch, using a pre-indexed rate
- * array for efficient array-based operations.
+ * array for efficient array-based operations. The factory evaluates the
+ * per-species mapping once at construction; later changes to its inputs
+ * are not seen.
  */
-public class IndexedDiscardRates implements DispositionProcess {
+public class IndexedDiscardRates implements CatchSorting {
 
   private final @NonNull SpeciesIndexedDoubleArray discardRates;
 
@@ -47,23 +49,12 @@ public class IndexedDiscardRates implements DispositionProcess {
     this.discardRates = discardRates;
   }
 
-  /**
-   * @return {@code currentDisposition} with {@link #discardRates}' per-species
-   *         fraction of its retained catch moved into discarded-alive
-   */
   @Override
-  public Disposition partition(
-    final Disposition currentDisposition,
-    final double availableCapacityInKg
-  ) {
-    final Bucket discarded = SpeciesSpecificRateBuckets.applyRates(
-      currentDisposition.getRetained(),
+  public Bucket keep(final Bucket catches, final double freeCapacityInKg) {
+    final Bucket discards = SpeciesSpecificRateBuckets.applyRates(
+      catches,
       discardRates
     );
-    return new Disposition(
-      currentDisposition.getRetained().subtract(discarded),
-      currentDisposition.getDiscardedAlive().add(discarded),
-      currentDisposition.getDiscardedDead()
-    );
+    return catches.subtract(discards);
   }
 }

@@ -31,8 +31,7 @@ import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /**
- * Factories for the steps of a catch's {@link DispositionProcess}
- * (retention/discarding).
+ * Factories for catch sorting and discard mortality.
  */
 @SuppressWarnings({ "varargs", "overloads" })
 public final class Factories {
@@ -42,7 +41,8 @@ public final class Factories {
   /**
    * @param species      the species to index rates over
    * @param rateFunction the proportion of retained catch to discard, per
-   *                     species
+   *                     species; evaluated once when built, so later input
+   *                     changes are not seen
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
    *         {@link IndexedDiscardRates}
    * @see IndexedDiscardRates
@@ -74,7 +74,8 @@ public final class Factories {
 
   /**
    * @param species      the species to index rates over
-   * @param rateFunction the discard mortality rate, per species
+   * @param rateFunction the discard mortality rate, per species; evaluated
+   *                     once when built, so later input changes are not seen
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
    *         {@link IndexedDiscardMortality}
    * @see IndexedDiscardMortality
@@ -92,32 +93,16 @@ public final class Factories {
   }
 
   /**
-   * @param species the species to index rates over
-   * @param rate    the rate, the same for every species
-   * @return the same as {@link #indexedDiscardMortality(Factory, MappingFactory)}, with a
-   *         constant {@code rate}
-   */
-  public static <S extends Scope> IndexedDiscardMortalityFactory<S> indexedDiscardMortality(
-    final Factory<? super S, ? extends Collection<? extends Species>> species,
-    final double rate
-  ) {
-    return indexedDiscardMortality(species, always(rate));
-  }
-
-  /**
-   * @param dispositionStrategies the steps to chain, in order
+   * @param steps the steps to chain, in order
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link CompositeDispositionProcess}
-   * @see CompositeDispositionProcess
+   *         {@link CompositeCatchSorting}
+   * @see CompositeCatchSorting
    */
   @SafeVarargs
-  public static <S extends Scope> CompositeDispositionProcessFactory<S> compositeDispositionProcess(
-    final Factory<
-      ? super S,
-      ? extends DispositionProcess
-    >... dispositionStrategies
+  public static <S extends Scope> CompositeCatchSortingFactory<S> compositeCatchSorting(
+    final Factory<? super S, ? extends CatchSorting>... steps
   ) {
-    return new CompositeDispositionProcessFactory<>(dispositionStrategies);
+    return new CompositeCatchSortingFactory<>(steps);
   }
 
   /**
@@ -136,31 +121,17 @@ public final class Factories {
   }
 
   /**
-   * @param mortalityRate the discard mortality rate, the same for every species
-   * @return the same as {@link #discardMortality(MappingFactory)}, with a
-   *         constant {@code mortalityRate}
+   * @param mortalityRate the fraction of discards that dies, in [0, 1]
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link UniformDiscardMortality}
+   * @see UniformDiscardMortality
    */
-  public static <S extends Scope> DiscardMortalityFactory<S> discardMortality(
+  public static UniformDiscardMortalityFactory uniformDiscardMortality(
     final double mortalityRate
   ) {
-    return discardMortality(always(mortalityRate));
-  }
-
-  /**
-   * @param mortalityRate the discard mortality rate, per species
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link DiscardMortality}
-   * @see DiscardMortality
-   */
-  public static <S extends Scope> DiscardMortalityFactory<S> discardMortality(
-    final MappingFactory<
-      ? super S,
-      ? super Void,
-      ? super Species,
-      Double
-    > mortalityRate
-  ) {
-    return new DiscardMortalityFactory<>(mortalityRate);
+    return UniformDiscardMortalityFactory.builder()
+      .mortalityRate(mortalityRate)
+      .build();
   }
 
   /**
@@ -170,14 +141,5 @@ public final class Factories {
    */
   public static ProportionallyLimitingBiomassToHoldFactory proportionallyLimitingBiomassToHold() {
     return new ProportionallyLimitingBiomassToHoldFactory();
-  }
-
-  /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   *         {@link FullDiscardMortality}
-   * @see FullDiscardMortality
-   */
-  public static FullDiscardMortalityFactory fullDiscardMortality() {
-    return new FullDiscardMortalityFactory();
   }
 }

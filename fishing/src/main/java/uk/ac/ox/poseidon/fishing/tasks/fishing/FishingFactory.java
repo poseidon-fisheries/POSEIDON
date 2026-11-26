@@ -32,7 +32,8 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
-import uk.ac.ox.poseidon.fishing.catches.disposition.DispositionProcess;
+import uk.ac.ox.poseidon.fishing.catches.disposition.CatchSorting;
+import uk.ac.ox.poseidon.fishing.catches.disposition.DiscardMortality;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
@@ -62,8 +63,12 @@ public class FishingFactory extends TaskFactory<Fishing> {
   > fisheable;
   private final Factory<
     ? super VesselComponentScope,
-    ? extends DispositionProcess
-  > dispositionProcess;
+    ? extends CatchSorting
+  > catchSorting;
+  private final Factory<
+    ? super VesselComponentScope,
+    ? extends DiscardMortality
+  > discardMortality;
 
   @Override
   protected Fishing newInstance(final VesselComponentScope scope) {
@@ -72,7 +77,8 @@ public class FishingFactory extends TaskFactory<Fishing> {
       hold,
       fuelTank,
       fisheable.get(scope),
-      dispositionProcess.get(scope),
+      catchSorting.get(scope),
+      discardMortality.get(scope),
       clock().get(scope)
     );
   }

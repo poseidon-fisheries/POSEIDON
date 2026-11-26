@@ -39,8 +39,10 @@ import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.fishing.catches.disposition.CatchSorting;
+import uk.ac.ox.poseidon.fishing.catches.disposition.DiscardMortality;
 import uk.ac.ox.poseidon.fishing.catches.disposition.Disposition;
-import uk.ac.ox.poseidon.fishing.catches.disposition.DispositionProcess;
+import uk.ac.ox.poseidon.fishing.catches.disposition.UniformDiscardMortality;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
@@ -54,40 +56,42 @@ class FishingTest {
   private final Species a = new Species("A", null, "A");
 
   @Test
-  void completePassesCatchThroughDispositionAndBroadcastsOutcome()
+  void completeAppliesMortalityAfterSortingAndRecordsEveryPart()
     throws Exception {
     final Vessel vessel = mock(Vessel.class);
     final Gear gear = mock(Gear.class);
     final Hold hold = mock(Hold.class);
-    final DispositionProcess dispositionProcess = mock(
-      DispositionProcess.class
-    );
+    final CatchSorting catchSorting = mock(CatchSorting.class);
     final Fisheable fisheable = mock(Fisheable.class);
     final Trip trip = mock(Trip.class);
     final EventManager eventManager = mock(EventManager.class);
 
     final Bucket grossCatch = Bucket.of(a, Biomass.ofKg(10.0));
     final Bucket retained = Bucket.of(a, Biomass.ofKg(7.0));
-    final Bucket discardedAlive = Bucket.of(a, Biomass.ofKg(3.0));
+    final Bucket discardedAlive = Bucket.of(a, Biomass.ofKg(1.5));
     final Disposition disposition = new Disposition(
       retained,
       discardedAlive,
-      Bucket.empty()
+      Bucket.of(a, Biomass.ofKg(1.5))
     );
 
     when(gear.fish(fisheable)).thenReturn(grossCatch);
     when(hold.getAvailableCapacityInKg()).thenReturn(42.0);
-    when(dispositionProcess.partition(grossCatch, 42.0)).thenReturn(
-      disposition
-    );
+    when(catchSorting.keep(grossCatch, 42.0)).thenReturn(retained);
     when(trip.getEventManager()).thenReturn(eventManager);
 
+    final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
     final ExposedFishing fishing = new ExposedFishing(
       componentGiving(vessel, gear),
       componentGiving(vessel, hold),
       componentGiving(vessel, mock(FuelTank.class)),
       v -> fisheable,
-      dispositionProcess
+      catchSorting,
+      (discards, fishingAction) -> {
+        assertThat(fishingAction).isSameAs(action);
+        assertThat(discards.getKg(a)).isEqualTo(3.0);
+        return Bucket.of(a, 1.5);
+      }
     );
     setTaskObject(fishing, vessel);
     setField(
@@ -96,17 +100,12 @@ class FishingTest {
       trip,
       fishing.getClass().getSuperclass().getSuperclass()
     );
-    setField(
-      fishing,
-      "action",
-      mock(ExtendedFishingAction.class),
-      fishing.getClass().getSuperclass()
-    );
+    setField(fishing, "action", action, fishing.getClass().getSuperclass());
 
     final Task.Status status = fishing.invokeComplete();
 
     assertThat(status).isEqualTo(Task.Status.SUCCEEDED);
-    verify(dispositionProcess).partition(grossCatch, 42.0);
+    verify(catchSorting).keep(grossCatch, 42.0);
     verify(hold).addContent(retained);
     verify(fisheable).release(discardedAlive);
 
@@ -126,19 +125,16 @@ class FishingTest {
     final Vessel vessel = mock(Vessel.class);
     final Gear gear = mock(Gear.class);
     final Hold hold = mock(Hold.class);
-    final DispositionProcess dispositionProcess = mock(
-      DispositionProcess.class
-    );
+    final CatchSorting catchSorting = mock(CatchSorting.class);
     final Fisheable fisheable = mock(Fisheable.class);
     final Trip trip = mock(Trip.class);
     final EventManager eventManager = mock(EventManager.class);
 
     final Bucket grossCatch = Bucket.empty();
-    final Disposition disposition = Disposition.empty();
 
     when(gear.fish(fisheable)).thenReturn(grossCatch);
     when(hold.getAvailableCapacityInKg()).thenReturn(0.0);
-    when(dispositionProcess.partition(grossCatch, 0.0)).thenReturn(disposition);
+    when(catchSorting.keep(grossCatch, 0.0)).thenReturn(Bucket.empty());
     when(trip.getEventManager()).thenReturn(eventManager);
 
     final ExposedFishing fishing = new ExposedFishing(
@@ -146,7 +142,8 @@ class FishingTest {
       componentGiving(vessel, hold),
       componentGiving(vessel, mock(FuelTank.class)),
       v -> fisheable,
-      dispositionProcess
+      catchSorting,
+      new UniformDiscardMortality(0.5)
     );
     setTaskObject(fishing, vessel);
     setField(
@@ -165,7 +162,7 @@ class FishingTest {
     final Task.Status status = fishing.invokeComplete();
 
     assertThat(status).isEqualTo(Task.Status.SUCCEEDED);
-    verify(dispositionProcess).partition(grossCatch, 0.0);
+    verify(catchSorting).keep(grossCatch, 0.0);
     verify(hold).addContent(Bucket.empty());
     verify(fisheable).release(Bucket.empty());
     verify(eventManager).broadcast(any(FishingActionEvent.class));
@@ -180,7 +177,8 @@ class FishingTest {
       componentGiving(vessel, mock(Hold.class)),
       componentGiving(vessel, mock(FuelTank.class)),
       v -> mock(Fisheable.class),
-      mock(DispositionProcess.class)
+      mock(CatchSorting.class),
+      new UniformDiscardMortality(0.5)
     );
     setTaskObject(fishing, vessel);
 
@@ -196,10 +194,17 @@ class FishingTest {
       final VesselComponent<Hold> hold,
       final VesselComponent<FuelTank> fuelTank,
       final Function<? super Vessel, Fisheable> fisheable,
-      final DispositionProcess dispositionProcess
+      final CatchSorting catchSorting,
+      final DiscardMortality discardMortality
     ) {
-      super(gear, hold, fuelTank, fisheable, dispositionProcess, () ->
-        LocalDateTime.of(2026, 1, 1, 0, 0)
+      super(
+        gear,
+        hold,
+        fuelTank,
+        fisheable,
+        catchSorting,
+        discardMortality,
+        () -> LocalDateTime.of(2026, 1, 1, 0, 0)
       );
     }
 

@@ -63,11 +63,7 @@ class HoldStoreTest {
       mock(CatchCategoriser.class);
     return Stream.of(
       infiniteBiomassHold(categoriser),
-      standardBiomassHold(
-        _ -> getQuantity(100, KILOGRAM),
-        _ -> getQuantity(0, KILOGRAM),
-        categoriser
-      )
+      standardBiomassHold(_ -> getQuantity(100, KILOGRAM), categoriser)
     );
   }
 

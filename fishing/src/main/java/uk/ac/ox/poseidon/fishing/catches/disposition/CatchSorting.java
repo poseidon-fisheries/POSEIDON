@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -25,26 +25,16 @@ package uk.ac.ox.poseidon.fishing.catches.disposition;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /**
- * A {@link DispositionProcess} that moves all currently discarded-alive catch
- * into discarded-dead.
+ * A crew's sorting of a catch into what is kept and what is discarded.
+ * Each step must keep only part of its input, at the content's own resolution.
+ * Steps can be chained with {@link CompositeCatchSorting}.
  */
-public class FullDiscardMortality implements DispositionProcess {
-
+@FunctionalInterface
+public interface CatchSorting {
   /**
-   * @return {@code currentDisposition} with all of its discarded-alive catch
-   *         moved to discarded-dead
+   * @param catches          the catch to sort
+   * @param freeCapacityInKg the hold's free capacity in kilograms
+   * @return the part of the catch kept for the hold
    */
-  @Override
-  public Disposition partition(
-    final Disposition currentDisposition,
-    final double availableCapacityInKg
-  ) {
-    return new Disposition(
-      currentDisposition.getRetained(),
-      Bucket.empty(),
-      currentDisposition
-        .getDiscardedDead()
-        .add(currentDisposition.getDiscardedAlive())
-    );
-  }
+  Bucket keep(Bucket catches, double freeCapacityInKg);
 }

@@ -274,8 +274,11 @@ components:
                 child: !!uk.ac.ox.poseidon.fishing.tasks.branches.SequenceTaskFactory
                   children:
                   - !!uk.ac.ox.poseidon.fishing.tasks.fishing.FishingFactory
-                    dispositionProcess: !!uk.ac.ox.poseidon.fishing.catches.disposition.ProportionallyLimitingBiomassToHoldFactory {
+                    catchSorting: !!uk.ac.ox.poseidon.fishing.catches.disposition.ProportionallyLimitingBiomassToHoldFactory {
                       }
+                    discardMortality: !!uk.ac.ox.poseidon.fishing.catches.disposition.UniformDiscardMortalityFactory {
+                      mortalityRate: 1.0
+                    }
                     fisheable: !!uk.ac.ox.poseidon.fishing.fisheables.CurrentCellFisheableFactory
                       fisheableGrid: *id005
                     fuelTank: *id014
@@ -306,10 +309,6 @@ components:
                         }
                         catchCategoriser: !!uk.ac.ox.poseidon.fishing.catches.UniformCatchCategoriserFactory
                           catchCategory: *id017
-                        tolerance: !!uk.ac.ox.poseidon.core.quantities.MassFactory {
-                          unitString: kg,
-                          value: 1.0
-                        }
                   - !!uk.ac.ox.poseidon.fishing.tasks.general.VesselPredicateTaskFactory
                     predicate: !!uk.ac.ox.poseidon.core.functions.MappingAsValueFactory
                       mapping: !!uk.ac.ox.poseidon.core.predicates.logical.AllOfFactory

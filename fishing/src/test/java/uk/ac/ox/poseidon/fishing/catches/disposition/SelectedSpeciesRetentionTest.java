@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -32,119 +32,35 @@ import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 
 class SelectedSpeciesRetentionTest {
 
-  @Test
-  void partition_keepsSelectedSpeciesAndDiscardsOthers() {
-    final SpeciesIndex speciesIndex = SpeciesIndex.of(
-      DummySpecies.A,
-      DummySpecies.B,
-      DummySpecies.C
-    );
-    final double[] retainedBiomass = new double[speciesIndex.size()];
-    retainedBiomass[speciesIndex.indexOf(DummySpecies.A)] = 10.0;
-    retainedBiomass[speciesIndex.indexOf(DummySpecies.B)] = 5.0;
-    retainedBiomass[speciesIndex.indexOf(DummySpecies.C)] = 3.0;
-    final Bucket retained = Bucket.of(retainedBiomass, speciesIndex);
+  private final Bucket catches = Bucket.of(
+    new double[] { 10, 5, 3 },
+    SpeciesIndex.of(DummySpecies.A, DummySpecies.B, DummySpecies.C)
+  );
 
-    final SelectedSpeciesRetention retention = new SelectedSpeciesRetention(
+  @Test
+  void keepsSelectedSpeciesOnly() {
+    final Bucket keptCatch = new SelectedSpeciesRetention(
       List.of(DummySpecies.A, DummySpecies.C)
-    );
+    ).keep(catches, 0);
 
-    final Disposition result = retention.partition(
-      new Disposition(retained, Bucket.empty(), Bucket.empty()),
-      0.0
-    );
-
-    assertThat(result.getRetained().getKg(DummySpecies.A)).isEqualTo(10.0);
-    assertThat(result.getRetained().getKg(DummySpecies.B)).isEqualTo(0.0);
-    assertThat(result.getRetained().getKg(DummySpecies.C)).isEqualTo(3.0);
-    assertThat(result.getDiscardedAlive().getKg(DummySpecies.A)).isEqualTo(0.0);
-    assertThat(result.getDiscardedAlive().getKg(DummySpecies.B)).isEqualTo(5.0);
-    assertThat(result.getDiscardedAlive().getKg(DummySpecies.C)).isEqualTo(0.0);
-    assertThat(result.getDiscardedDead().isEmpty()).isTrue();
+    assertThat(keptCatch.getKg(DummySpecies.A)).isEqualTo(10);
+    assertThat(keptCatch.getKg(DummySpecies.B)).isZero();
+    assertThat(keptCatch.getKg(DummySpecies.C)).isEqualTo(3);
   }
 
   @Test
-  void partition_preservesExistingDiscardedAlive() {
-    final SpeciesIndex speciesIndex = SpeciesIndex.of(
-      DummySpecies.A,
-      DummySpecies.B
-    );
-    final double[] retainedBiomass = new double[speciesIndex.size()];
-    retainedBiomass[speciesIndex.indexOf(DummySpecies.A)] = 10.0;
-    retainedBiomass[speciesIndex.indexOf(DummySpecies.B)] = 5.0;
-    final Bucket retained = Bucket.of(retainedBiomass, speciesIndex);
-
-    final double[] discardedAliveBiomass = new double[speciesIndex.size()];
-    discardedAliveBiomass[speciesIndex.indexOf(DummySpecies.A)] = 2.0;
-    final Bucket discardedAlive = Bucket.of(
-      discardedAliveBiomass,
-      speciesIndex
-    );
-
-    final SelectedSpeciesRetention retention = new SelectedSpeciesRetention(
-      List.of(DummySpecies.A)
-    );
-
-    final Disposition result = retention.partition(
-      new Disposition(retained, discardedAlive, Bucket.empty()),
-      0.0
-    );
-
-    assertThat(result.getRetained().getKg(DummySpecies.A)).isEqualTo(10.0);
-    assertThat(result.getRetained().getKg(DummySpecies.B)).isEqualTo(0.0);
-    assertThat(result.getDiscardedAlive().getKg(DummySpecies.A)).isEqualTo(2.0);
-    assertThat(result.getDiscardedAlive().getKg(DummySpecies.B)).isEqualTo(5.0);
+  void noSelectedSpeciesKeepsNothing() {
+    assertThat(
+      new SelectedSpeciesRetention(List.of()).keep(catches, 0).isEmpty()
+    ).isTrue();
   }
 
   @Test
-  void partition_noSelectedSpeciesDiscardsAll() {
-    final SpeciesIndex speciesIndex = SpeciesIndex.of(
-      DummySpecies.A,
-      DummySpecies.B
-    );
-    final double[] retainedBiomass = new double[speciesIndex.size()];
-    retainedBiomass[speciesIndex.indexOf(DummySpecies.A)] = 10.0;
-    retainedBiomass[speciesIndex.indexOf(DummySpecies.B)] = 5.0;
-    final Bucket retained = Bucket.of(retainedBiomass, speciesIndex);
-
-    final SelectedSpeciesRetention retention = new SelectedSpeciesRetention(
-      List.of()
-    );
-
-    final Disposition result = retention.partition(
-      new Disposition(retained, Bucket.empty(), Bucket.empty()),
-      0.0
-    );
-
-    assertThat(result.getRetained().isEmpty()).isTrue();
-    assertThat(result.getDiscardedAlive().getKg(DummySpecies.A)).isEqualTo(
-      10.0
-    );
-    assertThat(result.getDiscardedAlive().getKg(DummySpecies.B)).isEqualTo(5.0);
-  }
-
-  @Test
-  void partition_selectsAllSpeciesRetainsAll() {
-    final SpeciesIndex speciesIndex = SpeciesIndex.of(
-      DummySpecies.A,
-      DummySpecies.B
-    );
-    final double[] retainedBiomass = new double[speciesIndex.size()];
-    retainedBiomass[speciesIndex.indexOf(DummySpecies.A)] = 10.0;
-    retainedBiomass[speciesIndex.indexOf(DummySpecies.B)] = 5.0;
-    final Bucket retained = Bucket.of(retainedBiomass, speciesIndex);
-
-    final SelectedSpeciesRetention retention = new SelectedSpeciesRetention(
-      List.of(DummySpecies.A, DummySpecies.B)
-    );
-
-    final Disposition result = retention.partition(
-      new Disposition(retained, Bucket.empty(), Bucket.empty()),
-      0.0
-    );
-
-    assertThat(result.getRetained().getKg(DummySpecies.A)).isEqualTo(10.0);
-    assertThat(result.getRetained().getKg(DummySpecies.B)).isEqualTo(5.0);
-    assertThat(result.getDiscardedAlive().isEmpty()).isTrue();
+  void selectingAllSpeciesKeepsEverything() {
+    assertThat(
+      new SelectedSpeciesRetention(
+        List.of(DummySpecies.A, DummySpecies.B, DummySpecies.C)
+      ).keep(catches, 0)
+    ).isEqualTo(catches);
   }
 }

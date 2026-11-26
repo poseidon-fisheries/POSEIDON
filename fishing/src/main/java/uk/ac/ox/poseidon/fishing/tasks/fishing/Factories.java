@@ -25,7 +25,8 @@ package uk.ac.ox.poseidon.fishing.tasks.fishing;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
-import uk.ac.ox.poseidon.fishing.catches.disposition.DispositionProcess;
+import uk.ac.ox.poseidon.fishing.catches.disposition.CatchSorting;
+import uk.ac.ox.poseidon.fishing.catches.disposition.DiscardMortality;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
@@ -86,12 +87,14 @@ public final class Factories {
   }
 
   /**
-   * @param gear               the gear to fish with
-   * @param hold               the hold the catch goes in
-   * @param fuelTank           the tank the fuel fishing burns is taken from
-   * @param fisheable          the fisheable to fish from, read for the vessel
-   * @param dispositionProcess sorts the catch into retained/discarded
-   * @return a {@link uk.ac.ox.poseidon.fishing.tasks.TaskFactory} for a {@link Fishing} task
+   * @param gear             the gear to fish with
+   * @param hold             the hold the catch goes in
+   * @param fuelTank         the tank the fuel fishing burns is taken from
+   * @param fisheable        the fisheable to fish from, read for the vessel
+   * @param catchSorting     sorts the catch into kept catch and discards
+   * @param discardMortality determines which discards die
+   * @return a {@link uk.ac.ox.poseidon.fishing.tasks.TaskFactory} for a
+   *         {@link Fishing} task
    * @see Fishing
    */
   public static FishingFactory fishing(
@@ -105,15 +108,20 @@ public final class Factories {
     > fisheable,
     final Factory<
       ? super VesselComponentScope,
-      ? extends DispositionProcess
-    > dispositionProcess
+      ? extends CatchSorting
+    > catchSorting,
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends DiscardMortality
+    > discardMortality
   ) {
     return new FishingFactory(
       gear,
       hold,
       fuelTank,
       fisheable,
-      dispositionProcess
+      catchSorting,
+      discardMortality
     );
   }
 }

@@ -43,19 +43,11 @@ class IndexedDiscardMortalityTest {
       new double[] { 0.1, 0.0 },
       index
     );
-    final Disposition disposition = new Disposition(
-      Bucket.empty(),
-      discardedAlive,
-      Bucket.empty()
-    );
-
     final IndexedDiscardMortality process = new IndexedDiscardMortality(rates);
-    final Disposition updated = process.partition(disposition, 0.0);
+    final Bucket deaths = process.deaths(discardedAlive, null);
 
-    assertThat(updated.getDiscardedAlive().getKg(a)).isEqualTo(9.0);
-    assertThat(updated.getDiscardedAlive().getKg(b)).isEqualTo(20.0);
-    assertThat(updated.getDiscardedDead().getKg(a)).isEqualTo(1.0);
-    assertThat(updated.getDiscardedDead().getKg(b)).isEqualTo(0.0);
+    assertThat(deaths.getKg(a)).isEqualTo(1.0);
+    assertThat(deaths.getKg(b)).isZero();
   }
 
   @Test

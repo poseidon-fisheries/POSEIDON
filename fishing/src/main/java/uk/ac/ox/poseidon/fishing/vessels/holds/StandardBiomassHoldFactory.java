@@ -56,10 +56,6 @@ public class StandardBiomassHoldFactory
   > capacity;
   private final Factory<
     ? super VesselComponentScope,
-    ? extends Quantity<Mass>
-  > tolerance;
-  private final Factory<
-    ? super VesselComponentScope,
     ? extends CatchCategoriser
   > catchCategoriser;
 
@@ -67,8 +63,7 @@ public class StandardBiomassHoldFactory
   protected StandardBiomassHold newInstance(final VesselComponentScope scope) {
     final StandardBiomassHold hold = new StandardBiomassHold(
       catchCategoriser.get(scope),
-      capacity.get(scope).to(KILOGRAM).getValue().doubleValue(),
-      tolerance.get(scope).to(KILOGRAM).getValue().doubleValue()
+      capacity.get(scope).to(KILOGRAM).getValue().doubleValue()
     );
     BiomassHold.refuseToEndWithCatch(scope, hold);
     return hold;

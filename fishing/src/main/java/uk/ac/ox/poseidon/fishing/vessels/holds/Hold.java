@@ -53,7 +53,8 @@ public interface Hold {
   /**
    * The relative margin of the requested biomass threshold within which a hold
    * counts as filled to a proportion: a set fitted to the free capacity by
-   * scaling each species separately can add up to a few ulps short of it.
+   * scaling each species separately can add up to a few ulps either side of it.
+   * The same margin allows those rounding errors when adding content.
    */
   double FULLNESS_TOLERANCE = 1e-9;
 
@@ -61,8 +62,8 @@ public interface Hold {
    * @param proportion the proportion of the capacity, in (0, 1]
    * @return {@code true} if the content has reached {@code proportion} of
    *         {@link #getTotalCapacityInKg()}, within {@link #FULLNESS_TOLERANCE}
-   *         of that biomass threshold; content over the capacity has reached any
-   *         proportion, and a hold of infinite capacity none
+   *         of that biomass threshold; content over capacity has reached
+   *         any proportion, and a hold of infinite capacity none
    * @throws IllegalArgumentException if {@code proportion} is not in (0, 1]
    */
   default boolean isFilledTo(final double proportion) {
@@ -103,8 +104,8 @@ public interface Hold {
 
   /**
    * @return {@link #getTotalCapacityInKg()} minus the current content's total
-   *         biomass, or zero if the content is over the capacity: content
-   *         over it stays, but nothing more fits
+   *         biomass, clamped to zero when rounding puts content just over
+   *         capacity
    */
   default double getAvailableCapacityInKg() {
     return Math.max(
