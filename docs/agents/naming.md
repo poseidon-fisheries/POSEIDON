@@ -51,6 +51,9 @@ parameters, pattern variables and test helpers. A naming audit is complete only
 when every identifier in that inventory has been checked. Skip manual checks
 only for the exact cases tooling enforces, rather than the wider rule.
 
+Rename an identifier with the LSP rename tool, or by searching its whole file,
+so every use moves with it.
+
 For each naming violation found while writing or reviewing code, check whether
 Checkstyle catches it. If a missed case is a reusable naming failure likely to
 recur, search its identifier uses in POSEIDON and SURIMI-POSEIDON and assess
