@@ -30,6 +30,12 @@ Judge related names together and preserve their balance when renaming one.
 Checkstyle catches known cases in `config/checkstyle/checkstyle.xml`; the prose
 rule applies to every name, including those outside that list.
 
+## Name the quantity, not the mechanism
+
+Name a parameter, field or variable for the quantity it holds, not for the
+mechanism that uses it. Add words only where the referent is unclear without
+them.
+
 ## Units
 
 A quantity held as a bare number names its unit (`freeCapacityInKg`,
