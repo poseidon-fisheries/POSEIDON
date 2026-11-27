@@ -287,6 +287,17 @@ component is built, or corrected later in the object's life
 it), would otherwise be cached too early, and the bug surfaces far from where
 the value was captured. Failing loudly and early is no reason to resolve early.
 
+## Reading input tables
+
+A scenario reads a CSV input with the `io` module's table helpers
+(`uk.ac.ox.poseidon.io.tables.Factories`): `tableFromCsvFile` loads it;
+`mapFromTable` turns it into a map, and `tableLookup` looks a key up in it, each
+built from a key reader (`multiStringKeyFromRow`) and a value reader
+(`doubleFromRow`, or `moneyFromRow` in `fishing.money`). A value read per vessel
+is a `tableLookup` keyed by a mapping of the vessel, such as one of its
+attributes. Look here before writing a new reader: a value that needs one is a
+new `…FromRow` helper beside these.
+
 ## Model time precision
 
 Model date-times, times of day and durations have whole-second precision.
