@@ -1,32 +1,22 @@
 # AGENTS.md
 
-This file provides guidance to coding agents (Claude Code and others) when
-working with code in this repository. Longer topic-specific sections live in
-`docs/agents/` — read the relevant one before touching code it covers:
+Longer topic-specific guidance lives in `docs/agents/`. Read the relevant doc
+before the work it covers:
 
+- `docs/agents/modules.md` — before adding a class to a module or a dependency
+  between modules.
 - `docs/agents/architecture.md` — before writing or changing a factory, a
-  `Factories` helper or scenario code, or working with model time values: the
-  Factory + Scenario pattern, whole-second time precision, `*Factory` class
-  shape, live parameters, data shared across simulations, determinism.
+  `Factories` helper or scenario code, or working with model time values.
 - `docs/agents/runtime-model.md` — before changing `core` or `fishing`
-  internals: product stores, levels and scopes, vessel components, vessel
-  creation and statements, registration, services, scheduling.
-- `docs/agents/javadoc.md` — before writing or editing Javadoc: layout, and the
-  component/`Factory`/`Factories` triplet.
+  internals.
+- `docs/agents/javadoc.md` — before writing or editing Javadoc.
 - `docs/agents/lombok.md` — before writing a class or changing its Lombok
-  annotations: which annotation shape fits each class role.
-- `docs/agents/code-style.md` — before writing or reviewing Java: readability,
-  Checkstyle's checks, scenario classes, `Factories` helper names, streams
-  versus loops, single exit, hot paths, and the Prettier/Spotless setup
-  SURIMI-POSEIDON duplicates.
-- `docs/agents/testing.md` — before writing or editing a test: AssertJ, test
-  layout, and mocks that scopes hold weakly.
-- `docs/agents/naming.md` — before naming or reviewing any identifier:
-  factories, steppables, tasks, predicates, cells, fields and function-valued
-  fields, and what reads as English.
+  annotations.
+- `docs/agents/code-style.md` — before writing or reviewing Java.
+- `docs/agents/testing.md` — before writing or editing a test.
+- `docs/agents/naming.md` — before naming or reviewing any identifier.
 - `docs/agents/conceptual-correctness.md` — before fixing a design problem or
-  giving missing state a default: don't collapse distinct concepts for a smaller
-  diff; absence is not a default.
+  giving missing state a default.
 
 ## What this is
 
@@ -71,59 +61,6 @@ Notes:
   `./gradlew compileJava` is authoritative.
 - SpotBugs exclusions live in `spotbugs_exclude.xml` at the repo root; consult
   it before assuming a finding is a false positive.
-- To run one of the example scenarios directly: `./gradlew :examples:run` (see
-  `examples/build.gradle.kts` for the `writePeterSnapperScenario` task that
-  writes a scenario YAML from Java code).
-
-## Module structure & dependency graph
-
-Modules are Gradle subprojects under the root; dependencies flow one way (no
-cycles):
-
-```
-core  →  calibration
-core  →  io  →  geography  →  biology  →  fishing  →  gui
-                geography  →  regulations  →  fishing
-                                              fishing  →  examples
-                            calibration, io, gui, regulations, biology  →  examples
-```
-
-- **core** — Foundational abstractions used by everything else: `Simulation`
-  (extends MASON's `SimState`), `Scenario` (declarative, serializable simulation
-  configuration), the `Factory<Scope, P>` pattern, `Scope`/`SimulationScope`
-  (dependency-scoping for factories), `TemporalSchedule`. MASON is an upstream
-  commit built by JitPack, pinned in `gradle/libs.versions.toml`.
-- **io** — YAML scenario (de)serialization (`ScenarioLoader`, `ScenarioWriter`,
-  backed by SnakeYAML) and tabular data I/O (Tablesaw).
-- **geography** — Spatial primitives and grids: coordinates, envelopes,
-  bathymetry, ports, spatial allocators — built on JTS and GeoTools.
-- **biology** — Biological/ecological model: species, biomass, "fisheable"
-  content on the grid.
-- **regulations** — Fishing regulation rules: `Regulations`,
-  `ForbiddenIf`/`PermittedIf`, spatial/temporal actions/predicates.
-- **fishing** — The vessels, the model's agents, and what they do and deal with:
-  trips, tasks, choices, catches, fuel, markets/money, regulation enforcement on
-  vessels.
-- **calibration** — Parameter calibration using Jenetics (genetic algorithms);
-  `CalibrationProblem`, `CalibrationRunner`.
-- **gui** — Swing-based visualization (FlatLaf look-and-feel, Batik for SVG)
-  built on MASON's UI facilities (`ScenarioWithUI`, portrayals, palettes).
-- **examples** — Runnable example scenarios (e.g. `petersnapper`) that wire the
-  other modules together into an application; also contains
-  scenario-writing/calibration entry points with `main` methods.
-
-## Code style
-
-Mark everything that can be `final` as `final` — local variables,
-method/constructor parameters, and caught exceptions (e.g.
-`catch (final IOException e)`, `try (final SomeResource r = ...)`). The only
-common exception is a traditional counting `for` loop's own loop variable
-(`for (int i = 0; ...; i++)`), which must stay mutable by definition.
-
-Formatting is Prettier's, applied by `./gradlew spotlessApply`; wrap comments by
-hand within 80 columns. A method or lambda has at most one `return`, as its last
-statement. Scenario classes (such as `PeterSnapperScenario`) stay readable for
-people new to Java, as `docs/agents/code-style.md` details.
 
 ## Merging
 

@@ -1,8 +1,12 @@
 # Code style
 
-The short rules (`final` everywhere, Prettier, one `return` per method) are in
-`AGENTS.md`. This document holds their detail and the rules that only some code
-reaches.
+## `final`
+
+Mark everything that can be `final` as `final`: local variables,
+method/constructor parameters, and caught exceptions
+(`catch (final IOException e)`, `try (final SomeResource r = ...)`). The one
+common exception is a counting `for` loop's own variable
+(`for (int i = 0; ...; i++)`).
 
 ## Formatting
 
