@@ -28,19 +28,9 @@ of the original POSEIDON model.
 
 ## Build & test commands
 
-```
-./gradlew build                     # build all modules, run all tests + spotbugs + checkstyle
-./gradlew test                      # run all unit tests
-./gradlew :core:test                # run tests for a single module (core, io, geography, biology, fishing, regulations, calibration, gui, examples)
-./gradlew :core:test --tests "uk.ac.ox.poseidon.core.ScenarioTest"          # run a single test class
-./gradlew :core:test --tests "uk.ac.ox.poseidon.core.ScenarioTest.methodName"  # run a single test method
-./gradlew jacocoTestReport          # generate coverage reports (build/reports/jacoco/test/…) per module
-./gradlew spotbugsMain              # run SpotBugs static analysis on a module (Werror is on for javac too)
-./gradlew spotlessApply             # format Java and Markdown with Prettier, remove unused imports, add missing license headers
-./gradlew checkstyleMain            # run Checkstyle on main sources (checkstyleTest for tests)
-```
-
-Notes:
+`./gradlew build` runs all tests, SpotBugs, Checkstyle and `spotlessCheck`. Test
+one module with `./gradlew :core:test`, one class or method with
+`--tests "uk.ac.ox.poseidon.core.ScenarioTest"`.
 
 - Shared build configuration (dependencies, toolchain, compiler flags, test and
   analysis wiring) lives in the convention plugins in
