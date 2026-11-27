@@ -2,7 +2,7 @@
 
 Names are one of the strongest signals of whether a design is good: a name that
 is hard to find, or that fits two things, usually means the parts are cut
-wrongly. Settle a name when it comes up.
+wrongly.
 
 ## Read as English
 
